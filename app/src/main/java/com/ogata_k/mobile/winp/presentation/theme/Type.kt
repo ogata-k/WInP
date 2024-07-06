@@ -1,4 +1,4 @@
-package com.ogata_k.mobile.winp.ui.theme
+package com.ogata_k.mobile.winp.presentation.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

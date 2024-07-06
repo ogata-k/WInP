@@ -1,4 +1,4 @@
-package com.ogata_k.mobile.winp
+package com.ogata_k.mobile.winp.presentation.activity
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -11,7 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.ogata_k.mobile.winp.ui.theme.WInPTheme
+import com.ogata_k.mobile.winp.presentation.theme.WInPTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
