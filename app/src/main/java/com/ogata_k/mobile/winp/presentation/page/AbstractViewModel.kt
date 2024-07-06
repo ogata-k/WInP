@@ -1,4 +1,4 @@
-package com.ogata_k.mobile.winp.presentation.viewmodel
+package com.ogata_k.mobile.winp.presentation.page
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
