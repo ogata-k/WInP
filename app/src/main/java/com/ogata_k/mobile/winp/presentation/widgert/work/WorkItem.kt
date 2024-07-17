@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import com.ogata_k.mobile.winp.R
 import com.ogata_k.mobile.winp.presentation.model.wip.Work
 import com.ogata_k.mobile.winp.presentation.theme.WInPTheme
+import com.ogata_k.mobile.winp.presentation.widgert.common.BodyMediumText
 import com.ogata_k.mobile.winp.presentation.widgert.common.BodySmallText
 import com.ogata_k.mobile.winp.presentation.widgert.common.TitleLargeText
 import java.time.LocalDateTime
@@ -50,10 +51,7 @@ fun WorkItem(work: Work, onClick: () -> Unit, modifier: Modifier = Modifier) {
             modifier = Modifier
                 .wrapContentHeight()
                 .fillMaxWidth()
-                .padding(
-                    vertical = dimensionResource(id = R.dimen.padding_middle),
-                    horizontal = dimensionResource(id = R.dimen.padding_large),
-                ),
+                .padding(dimensionResource(id = R.dimen.padding_large)),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(
@@ -85,8 +83,17 @@ fun WorkItem(work: Work, onClick: () -> Unit, modifier: Modifier = Modifier) {
                     work.title,
                     fontWeight = FontWeight.Bold,
                 )
+                BodyMediumText(
+                    work.description,
+                    modifier = Modifier.padding(
+                        top = dimensionResource(id = R.dimen.padding_medium),
+                    ),
+                )
             }
             Icon(
+                modifier = Modifier.padding(
+                    start = dimensionResource(id = R.dimen.padding_medium),
+                ),
                 imageVector = Icons.Filled.ChevronRight,
                 contentDescription = stringResource(id = R.string.navigate_to_detail)
             )
@@ -104,7 +111,7 @@ private fun WorkItemNoDeadlinePreview() {
         beganAt = LocalDateTime.now(),
         deadline = null,
         completedAt = null,
-        cratedAt = LocalDateTime.now(),
+        createdAt = LocalDateTime.now(),
         updatedAt = LocalDateTime.now(),
     )
 
@@ -118,12 +125,12 @@ private fun WorkItemNoDeadlinePreview() {
 private fun WorkItemNoPeriodPreview() {
     val work = Work(
         id = 1,
-        title = "サンプルタスクプル",
+        title = "サンプルタスク",
         description = "これはサンプル。完了もしていないし期限もなし。",
         beganAt = null,
         deadline = null,
         completedAt = null,
-        cratedAt = LocalDateTime.now(),
+        createdAt = LocalDateTime.now(),
         updatedAt = LocalDateTime.now(),
     )
 
@@ -142,7 +149,7 @@ private fun NotCompletedNotExpiredWorkItemPreview() {
         beganAt = LocalDateTime.now(),
         deadline = LocalDateTime.now().plusDays(1),
         completedAt = null,
-        cratedAt = LocalDateTime.now(),
+        createdAt = LocalDateTime.now(),
         updatedAt = LocalDateTime.now(),
     )
 
@@ -161,7 +168,7 @@ private fun NotCompletedExpiredWorkItemPreview() {
         beganAt = LocalDateTime.now().minusDays(2),
         deadline = LocalDateTime.now().minusDays(1),
         completedAt = null,
-        cratedAt = LocalDateTime.now(),
+        createdAt = LocalDateTime.now(),
         updatedAt = LocalDateTime.now(),
     )
 
@@ -180,7 +187,7 @@ private fun CompletedWorkItemPreview() {
         beganAt = LocalDateTime.now().minusDays(1),
         deadline = LocalDateTime.now().minusDays(1),
         completedAt = LocalDateTime.now(),
-        cratedAt = LocalDateTime.now(),
+        createdAt = LocalDateTime.now(),
         updatedAt = LocalDateTime.now(),
     )
 

@@ -13,7 +13,7 @@ data class Work(
     val beganAt: LocalDateTime?,
     val deadline: LocalDateTime?,
     val completedAt: LocalDateTime?,
-    val cratedAt: LocalDateTime,
+    val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
 ) {
     val hasPeriod: Boolean = beganAt !== null || deadline !== null

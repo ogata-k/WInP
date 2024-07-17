@@ -63,6 +63,8 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.material.icon.extended)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.paging.runtime)
+    implementation(libs.androidx.paging.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.runtime.compose.android)
     implementation(libs.lifecycle.viewmodel.ktx)
@@ -73,6 +75,7 @@ dependencies {
     // For Local tests
     testImplementation(libs.junit)
     testImplementation(libs.hilt.android.testing)
+    testImplementation(libs.androidx.paging.common)
     kspTest(libs.hilt.compiler)
 
     // For instrumentation tests

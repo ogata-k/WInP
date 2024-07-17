@@ -12,12 +12,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.ogata_k.mobile.winp.presentation.page.work.index.WorkIndexScreen
+import com.ogata_k.mobile.winp.presentation.page.work.index.WorkIndexVM
 import com.ogata_k.mobile.winp.presentation.theme.WInPTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -38,7 +41,12 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun SetupRouting(navController: NavHostController) {
-    NavHost(navController = navController, startDestination = "screen1") {
+    NavHost(navController = navController, startDestination = "home") {
+        composable(route = "home") { _ ->
+            val vm: WorkIndexVM = hiltViewModel()
+            WorkIndexScreen(navController = navController, viewModel = vm)
+        }
+        // @todo ここから下は削除して正しい実装に置き換える
         composable(
             route = "screen1"
         ) { _ ->
