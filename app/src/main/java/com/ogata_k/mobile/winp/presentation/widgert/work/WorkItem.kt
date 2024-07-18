@@ -33,7 +33,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun WorkItem(work: Work, onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun WorkItem(work: Work, modifier: Modifier = Modifier, onClick: () -> Unit) {
     Card(
         onClick = onClick,
         modifier = modifier,
@@ -116,7 +116,7 @@ private fun WorkItemNoDeadlinePreview() {
     )
 
     WInPTheme {
-        WorkItem(work, {})
+        WorkItem(work) {}
     }
 }
 
@@ -135,7 +135,7 @@ private fun WorkItemNoPeriodPreview() {
     )
 
     WInPTheme {
-        WorkItem(work, {})
+        WorkItem(work) {}
     }
 }
 
@@ -154,7 +154,7 @@ private fun NotCompletedNotExpiredWorkItemPreview() {
     )
 
     WInPTheme {
-        WorkItem(work, {})
+        WorkItem(work) {}
     }
 }
 
@@ -173,7 +173,7 @@ private fun NotCompletedExpiredWorkItemPreview() {
     )
 
     WInPTheme {
-        WorkItem(work, {})
+        WorkItem(work) {}
     }
 }
 
@@ -192,6 +192,6 @@ private fun CompletedWorkItemPreview() {
     )
 
     WInPTheme {
-        WorkItem(work, {})
+        WorkItem(work) {}
     }
 }

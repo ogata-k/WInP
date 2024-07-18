@@ -1,9 +1,9 @@
 package com.ogata_k.mobile.winp.presentation.page.work.index
 
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -23,15 +23,13 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
 
 
     PagingLoadColumn(
+        contentPadding = PaddingValues(
+            vertical = dimensionResource(id = R.dimen.padding_medium),
+            horizontal = dimensionResource(id = R.dimen.padding_medium_large),
+        ),
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium_large)),
         pagingItems = workPagingItems,
     ) { work ->
-        WorkItem(
-            work = work,
-            modifier = Modifier.padding(
-                vertical = dimensionResource(id = R.dimen.padding_medium),
-                horizontal = dimensionResource(id = R.dimen.padding_medium_large),
-            ),
-            onClick = { /*TODO*/ },
-        )
+        WorkItem(work) { /*TODO*/ }
     }
 }
