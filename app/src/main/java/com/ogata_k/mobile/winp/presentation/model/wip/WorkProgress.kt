@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 /**
  * タスクの対応状況
  */
-data class ProgressDescription(
+data class WorkProgress(
     val id: Int,
     val description: String,
     val createdAt: LocalDateTime,
