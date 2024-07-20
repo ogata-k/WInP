@@ -32,8 +32,28 @@ fun WithScaffoldCenteredSmallTopAppBar(
         containerColor = MaterialTheme.colorScheme.primaryContainer,
         titleContentColor = MaterialTheme.colorScheme.primary,
     ),
+    // 上部に固定でスケールが変化したりしないので固定したいときに色変化させないように指定する想定
+    canChangeColor: Boolean = true,
     scaffoldBuilder: @Composable (scaffoldModifier: Modifier, topAppBar: @Composable () -> Unit) -> Unit,
 ) {
+    if (!canChangeColor) {
+        scaffoldBuilder(Modifier) {
+            CenterAlignedTopAppBar(
+                modifier = modifier,
+                colors = colors.copy(
+                    scrolledContainerColor = colors.containerColor,
+                ),
+                title = {
+                    HeadlineMediumText(text = text)
+                },
+                navigationIcon = navigationIcon,
+                actions = actions,
+                windowInsets = windowInsets,
+            )
+        }
+        return
+    }
+
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
     scaffoldBuilder(Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)) {
@@ -66,8 +86,28 @@ fun WithScaffoldSmallTopAppBar(
         containerColor = MaterialTheme.colorScheme.primaryContainer,
         titleContentColor = MaterialTheme.colorScheme.primary,
     ),
+    // 上部に固定でスケールが変化したりしないので固定したいときに色変化させないように指定する想定
+    canChangeColor: Boolean = true,
     scaffoldBuilder: @Composable (scaffoldModifier: Modifier, topAppBar: @Composable () -> Unit) -> Unit,
 ) {
+    if (!canChangeColor) {
+        scaffoldBuilder(Modifier) {
+            TopAppBar(
+                modifier = modifier,
+                colors = colors.copy(
+                    scrolledContainerColor = colors.containerColor,
+                ),
+                title = {
+                    HeadlineMediumText(text = text)
+                },
+                navigationIcon = navigationIcon,
+                actions = actions,
+                windowInsets = windowInsets,
+            )
+        }
+        return
+    }
+
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
     scaffoldBuilder(Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)) {

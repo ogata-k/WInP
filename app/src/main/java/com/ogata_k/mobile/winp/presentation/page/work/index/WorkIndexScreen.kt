@@ -1,10 +1,14 @@
 package com.ogata_k.mobile.winp.presentation.page.work.index
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -20,7 +24,7 @@ import com.ogata_k.mobile.winp.presentation.widgert.common.PagingLoadColumn
 import com.ogata_k.mobile.winp.presentation.widgert.common.WithScaffoldSmallTopAppBar
 import com.ogata_k.mobile.winp.presentation.widgert.work.WorkItem
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
     val uiState: WorkIndexUiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -31,22 +35,38 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
     // TODO PagingSourceをDBを使う形式に変更
     // TODO 表示する日時を変更することでリストを更新する機能
 
-    WithScaffoldSmallTopAppBar(text = stringResource(id = R.string.app_name)) { modifier, appBar ->
+    WithScaffoldSmallTopAppBar(
+        text = stringResource(id = R.string.app_name),
+        canChangeColor = false,
+    ) { modifier, appBar ->
         Scaffold(
             modifier = modifier,
-            topBar = { appBar() },
+            topBar = appBar,
         ) { padding ->
             PagingLoadColumn(
                 modifier = Modifier.padding(padding),
-                contentPadding = PaddingValues(
-                    vertical = dimensionResource(id = R.dimen.padding_medium),
-                    horizontal = dimensionResource(id = R.dimen.padding_medium_large),
-                ),
-                verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium_large)),
                 pagingItems = workPagingItems,
+                headerBuilder = { refreshLoadState, isLoadedItemEmpty ->
+                    stickyHeader {
+                        Row(
+                            modifier = Modifier
+                                .background(MaterialTheme.colorScheme.background)
+                                .fillMaxWidth()
+                                .padding(dimensionResource(id = R.dimen.padding_large)),
+                        ) {
+                            // TODO ここで検索条件などを指定指定する。スクロールしたら消したい場合はこの上でitemなどで指定する
+                            Text("hoge")
+                        }
+                    }
+                }
             ) { work ->
-                WorkItem(work) {
-                    // TODO
+                WorkItem(
+                    work, modifier = Modifier.padding(
+                        vertical = dimensionResource(id = R.dimen.padding_medium),
+                        horizontal = dimensionResource(id = R.dimen.padding_medium_large),
+                    )
+                ) {
+                    // TODO onClick
                 }
             }
         }

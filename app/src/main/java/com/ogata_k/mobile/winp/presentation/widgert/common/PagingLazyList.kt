@@ -49,6 +49,8 @@ fun <Item : Any> PagingLoadColumn(
     errorItemBuilder: @Composable (errorState: LoadState.Error) -> Unit = {
         DefaultErrorColumnItemBuilder(state = it)
     },
+    headerBuilder: LazyListScope.(refreshLoadState: LoadState, isLoadedItemEmpty: Boolean) -> Unit = { _, _ -> },
+    footerBuilder: LazyListScope.(refreshLoadState: LoadState, isLoadedItemEmpty: Boolean) -> Unit = { _, _ -> },
     itemBuilder: @Composable (item: Item) -> Unit,
 ) {
     // @todo 必要ならPullToRefreshを実装
@@ -71,6 +73,8 @@ fun <Item : Any> PagingLoadColumn(
                 loaderBuilder = loaderBuilder,
                 placeHolderBuilder = placeHolderBuilder,
                 errorItemBuilder = errorItemBuilder,
+                headerBuilder = headerBuilder,
+                footerBuilder = footerBuilder,
                 itemBuilder = itemBuilder,
             )
         }
@@ -105,6 +109,8 @@ private fun <Item : Any> LazyListScope.buildPagingListItems(
     errorItemBuilder: @Composable (errorState: LoadState.Error) -> Unit = {
         DefaultErrorColumnItemBuilder(state = it)
     },
+    headerBuilder: LazyListScope.(refreshLoadState: LoadState, isLoadedItemEmpty: Boolean) -> Unit = { _, _ -> },
+    footerBuilder: LazyListScope.(refreshLoadState: LoadState, isLoadedItemEmpty: Boolean) -> Unit = { _, _ -> },
     itemBuilder: @Composable (item: Item) -> Unit,
 ) {
     // @todo 必要ならPullToRefreshを実装
@@ -116,19 +122,27 @@ private fun <Item : Any> LazyListScope.buildPagingListItems(
         refreshLoadState is LoadState.Error || prependLoadState is LoadState.Error || appendLoadState is LoadState.Error
 
     if (refreshLoadState is LoadState.Loading) {
+        headerBuilder(refreshLoadState, true)
         item {
             loaderBuilder()
         }
-    }
+        footerBuilder(refreshLoadState, true)
+    } else {
+        headerBuilder(refreshLoadState, pagingItems.itemSnapshotList.isEmpty())
 
-    if (prependLoadState is LoadState.Loading && refreshLoadState is LoadState.NotLoading) {
-        // 前データを読み込み中
-        item {
-            loaderBuilder()
+        if (prependLoadState is LoadState.Loading && refreshLoadState is LoadState.NotLoading) {
+            // 前データを読み込み中
+            item {
+                loaderBuilder()
+            }
         }
-    }
 
-    if (refreshLoadState is LoadState.NotLoading) {
+        if (hasError && prependLoadState is LoadState.Error) {
+            item {
+                errorItemBuilder(prependLoadState)
+            }
+        }
+
         if (pagingItems.itemSnapshotList.isEmpty()) {
             if (!hasError) {
                 item {
@@ -149,21 +163,22 @@ private fun <Item : Any> LazyListScope.buildPagingListItems(
                 }
             }
         }
-    }
 
-    if (hasError) {
-        item {
-            val error: LoadState.Error =
-                if (refreshLoadState is LoadState.Error) refreshLoadState else if (prependLoadState is LoadState.Error) prependLoadState else appendLoadState as LoadState.Error
-            errorItemBuilder(error)
+        if (hasError && (refreshLoadState is LoadState.Error || appendLoadState is LoadState.Error)) {
+            item {
+                val error: LoadState.Error =
+                    if (refreshLoadState is LoadState.Error) refreshLoadState else appendLoadState as LoadState.Error
+                errorItemBuilder(error)
+            }
         }
-    }
 
-    if (appendLoadState is LoadState.Loading && refreshLoadState is LoadState.NotLoading) {
-        // 後データを読み込み中
-        item {
-            loaderBuilder()
+        if (appendLoadState is LoadState.Loading && refreshLoadState is LoadState.NotLoading) {
+            // 後データを読み込み中
+            item {
+                loaderBuilder()
+            }
         }
+        footerBuilder(refreshLoadState, pagingItems.itemSnapshotList.isEmpty())
     }
 }
 
