@@ -102,6 +102,7 @@ fun BoxScope.LazyColumnScrollBar(
                     firstVisibleItemScrollOffset.toFloat() / firstVisibleItemHeight * (scrollbarTopY2 - scrollbarTopY1)
                 }
 
+            // @todo FIXME ヘッダーが入ると描画位置がおかしくなる
             drawRect(
                 color = scrollBarColor,
                 topLeft = Offset(
