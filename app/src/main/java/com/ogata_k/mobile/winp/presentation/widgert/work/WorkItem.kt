@@ -24,13 +24,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ogata_k.mobile.winp.R
+import com.ogata_k.mobile.winp.common.buildFullDateTimePatternFormatter
 import com.ogata_k.mobile.winp.presentation.model.wip.Work
 import com.ogata_k.mobile.winp.presentation.theme.WInPTheme
 import com.ogata_k.mobile.winp.presentation.widgert.common.BodyMediumText
 import com.ogata_k.mobile.winp.presentation.widgert.common.BodySmallText
 import com.ogata_k.mobile.winp.presentation.widgert.common.TitleLargeText
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 @Composable
 fun WorkItem(work: Work, modifier: Modifier = Modifier, onClick: () -> Unit) {
@@ -67,7 +67,7 @@ fun WorkItem(work: Work, modifier: Modifier = Modifier, onClick: () -> Unit) {
                             .size((MaterialTheme.typography.bodySmall.fontSize.value * 1.2).dp)
                     )
                     val formattedPair =
-                        work.splitToFormattedPeriod(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"))
+                        work.splitToFormattedPeriod(buildFullDateTimePatternFormatter())
                     BodySmallText(
                         if (work.hasPeriod)
                             stringResource(

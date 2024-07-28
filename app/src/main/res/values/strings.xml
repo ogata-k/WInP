@@ -3,4 +3,7 @@
     <string name="navigate_to_detail">詳細を開く</string>
     <string name="period_with_range">%s ～ %s</string>
     <string name="none_period">未定</string>
+    <string name="select_date">日にちを入力</string>
+    <string name="ok">OK</string>
+    <string name="cancel">キャンセル</string>
 </resources>

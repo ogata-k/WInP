@@ -5,4 +5,8 @@ import com.ogata_k.mobile.winp.presentation.model.wip.Work
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 
-data class WorkIndexUiState(val searchDate: LocalDate, val workPagingData: Flow<PagingData<Work>>)
+data class WorkIndexUiState(
+    val isInSearchDate: Boolean,
+    val searchDate: LocalDate,
+    val workPagingData: Flow<PagingData<Work>>,
+)

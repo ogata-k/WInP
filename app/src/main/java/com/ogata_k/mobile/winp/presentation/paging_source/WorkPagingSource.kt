@@ -5,6 +5,7 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.ogata_k.mobile.winp.presentation.model.wip.Work
 import kotlinx.coroutines.delay
+import java.time.LocalDate
 import java.time.LocalDateTime
 import kotlin.math.max
 
@@ -13,12 +14,11 @@ import kotlin.math.max
  * prevKey：取得したページの前ページのnextKey
  * nextKey：取得したデータの最後のタスクの作成日時
  */
-class WorkPagingSource : PagingSource<Int, Work>() {
+class WorkPagingSource(searchDate: LocalDate? = null) : PagingSource<Int, Work>() {
+    private var searchDate: LocalDate = searchDate ?: LocalDate.now()
+
     override fun getRefreshKey(state: PagingState<Int, Work>): Int? {
-        return state.anchorPosition?.let {
-            state.closestPageToPosition(it)?.prevKey?.plus(1)
-                ?: state.closestPageToPosition(it)?.nextKey?.minus(1)
-        }
+        return null
     }
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Work> {
@@ -34,19 +34,19 @@ class WorkPagingSource : PagingSource<Int, Work>() {
             val currentPageNumber: Int = max(params.key ?: 1, 1)
 
             val loadedItemCount: Int = (currentPageNumber - 1) * params.loadSize
-            val now = LocalDateTime.now()
+            val searchDate: LocalDateTime = this.searchDate.atStartOfDay()
             val items = List(params.loadSize) {
                 val workId = it + 1
                 val itemIndex = loadedItemCount + it
                 Work(
                     id = workId,
                     title = "タスク$workId at the page $currentPageNumber at the index $itemIndex",
-                    description = "このタスクはテスト用のタスクです。タスクのIDは${workId}です。",
-                    beganAt = now.plusSeconds(it.toLong()),
+                    description = "このタスクは${this.searchDate}におけるタスクです。タスクのIDは${workId}です。",
+                    beganAt = searchDate.plusSeconds(it.toLong()),
                     deadline = null,
                     completedAt = null,
-                    createdAt = now.plusSeconds(it.toLong()),
-                    updatedAt = now.plusSeconds(it.toLong()),
+                    createdAt = searchDate.plusSeconds(it.toLong()),
+                    updatedAt = searchDate.plusSeconds(it.toLong()),
                 )
             }
             val result = LoadResult.Page(

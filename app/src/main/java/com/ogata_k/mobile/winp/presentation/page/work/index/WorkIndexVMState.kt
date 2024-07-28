@@ -6,9 +6,13 @@ import com.ogata_k.mobile.winp.presentation.page.ToUiState
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 
-data class WorkIndexVMState(val searchDate: LocalDate, val workPagingData: Flow<PagingData<Work>>) :
+data class WorkIndexVMState(
+    val isInSearchDate: Boolean,
+    val searchDate: LocalDate,
+    val workPagingData: Flow<PagingData<Work>>,
+) :
     ToUiState<WorkIndexUiState> {
     override fun toUiState(): WorkIndexUiState {
-        return WorkIndexUiState(searchDate, workPagingData)
+        return WorkIndexUiState(isInSearchDate, searchDate, workPagingData)
     }
 }
