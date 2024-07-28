@@ -1,6 +1,5 @@
 package com.ogata_k.mobile.winp.presentation.page.work.index
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -41,7 +40,7 @@ import com.ogata_k.mobile.winp.presentation.widgert.common.fromMillsToDate
 import com.ogata_k.mobile.winp.presentation.widgert.work.WorkItem
 import java.time.LocalDate
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
     val uiState: WorkIndexUiState by viewModel.uiStateFlow.collectAsStateWithLifecycle()
