@@ -21,6 +21,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ogata_k.mobile.winp.R
@@ -88,6 +89,8 @@ fun WorkItem(work: Work, modifier: Modifier = Modifier, onClick: () -> Unit) {
                     modifier = Modifier.padding(
                         top = dimensionResource(id = R.dimen.padding_medium),
                     ),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
             Icon(
