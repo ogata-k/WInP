@@ -9,3 +9,11 @@ fun buildFullDateTimePatternFormatter(): DateTimeFormatter {
 fun buildFullDatePatternFormatter(): DateTimeFormatter {
     return DateTimeFormatter.ofPattern("yyyy/MM/dd")
 }
+
+fun buildFullTimePatternFormatter(): DateTimeFormatter {
+    return DateTimeFormatter.ofPattern("HH:mm:ss")
+}
+
+fun buildHourMinutePatternFormatter(): DateTimeFormatter {
+    return DateTimeFormatter.ofPattern("HH:mm")
+}

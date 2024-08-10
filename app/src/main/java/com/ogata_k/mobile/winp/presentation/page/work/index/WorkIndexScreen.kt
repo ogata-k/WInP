@@ -9,16 +9,22 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
 import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -29,11 +35,13 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.ogata_k.mobile.winp.R
 import com.ogata_k.mobile.winp.common.buildFullDatePatternFormatter
-import com.ogata_k.mobile.winp.presentation.model.wip.Work
+import com.ogata_k.mobile.winp.presentation.model.work.Work
+import com.ogata_k.mobile.winp.presentation.page.work.edit.WorkEditRouting
 import com.ogata_k.mobile.winp.presentation.widgert.common.ButtonText
+import com.ogata_k.mobile.winp.presentation.widgert.common.DefaultErrorColumnItemBuilder
 import com.ogata_k.mobile.winp.presentation.widgert.common.DialogOfDatePicker
 import com.ogata_k.mobile.winp.presentation.widgert.common.PagingLoadColumn
-import com.ogata_k.mobile.winp.presentation.widgert.common.TitleSmallText
+import com.ogata_k.mobile.winp.presentation.widgert.common.TitleMediumText
 import com.ogata_k.mobile.winp.presentation.widgert.common.WithScaffoldSmallTopAppBar
 import com.ogata_k.mobile.winp.presentation.widgert.common.fromDateToMills
 import com.ogata_k.mobile.winp.presentation.widgert.common.fromMillsToDate
@@ -51,15 +59,29 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
     WithScaffoldSmallTopAppBar(
         text = stringResource(id = R.string.app_name),
         canChangeColor = false,
+        actions = {
+            // TODO 作成成功して戻った時にページャー更新具処理を行わせたい
+            IconButton(onClick = { navController.navigate(WorkEditRouting(WorkEditRouting.CREATE_WORK_ID).toPath()) }) {
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = stringResource(R.string.create_task),
+                )
+            }
+        },
     ) { modifier, appBar ->
+        val snackbarHostState = remember { SnackbarHostState() }
+
         Scaffold(
             modifier = modifier,
             topBar = appBar,
+            snackbarHost = {
+                SnackbarHost(hostState = snackbarHostState)
+            },
         ) { padding ->
             Column(
                 modifier = Modifier.padding(padding),
             ) {
-                BuildHeader(
+                WorkIndexHeader(
                     uiState = uiState,
                     switchShowDatePickerForSearch = { toShow ->
                         viewModel.showDatePickerForSearch(toShow)
@@ -73,6 +95,15 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
                 )
                 PagingLoadColumn(
                     pagingItems = workPagingItems,
+                    errorItemBuilder = { state ->
+                        val errorMessage = state.error.message ?: "UNKNOWN ERROR"
+                        LaunchedEffect(errorMessage, snackbarHostState) {
+                            snackbarHostState.showSnackbar(
+                                message = errorMessage
+                            )
+                        }
+                        DefaultErrorColumnItemBuilder(state = state)
+                    },
                 ) { work ->
                     WorkItem(
                         work, modifier = Modifier.padding(
@@ -80,7 +111,9 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
                             horizontal = dimensionResource(id = R.dimen.padding_medium_large),
                         )
                     ) {
-                        // @todo onClick
+                        // TODO 編集成功して戻った時にページャー更新具処理を行わせたい
+                        // 編集画面への遷移
+                        navController.navigate(WorkEditRouting(work.id).toPath())
                     }
                 }
             }
@@ -90,7 +123,7 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun BuildHeader(
+private fun WorkIndexHeader(
     uiState: WorkIndexUiState,
     switchShowDatePickerForSearch: (toShow: Boolean) -> Unit,
     updateAndHideDialogSearchQuery: (date: LocalDate) -> Unit
@@ -113,7 +146,7 @@ private fun BuildHeader(
                 contentDescription = stringResource(id = R.string.select_date)
             )
             Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_medium)))
-            TitleSmallText(text = buildFullDatePatternFormatter().format(uiState.searchDate))
+            TitleMediumText(text = buildFullDatePatternFormatter().format(uiState.searchDate))
         }
         if (uiState.isInSearchDate) {
             val datePickerState = rememberDatePickerState(

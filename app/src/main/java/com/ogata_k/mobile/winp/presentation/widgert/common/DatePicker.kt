@@ -23,12 +23,12 @@ fun DialogOfDatePicker(
     dismissButton: @Composable (() -> Unit)? = null,
 ) {
     DatePickerDialog(
-        modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large)),
+        modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_extra_large)),
         onDismissRequest = onDismissRequest,
         dismissButton = dismissButton,
         confirmButton = confirmButton,
     ) {
-        DatePicker(state, Modifier.weight(1f))
+        DatePicker(state)
     }
 }
 

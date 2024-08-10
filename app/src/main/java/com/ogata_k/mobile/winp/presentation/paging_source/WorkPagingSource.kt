@@ -3,7 +3,7 @@ package com.ogata_k.mobile.winp.presentation.paging_source
 import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.ogata_k.mobile.winp.presentation.model.wip.Work
+import com.ogata_k.mobile.winp.presentation.model.work.Work
 import kotlinx.coroutines.delay
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -43,7 +43,7 @@ class WorkPagingSource(searchDate: LocalDate? = null) : PagingSource<Int, Work>(
                     title = "タスク$workId at the page $currentPageNumber at the index $itemIndex",
                     description = "このタスクは${this.searchDate}におけるタスクです。タスクのIDは${workId}です。",
                     beganAt = searchDate.plusSeconds(it.toLong()),
-                    deadline = null,
+                    endedAt = null,
                     completedAt = null,
                     createdAt = searchDate.plusSeconds(it.toLong()),
                     updatedAt = searchDate.plusSeconds(it.toLong()),

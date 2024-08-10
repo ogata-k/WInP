@@ -5,7 +5,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import androidx.paging.compose.LazyPagingItems
-import com.ogata_k.mobile.winp.presentation.model.wip.Work
+import com.ogata_k.mobile.winp.presentation.model.work.Work
 import com.ogata_k.mobile.winp.presentation.page.AbstractViewModel
 import com.ogata_k.mobile.winp.presentation.paging_source.WorkPagingSource
 import dagger.hilt.android.lifecycle.HiltViewModel

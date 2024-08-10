@@ -59,5 +59,5 @@ interface ISetupRouting {
  * ルーティング必須項目用のインターフェース
  */
 interface IRouting {
-    fun getPath(): String
+    fun toPath(): String
 }

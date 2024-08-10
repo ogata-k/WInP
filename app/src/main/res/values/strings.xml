@@ -4,6 +4,20 @@
     <string name="period_with_range">%s ～ %s</string>
     <string name="none_period">未定</string>
     <string name="select_date">日にちを入力</string>
+    <string name="select_time">時間を入力</string>
     <string name="ok">OK</string>
     <string name="cancel">キャンセル</string>
+    <string name="create_task">タスクを作成</string>
+    <string name="title_create_task">タスク作成</string>
+    <string name="title_edit_task">タスク編集</string>
+    <string name="back">戻る</string>
+    <string name="work_title">タイトル</string>
+    <string name="work_description">説明</string>
+    <string name="work_todo">タスクTODO</string>
+    <string name="work_began_at">開始日時</string>
+    <string name="work_ended_at">終了日時</string>
+    <string name="counter_format">%d／%d</string>
+    <string name="clear_form_value">入力値を削除</string>
+    <string name="required">必須</string>
+    <string name="optional">任意</string>
 </resources>

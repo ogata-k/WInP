@@ -1,4 +1,4 @@
-package com.ogata_k.mobile.winp.presentation.model.wip
+package com.ogata_k.mobile.winp.presentation.model.work
 
 import java.time.LocalDateTime
 

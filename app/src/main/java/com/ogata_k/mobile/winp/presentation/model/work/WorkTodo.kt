@@ -1,4 +1,4 @@
-package com.ogata_k.mobile.winp.presentation.model.wip
+package com.ogata_k.mobile.winp.presentation.model.work
 
 import java.time.LocalDateTime
 
@@ -8,6 +8,7 @@ import java.time.LocalDateTime
 data class WorkTodo(
     val id: Int,
     val todoTask: String,
+    val completedAt: LocalDateTime?,
     val position: Int,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,

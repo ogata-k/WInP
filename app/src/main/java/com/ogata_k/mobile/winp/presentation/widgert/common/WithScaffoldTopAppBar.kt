@@ -23,7 +23,8 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WithScaffoldCenteredSmallTopAppBar(
-    text: String,
+    // nullとするとタイトルなし
+    text: String?,
     modifier: Modifier = Modifier,
     navigationIcon: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
@@ -44,7 +45,9 @@ fun WithScaffoldCenteredSmallTopAppBar(
                     scrolledContainerColor = colors.containerColor,
                 ),
                 title = {
-                    HeadlineMediumText(text = text)
+                    if (text != null) {
+                        HeadlineMediumText(text = text)
+                    }
                 },
                 navigationIcon = navigationIcon,
                 actions = actions,
@@ -61,7 +64,9 @@ fun WithScaffoldCenteredSmallTopAppBar(
             modifier = modifier,
             colors = colors,
             title = {
-                HeadlineMediumText(text = text)
+                if (text != null) {
+                    HeadlineMediumText(text = text)
+                }
             },
             navigationIcon = navigationIcon,
             actions = actions,
@@ -77,7 +82,8 @@ fun WithScaffoldCenteredSmallTopAppBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WithScaffoldSmallTopAppBar(
-    text: String,
+    // nullとするとタイトルなし
+    text: String?,
     modifier: Modifier = Modifier,
     navigationIcon: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
@@ -98,7 +104,9 @@ fun WithScaffoldSmallTopAppBar(
                     scrolledContainerColor = colors.containerColor,
                 ),
                 title = {
-                    HeadlineMediumText(text = text)
+                    if (text != null) {
+                        HeadlineMediumText(text = text)
+                    }
                 },
                 navigationIcon = navigationIcon,
                 actions = actions,
@@ -115,7 +123,9 @@ fun WithScaffoldSmallTopAppBar(
             modifier = modifier,
             colors = colors,
             title = {
-                HeadlineMediumText(text = text)
+                if (text != null) {
+                    HeadlineMediumText(text = text)
+                }
             },
             navigationIcon = navigationIcon,
             actions = actions,

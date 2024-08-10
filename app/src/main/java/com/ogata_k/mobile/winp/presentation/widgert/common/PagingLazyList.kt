@@ -44,7 +44,7 @@ fun <Item : Any> PagingLoadColumn(
     key: ((item: Item) -> Any)? = null,
     contentType: ((item: Item) -> Any?)? = null,
     emptyBuilder: @Composable () -> Unit = {},
-    loaderBuilder: @Composable () -> Unit = { CircularProgressIndicatorItem() },
+    loaderBuilder: @Composable () -> Unit = { DefaultCircularProgressIndicatorItem() },
     placeHolderBuilder: (@Composable () -> Unit)? = null,
     errorItemBuilder: @Composable (errorState: LoadState.Error) -> Unit = {
         DefaultErrorColumnItemBuilder(state = it)
@@ -92,7 +92,7 @@ fun <Item : Any> PagingLoadColumn(
  * エラーアイテムのデフォルトビルダー
  */
 @Composable
-private fun DefaultErrorColumnItemBuilder(state: LoadState.Error) {
+fun DefaultErrorColumnItemBuilder(state: LoadState.Error) {
     TitleMediumText(text = state.error.message ?: "UNKNOWN ERROR")
 }
 
@@ -104,7 +104,7 @@ private fun <Item : Any> LazyListScope.buildPagingListItems(
     key: ((item: Item) -> Any)? = null,
     contentType: ((item: Item) -> Any?)? = null,
     emptyBuilder: @Composable () -> Unit = {},
-    loaderBuilder: @Composable () -> Unit = { CircularProgressIndicatorItem() },
+    loaderBuilder: @Composable () -> Unit = { DefaultCircularProgressIndicatorItem() },
     placeHolderBuilder: (@Composable () -> Unit)? = null,
     errorItemBuilder: @Composable (errorState: LoadState.Error) -> Unit = {
         DefaultErrorColumnItemBuilder(state = it)
@@ -186,7 +186,7 @@ private fun <Item : Any> LazyListScope.buildPagingListItems(
  * 差分読み込み中のローディング表示
  */
 @Composable
-private fun CircularProgressIndicatorItem() {
+fun DefaultCircularProgressIndicatorItem() {
     CircularProgressIndicator(
         modifier = Modifier
             .fillMaxWidth()

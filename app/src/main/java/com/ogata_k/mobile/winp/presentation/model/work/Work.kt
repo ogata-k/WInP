@@ -1,4 +1,4 @@
-package com.ogata_k.mobile.winp.presentation.model.wip
+package com.ogata_k.mobile.winp.presentation.model.work
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -11,19 +11,19 @@ data class Work(
     val title: String,
     val description: String,
     val beganAt: LocalDateTime?,
-    val deadline: LocalDateTime?,
+    val endedAt: LocalDateTime?,
     val completedAt: LocalDateTime?,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
 ) {
-    val hasPeriod: Boolean = beganAt !== null || deadline !== null
-    val isExpired: Boolean = deadline?.isBefore(LocalDateTime.now()) ?: false
+    val hasPeriod: Boolean = beganAt !== null || endedAt !== null
+    val isExpired: Boolean = endedAt?.isBefore(LocalDateTime.now()) ?: false
     val isCompleted: Boolean = completedAt != null
 
     fun splitToFormattedPeriod(formatter: DateTimeFormatter): Pair<String, String> {
-        val startDateTime: String = beganAt?.format(formatter) ?: ""
-        val deadlineDateTime: String = deadline?.format(formatter) ?: ""
+        val formatBeganAt: String = beganAt?.format(formatter) ?: ""
+        val formatEndedAt: String = endedAt?.format(formatter) ?: ""
 
-        return Pair(startDateTime, deadlineDateTime)
+        return Pair(formatBeganAt, formatEndedAt)
     }
 }

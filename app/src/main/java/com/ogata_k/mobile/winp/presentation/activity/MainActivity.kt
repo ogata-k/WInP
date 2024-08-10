@@ -4,11 +4,15 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.ogata_k.mobile.winp.presentation.page.composableByRouting
+import com.ogata_k.mobile.winp.presentation.page.work.edit.WorkEditRouting
+import com.ogata_k.mobile.winp.presentation.page.work.edit.WorkEditScreen
+import com.ogata_k.mobile.winp.presentation.page.work.edit.WorkEditVM
 import com.ogata_k.mobile.winp.presentation.page.work.index.WorkIndexRouting
 import com.ogata_k.mobile.winp.presentation.page.work.index.WorkIndexScreen
 import com.ogata_k.mobile.winp.presentation.page.work.index.WorkIndexVM
@@ -33,9 +37,23 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun SetupRouting(navController: NavHostController) {
     NavHost(navController = navController, startDestination = WorkIndexRouting.routingPath) {
+        // Workの一覧
         composableByRouting(WorkIndexRouting) { _ ->
             val vm: WorkIndexVM = hiltViewModel()
             WorkIndexScreen(navController = navController, viewModel = vm)
+        }
+        // Workの作成編集
+        composableByRouting(WorkEditRouting) { entry ->
+            val vm: WorkEditVM = hiltViewModel()
+
+            // デフォルトは作成
+            val workId = entry.arguments?.getInt(WorkEditRouting.WORK_ID_KEY)
+                ?: WorkEditRouting.CREATE_WORK_ID
+            LaunchedEffect(true) {
+                vm.initializeForm(workId)
+            }
+
+            WorkEditScreen(navController = navController, viewModel = vm)
         }
     }
 }

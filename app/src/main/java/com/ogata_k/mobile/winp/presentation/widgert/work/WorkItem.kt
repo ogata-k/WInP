@@ -26,7 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ogata_k.mobile.winp.R
 import com.ogata_k.mobile.winp.common.buildFullDateTimePatternFormatter
-import com.ogata_k.mobile.winp.presentation.model.wip.Work
+import com.ogata_k.mobile.winp.presentation.model.work.Work
 import com.ogata_k.mobile.winp.presentation.theme.WInPTheme
 import com.ogata_k.mobile.winp.presentation.widgert.common.BodyMediumText
 import com.ogata_k.mobile.winp.presentation.widgert.common.BodySmallText
@@ -112,7 +112,7 @@ private fun WorkItemNoDeadlinePreview() {
         title = "サンプルタスク",
         description = "これはサンプル。完了もしていないし期限もなし。",
         beganAt = LocalDateTime.now(),
-        deadline = null,
+        endedAt = null,
         completedAt = null,
         createdAt = LocalDateTime.now(),
         updatedAt = LocalDateTime.now(),
@@ -131,7 +131,7 @@ private fun WorkItemNoPeriodPreview() {
         title = "サンプルタスク",
         description = "これはサンプル。完了もしていないし期限もなし。",
         beganAt = null,
-        deadline = null,
+        endedAt = null,
         completedAt = null,
         createdAt = LocalDateTime.now(),
         updatedAt = LocalDateTime.now(),
@@ -150,7 +150,7 @@ private fun NotCompletedNotExpiredWorkItemPreview() {
         title = "サンプルタスク",
         description = "これはサンプル。期限は設けられているがまだ来ていない。",
         beganAt = LocalDateTime.now(),
-        deadline = LocalDateTime.now().plusDays(1),
+        endedAt = LocalDateTime.now().plusDays(1),
         completedAt = null,
         createdAt = LocalDateTime.now(),
         updatedAt = LocalDateTime.now(),
@@ -169,7 +169,7 @@ private fun NotCompletedExpiredWorkItemPreview() {
         title = "サンプルタスク",
         description = "これはサンプル。期限は設けられているがまだ来ていない。",
         beganAt = LocalDateTime.now().minusDays(2),
-        deadline = LocalDateTime.now().minusDays(1),
+        endedAt = LocalDateTime.now().minusDays(1),
         completedAt = null,
         createdAt = LocalDateTime.now(),
         updatedAt = LocalDateTime.now(),
@@ -188,7 +188,7 @@ private fun CompletedWorkItemPreview() {
         title = "サンプルタスク",
         description = "これはサンプル。タスクは完了している。",
         beganAt = LocalDateTime.now().minusDays(1),
-        deadline = LocalDateTime.now().minusDays(1),
+        endedAt = LocalDateTime.now().minusDays(1),
         completedAt = LocalDateTime.now(),
         createdAt = LocalDateTime.now(),
         updatedAt = LocalDateTime.now(),

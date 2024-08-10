@@ -9,5 +9,5 @@ class WorkIndexRouting : IRouting {
             get() = "work/index"
     }
 
-    override fun getPath(): String = routingPath
+    override fun toPath(): String = routingPath
 }
