@@ -8,28 +8,15 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccessTime
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.TextField
-import androidx.compose.material3.rememberDatePickerState
-import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -41,20 +28,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.ogata_k.mobile.winp.R
-import com.ogata_k.mobile.winp.common.buildFullDatePatternFormatter
-import com.ogata_k.mobile.winp.common.buildHourMinutePatternFormatter
 import com.ogata_k.mobile.winp.presentation.widgert.common.AppBarBackButton
-import com.ogata_k.mobile.winp.presentation.widgert.common.ButtonText
-import com.ogata_k.mobile.winp.presentation.widgert.common.DialogOfDatePicker
-import com.ogata_k.mobile.winp.presentation.widgert.common.DialogOfTimePicker
 import com.ogata_k.mobile.winp.presentation.widgert.common.MaxLengthTextField
 import com.ogata_k.mobile.winp.presentation.widgert.common.OptionalLabel
 import com.ogata_k.mobile.winp.presentation.widgert.common.RequireLabel
 import com.ogata_k.mobile.winp.presentation.widgert.common.TitleLargeText
 import com.ogata_k.mobile.winp.presentation.widgert.common.TitleMediumText
 import com.ogata_k.mobile.winp.presentation.widgert.common.WithScaffoldSmallTopAppBar
-import com.ogata_k.mobile.winp.presentation.widgert.common.fromDateToMills
-import com.ogata_k.mobile.winp.presentation.widgert.common.fromMillsToDate
+import com.ogata_k.mobile.winp.presentation.widgert.work_form.DateFormColumnItem
+import com.ogata_k.mobile.winp.presentation.widgert.work_form.TimeFormColumnItem
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -299,151 +281,18 @@ private fun DateTimeForm(
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
-        DateForm(
+        DateFormColumnItem(
             date = date,
             isInShowDatePicker = isInShowDatePicker,
             switchShowDatePicker = switchShowDatePicker,
             updateDate = updateDate,
         )
         Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_large)))
-        TimeForm(
+        TimeFormColumnItem(
             time = time,
             isInShowTimePicker = isInShowTimePicker,
             switchShowTimePicker = switchShowTimePicker,
             updateTime = updateTime,
-        )
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun DateForm(
-    date: LocalDate?,
-    isInShowDatePicker: Boolean,
-    switchShowDatePicker: (toShow: Boolean) -> Unit,
-    updateDate: (date: LocalDate?) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        IconButton(onClick = { switchShowDatePicker(true) }) {
-            Icon(
-                modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_large)),
-                imageVector = Icons.Filled.DateRange,
-                contentDescription = stringResource(id = R.string.select_date)
-            )
-        }
-        Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_medium)))
-        TextField(
-            value = if (date == null) "" else buildFullDatePatternFormatter().format(date),
-            onValueChange = {},
-            readOnly = true,
-            modifier = Modifier.weight(1f),
-            textStyle = MaterialTheme.typography.titleMedium,
-        )
-        Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_small)))
-        IconButton(onClick = { updateDate(null) }) {
-            Icon(
-                modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_medium)),
-                imageVector = Icons.Filled.Close,
-                contentDescription = stringResource(id = R.string.clear_form_value)
-            )
-        }
-    }
-    if (isInShowDatePicker) {
-        val datePickerState = rememberDatePickerState(
-            initialSelectedDateMillis = if (date == null) null else fromDateToMills(date),
-            initialDisplayMode = DisplayMode.Picker,
-        )
-        DialogOfDatePicker(
-            state = datePickerState,
-            onDismissRequest = { /* ignore background dismiss */ },
-            dismissButton = {
-                Button(onClick = {
-                    switchShowDatePicker(false)
-                }) {
-                    ButtonText(text = stringResource(R.string.cancel))
-                }
-            },
-            confirmButton = {
-                Button(onClick = {
-                    val dateTimestamp: Long? =
-                        datePickerState.selectedDateMillis
-                    if (dateTimestamp != null) {
-                        updateDate(fromMillsToDate(dateTimestamp))
-                    }
-                    switchShowDatePicker(false)
-                }) {
-                    ButtonText(text = stringResource(R.string.ok))
-                }
-            },
-        )
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun TimeForm(
-    time: LocalTime?,
-    isInShowTimePicker: Boolean,
-    switchShowTimePicker: (toShow: Boolean) -> Unit,
-    updateTime: (time: LocalTime?) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        IconButton(onClick = { switchShowTimePicker(true) }) {
-            Icon(
-                modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_large)),
-                imageVector = Icons.Filled.AccessTime,
-                contentDescription = stringResource(id = R.string.select_time)
-            )
-        }
-        Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_medium)))
-        TextField(
-            value = if (time == null) "" else buildHourMinutePatternFormatter().format(time),
-            onValueChange = {},
-            readOnly = true,
-            modifier = Modifier.weight(1f),
-            textStyle = MaterialTheme.typography.titleMedium,
-        )
-        Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_small)))
-        IconButton(onClick = { updateTime(null) }) {
-            Icon(
-                modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_medium)),
-                imageVector = Icons.Filled.Close,
-                contentDescription = stringResource(id = R.string.clear_form_value)
-            )
-        }
-    }
-    if (isInShowTimePicker) {
-        val timePickerState = rememberTimePickerState(
-            initialHour = time?.hour ?: LocalTime.now().hour,
-            initialMinute = 0,
-            is24Hour = true,
-        )
-        DialogOfTimePicker(
-            state = timePickerState,
-            onDismissRequest = { /* ignore background dismiss */ },
-            dismissButton = {
-                Button(onClick = {
-                    switchShowTimePicker(false)
-                }) {
-                    ButtonText(text = stringResource(R.string.cancel))
-                }
-            },
-            confirmButton = {
-                Button(onClick = {
-                    updateTime(LocalTime.of(timePickerState.hour, timePickerState.minute))
-                    switchShowTimePicker(false)
-                }) {
-                    ButtonText(text = stringResource(R.string.ok))
-                }
-            },
         )
     }
 }
