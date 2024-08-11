@@ -99,7 +99,8 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
                         val errorMessage = state.error.message ?: "UNKNOWN ERROR"
                         LaunchedEffect(errorMessage, snackbarHostState) {
                             snackbarHostState.showSnackbar(
-                                message = errorMessage
+                                message = errorMessage,
+                                withDismissAction = true,
                             )
                         }
                         DefaultErrorColumnItemBuilder(state = state)
