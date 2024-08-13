@@ -17,6 +17,7 @@ interface ToUiState<out UiState> {
 
 /**
  * ViewModelStateの状態を変更することでUiStateを自動的に更新することができるViewModel
+ * ※基本的に戻り値がUnit以外のメソッドはこのViewModelでは公開しないこと
  */
 abstract class AbstractViewModel<ViewModelState, UiState> : ViewModel() {
     companion object {
