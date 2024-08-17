@@ -488,7 +488,7 @@ class WorkEditVM @Inject constructor() : AbstractViewModel<WorkEditVMState, Work
         return WorkFormValidateExceptions(
             title = titleValidated,
             description = descriptionValidated,
-            beganDateTIme = beganDateTimeValidated,
+            beganDateTime = beganDateTimeValidated,
             endedDateTime = endedDateTimeValidated,
             editingTodoItem = editingTodoItemValidated,
         )

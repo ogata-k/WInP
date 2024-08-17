@@ -41,7 +41,7 @@ data class WorkFormData(
 data class WorkFormValidateExceptions(
     val title: ValidationException,
     val description: ValidationException,
-    val beganDateTIme: ValidationException,
+    val beganDateTime: ValidationException,
     val endedDateTime: ValidationException,
     val editingTodoItem: WorkTodoFormValidateExceptions,
 ) {
@@ -50,7 +50,7 @@ data class WorkFormValidateExceptions(
             return WorkFormValidateExceptions(
                 title = ValidationException.empty(),
                 description = ValidationException.empty(),
-                beganDateTIme = ValidationException.empty(),
+                beganDateTime = ValidationException.empty(),
                 endedDateTime = ValidationException.empty(),
                 editingTodoItem = WorkTodoFormValidateExceptions.empty(),
             )
@@ -61,6 +61,6 @@ data class WorkFormValidateExceptions(
      * エラーがあればtrue
      */
     fun hasError(): Boolean {
-        return title.hasError() || description.hasError() || beganDateTIme.hasError() || endedDateTime.hasError() || editingTodoItem.hasError()
+        return title.hasError() || description.hasError() || beganDateTime.hasError() || endedDateTime.hasError() || editingTodoItem.hasError()
     }
 }

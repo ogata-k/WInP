@@ -220,7 +220,7 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
 
                             FormBlock(
                                 title = stringResource(id = R.string.work_began_at),
-                                errorMessage = workValidateExceptions.beganDateTIme.toErrorMessage(
+                                errorMessage = workValidateExceptions.beganDateTime.toErrorMessage(
                                     LocalContext.current
                                 ) { context, type ->
                                     if (type is ValidationExceptionType.NeedBiggerThanDatetime) {
@@ -251,6 +251,7 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                                     updateTime = {
                                         viewModel.updateBeganTime(it)
                                     },
+                                    isError = workValidateExceptions.beganDateTime.hasError(),
                                 )
                             }
 
@@ -287,6 +288,7 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                                     updateTime = {
                                         viewModel.updateEndedTime(it)
                                     },
+                                    isError = workValidateExceptions.endedDateTime.hasError(),
                                 )
                             }
 
@@ -447,6 +449,8 @@ private fun DateTimeForm(
     switchShowTimePicker: (toShow: Boolean) -> Unit,
     updateTime: (time: LocalTime?) -> Unit,
     modifier: Modifier = Modifier,
+    canDelete: Boolean = true,
+    isError: Boolean = false,
 ) {
     Column(modifier = modifier) {
         DateFormColumnItem(
@@ -454,6 +458,8 @@ private fun DateTimeForm(
             isInShowDatePicker = isInShowDatePicker,
             switchShowDatePicker = switchShowDatePicker,
             updateDate = updateDate,
+            canDelete = canDelete,
+            isError = isError,
         )
         Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_large)))
         TimeFormColumnItem(
@@ -461,6 +467,8 @@ private fun DateTimeForm(
             isInShowTimePicker = isInShowTimePicker,
             switchShowTimePicker = switchShowTimePicker,
             updateTime = updateTime,
+            canDelete = canDelete,
+            isError = isError,
         )
     }
 }

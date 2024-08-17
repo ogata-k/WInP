@@ -1,5 +1,6 @@
 package com.ogata_k.mobile.winp.presentation.widgert.work_form
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
@@ -12,6 +13,7 @@ import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberDatePickerState
@@ -37,6 +39,7 @@ fun DateFormColumnItem(
     updateDate: (date: LocalDate?) -> Unit,
     modifier: Modifier = Modifier,
     canDelete: Boolean = true,
+    isError: Boolean = false,
 ) {
     Row(
         modifier = modifier,
@@ -46,7 +49,8 @@ fun DateFormColumnItem(
             Icon(
                 modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_large)),
                 imageVector = Icons.Filled.DateRange,
-                contentDescription = stringResource(id = R.string.select_date)
+                contentDescription = stringResource(id = R.string.select_date),
+                tint = if (isError) MaterialTheme.colorScheme.error else LocalContentColor.current,
             )
         }
         Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_medium)))
@@ -54,8 +58,11 @@ fun DateFormColumnItem(
             value = if (date == null) "" else buildFullDatePatternFormatter().format(date),
             onValueChange = {},
             readOnly = true,
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .clickable { switchShowDatePicker(true) }
+                .weight(1f),
             textStyle = MaterialTheme.typography.titleMedium,
+            isError = isError,
         )
         if (canDelete) {
             Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_small)))
