@@ -21,7 +21,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.ogata_k.mobile.winp.R
 import com.ogata_k.mobile.winp.common.buildHourMinutePatternFormatter
-import com.ogata_k.mobile.winp.presentation.widgert.common.ButtonText
+import com.ogata_k.mobile.winp.presentation.widgert.common.ButtonLargeText
 import com.ogata_k.mobile.winp.presentation.widgert.common.DialogOfTimePicker
 import java.time.LocalTime
 
@@ -78,7 +78,7 @@ fun TimeFormColumnItem(
                 Button(onClick = {
                     switchShowTimePicker(false)
                 }) {
-                    ButtonText(text = stringResource(R.string.cancel))
+                    ButtonLargeText(text = stringResource(R.string.cancel))
                 }
             },
             confirmButton = {
@@ -86,7 +86,7 @@ fun TimeFormColumnItem(
                     updateTime(LocalTime.of(timePickerState.hour, timePickerState.minute))
                     switchShowTimePicker(false)
                 }) {
-                    ButtonText(text = stringResource(R.string.ok))
+                    ButtonLargeText(text = stringResource(R.string.ok))
                 }
             },
         )

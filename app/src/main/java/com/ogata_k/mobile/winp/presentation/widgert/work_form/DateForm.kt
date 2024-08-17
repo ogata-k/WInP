@@ -22,7 +22,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.ogata_k.mobile.winp.R
 import com.ogata_k.mobile.winp.common.buildFullDatePatternFormatter
-import com.ogata_k.mobile.winp.presentation.widgert.common.ButtonText
+import com.ogata_k.mobile.winp.presentation.widgert.common.ButtonLargeText
 import com.ogata_k.mobile.winp.presentation.widgert.common.DialogOfDatePicker
 import com.ogata_k.mobile.winp.presentation.widgert.common.fromDateToMills
 import com.ogata_k.mobile.winp.presentation.widgert.common.fromMillsToDate
@@ -80,7 +80,7 @@ fun DateFormColumnItem(
                 Button(onClick = {
                     switchShowDatePicker(false)
                 }) {
-                    ButtonText(text = stringResource(R.string.cancel))
+                    ButtonLargeText(text = stringResource(R.string.cancel))
                 }
             },
             confirmButton = {
@@ -92,7 +92,7 @@ fun DateFormColumnItem(
                     }
                     switchShowDatePicker(false)
                 }) {
-                    ButtonText(text = stringResource(R.string.ok))
+                    ButtonLargeText(text = stringResource(R.string.ok))
                 }
             },
         )

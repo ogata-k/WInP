@@ -1,23 +1,67 @@
 <resources>
+    <!-- アプリ一般 -->
     <string name="app_name">WInP</string>
+
+    <!-- 画面遷移 -->
     <string name="navigate_to_detail">詳細を開く</string>
+
+    <!-- 一般共通 -->
     <string name="period_with_range">%s ～ %s</string>
     <string name="none_period">未定</string>
+
+    <!-- 操作 -->
     <string name="select_date">日にちを入力</string>
     <string name="select_time">時間を入力</string>
     <string name="ok">OK</string>
     <string name="cancel">キャンセル</string>
-    <string name="create_task">タスクを作成</string>
-    <string name="title_create_task">タスク作成</string>
-    <string name="title_edit_task">タスク編集</string>
     <string name="back">戻る</string>
-    <string name="work_title">タイトル</string>
-    <string name="work_description">説明</string>
-    <string name="work_todo">タスクTODO</string>
-    <string name="work_began_at">開始日時</string>
-    <string name="work_ended_at">終了日時</string>
+    <string name="add">追加</string>
+    <string name="create">作成</string>
+    <string name="update">更新</string>
+
+    <!-- CRUD操作 -->
+    <string name="create_work">タスクを作成</string>
+    <string name="create_work_todo">タスクTODOを作成</string>
+
+    <!-- タイトル -->
+    <string name="title_create_work">タスク作成</string>
+    <string name="title_edit_work">タスク編集</string>
+    <string name="title_create_work_todo">タスクTODO作成</string>
+    <string name="title_edit_work_todo">タスクTODO編集</string>
+
+    <!-- フォーム共通 -->
     <string name="counter_format">%d／%d</string>
     <string name="clear_form_value">入力値を削除</string>
     <string name="required">必須</string>
     <string name="optional">任意</string>
+
+    <!-- フォーム -->
+    <string name="work_title">タイトル</string>
+    <string name="work_description">説明</string>
+    <string name="work_todo">タスクTODO</string>
+    <string name="work_todo_complete_state">状態</string>
+    <string name="completed">完了済み</string>
+    <string name="not_completed">未完了</string>
+    <string name="completed_work_todo">完了済みタスクTODO</string>
+    <string name="not_completed_work_todo">未完了タスクTODO</string>
+    <string name="work_todo_description">説明</string>
+    <string name="work_began_at">開始日時</string>
+    <string name="work_ended_at">終了日時</string>
+
+    <!-- バリデーションエラー -->
+    <string name="validation_exception_empty_select_value">値を選択してください。</string>
+    <string name="validation_exception_empty_input_value">入力してください。</string>
+    <string name="validation_exception_underflow_number_value">%d以上の数字のみ有効です。</string>
+    <string name="validation_exception_underflow_input_value">%d文字以上で入力してください。</string>
+    <string name="validation_exception_overflow_number_value">%d以下の数字のみ有効です。</string>
+    <string name="validation_exception_overflow_input_value">%d文字以下で入力してください。</string>
+    <string name="validation_exception_invalid_date_time">日時のフォーマットが不正です。</string>
+    <string name="validation_exception_need_date">日にちも入力してください。</string>
+    <string name="validation_exception_need_bigger_than_other_date_time">%sより未来の日時を入力してください。</string>
+    >
+    <string name="validation_exception_need_smaller_than_other_date_time">%sより過去の日時を入力してください。</string>
+    <string name="validation_exception_inconsistent_order_for_before">%sは%sより前の値を指定してください。</string>
+    <string name="validation_exception_inconsistent_order_for_after">%sは%sより後の値を指定してください。</string>
+
+    <!-- その他 -->
 </resources>

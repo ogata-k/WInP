@@ -466,7 +466,7 @@ fun LabelSmallText(
  * Button内で使う想定のText
  */
 @Composable
-fun ButtonText(
+fun ButtonLargeText(
     text: String,
     modifier: Modifier = Modifier,
     color: Color = Color.Unspecified,
@@ -480,6 +480,101 @@ fun ButtonText(
     onTextLayout: ((TextLayoutResult) -> Unit)? = null,
 ) {
     LabelLargeText(
+        text = text,
+        modifier = modifier,
+        color = color,
+        fontWeight = fontWeight,
+        textDecoration = textDecoration,
+        textAlign = textAlign,
+        overflow = overflow,
+        softWrap = softWrap,
+        maxLines = maxLines,
+        minLines = minLines,
+        onTextLayout = onTextLayout,
+    )
+}
+
+/**
+ * エラーを表示するときに使うText
+ */
+@Composable
+fun ErrorText(
+    text: String,
+    modifier: Modifier = Modifier,
+    fontWeight: FontWeight? = null,
+    textDecoration: TextDecoration? = null,
+    textAlign: TextAlign? = null,
+    overflow: TextOverflow = TextOverflow.Clip,
+    softWrap: Boolean = true,
+    maxLines: Int = Int.MAX_VALUE,
+    minLines: Int = 1,
+    onTextLayout: ((TextLayoutResult) -> Unit)? = null,
+) {
+    TitleSmallText(
+        text = text,
+        modifier = modifier,
+        color = MaterialTheme.colorScheme.error,
+        fontWeight = fontWeight,
+        textDecoration = textDecoration,
+        textAlign = textAlign,
+        overflow = overflow,
+        softWrap = softWrap,
+        maxLines = maxLines,
+        minLines = minLines,
+        onTextLayout = onTextLayout,
+    )
+}
+
+/**
+ * Button内で使う想定のText
+ */
+@Composable
+fun ButtonMediumText(
+    text: String,
+    modifier: Modifier = Modifier,
+    color: Color = Color.Unspecified,
+    fontWeight: FontWeight? = null,
+    textDecoration: TextDecoration? = null,
+    textAlign: TextAlign? = null,
+    overflow: TextOverflow = TextOverflow.Clip,
+    softWrap: Boolean = true,
+    maxLines: Int = Int.MAX_VALUE,
+    minLines: Int = 1,
+    onTextLayout: ((TextLayoutResult) -> Unit)? = null,
+) {
+    LabelMediumText(
+        text = text,
+        modifier = modifier,
+        color = color,
+        fontWeight = fontWeight,
+        textDecoration = textDecoration,
+        textAlign = textAlign,
+        overflow = overflow,
+        softWrap = softWrap,
+        maxLines = maxLines,
+        minLines = minLines,
+        onTextLayout = onTextLayout,
+    )
+}
+
+/**
+ * Button内で使う想定のText
+ */
+@Composable
+fun ButtonSmallText(
+    text: String,
+    modifier: Modifier = Modifier,
+    color: Color = Color.Unspecified,
+    fontWeight: FontWeight? = null,
+    textDecoration: TextDecoration? = null,
+    textAlign: TextAlign? = null,
+    overflow: TextOverflow = TextOverflow.Clip,
+    softWrap: Boolean = true,
+    maxLines: Int = Int.MAX_VALUE,
+    minLines: Int = 1,
+    onTextLayout: ((TextLayoutResult) -> Unit)? = null,
+) {
+    LabelSmallText(
         text = text,
         modifier = modifier,
         color = color,
@@ -587,6 +682,6 @@ private fun LabelSmallTextPreview() {
 @Preview(showBackground = true)
 @Composable
 private fun ButtonTextPreview() {
-    ButtonText("本日2024/7/23は晴天なり")
+    ButtonLargeText("本日2024/7/23は晴天なり")
 }
 

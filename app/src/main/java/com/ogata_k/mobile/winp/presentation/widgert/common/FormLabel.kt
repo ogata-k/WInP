@@ -10,9 +10,20 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.ogata_k.mobile.winp.R
 
+@Composable
+fun FormLabel(
+    isRequired: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    if (isRequired) {
+        RequireLabel()
+    } else {
+        OptionalLabel()
+    }
+}
 
 @Composable
-fun RequireLabel(
+private fun RequireLabel(
     modifier: Modifier = Modifier
 ) {
     LabelSmallText(
@@ -25,7 +36,7 @@ fun RequireLabel(
 }
 
 @Composable
-fun OptionalLabel(
+private fun OptionalLabel(
     modifier: Modifier = Modifier
 ) {
     LabelSmallText(

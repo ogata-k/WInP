@@ -37,7 +37,7 @@ import com.ogata_k.mobile.winp.R
 import com.ogata_k.mobile.winp.common.buildFullDatePatternFormatter
 import com.ogata_k.mobile.winp.presentation.model.work.Work
 import com.ogata_k.mobile.winp.presentation.page.work.edit.WorkEditRouting
-import com.ogata_k.mobile.winp.presentation.widgert.common.ButtonText
+import com.ogata_k.mobile.winp.presentation.widgert.common.ButtonLargeText
 import com.ogata_k.mobile.winp.presentation.widgert.common.DefaultErrorColumnItemBuilder
 import com.ogata_k.mobile.winp.presentation.widgert.common.DialogOfDatePicker
 import com.ogata_k.mobile.winp.presentation.widgert.common.PagingLoadColumn
@@ -64,7 +64,7 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
             IconButton(onClick = { navController.navigate(WorkEditRouting(WorkEditRouting.CREATE_WORK_ID).toPath()) }) {
                 Icon(
                     imageVector = Icons.Filled.Add,
-                    contentDescription = stringResource(R.string.create_task),
+                    contentDescription = stringResource(R.string.create_work),
                 )
             }
         },
@@ -161,7 +161,7 @@ private fun WorkIndexHeader(
                     Button(onClick = {
                         switchShowDatePickerForSearch(false)
                     }) {
-                        ButtonText(text = stringResource(R.string.cancel))
+                        ButtonLargeText(text = stringResource(R.string.cancel))
                     }
                 },
                 confirmButton = {
@@ -172,7 +172,7 @@ private fun WorkIndexHeader(
                             updateAndHideDialogSearchQuery(fromMillsToDate(dateTimestamp))
                         }
                     }) {
-                        ButtonText(text = stringResource(R.string.ok))
+                        ButtonLargeText(text = stringResource(R.string.ok))
                     }
                 },
             )
