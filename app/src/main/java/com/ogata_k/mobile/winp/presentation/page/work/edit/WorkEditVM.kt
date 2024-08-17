@@ -422,7 +422,7 @@ class WorkEditVM @Inject constructor() : AbstractViewModel<WorkEditVMState, Work
             if (formData.endedDate != null && LocalDateTime.of(
                     formData.beganDate,
                     formData.beganTime ?: LocalTime.MIN
-                ) < LocalDateTime.of(formData.endedDate, formData.endedTime ?: LocalTime.MAX)
+                ) >= LocalDateTime.of(formData.endedDate, formData.endedTime ?: LocalTime.MAX)
             ) {
                 ValidationException.of(
                     ValidationExceptionType.NeedSmallerThanDatetime(
@@ -445,7 +445,7 @@ class WorkEditVM @Inject constructor() : AbstractViewModel<WorkEditVMState, Work
             if (formData.beganDate != null && LocalDateTime.of(
                     formData.beganDate,
                     formData.beganTime ?: LocalTime.MIN
-                ) < LocalDateTime.of(formData.endedDate, formData.endedTime ?: LocalTime.MAX)
+                ) >= LocalDateTime.of(formData.endedDate, formData.endedTime ?: LocalTime.MAX)
             ) {
                 ValidationException.of(
                     ValidationExceptionType.NeedBiggerThanDatetime(
