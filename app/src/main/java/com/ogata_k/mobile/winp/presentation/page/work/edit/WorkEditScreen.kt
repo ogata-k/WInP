@@ -96,7 +96,7 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                         .padding(dimensionResource(id = R.dimen.padding_large)),
                     horizontalAlignment = Alignment.Start,
                 ) {
-                    // TODO DBのエラーハンドリング(snackbarHostState.showSnackBar())をするためにinitializedをScreenLoadResult的なSealedClassにする->次はここから。
+                    // TODO DBのエラーハンドリング(snackbarHostState.showSnackBar()かToast)をするためにinitializedをScreenLoadResult的なSealedClassにする->次はここから。
                     when (uiState.initializeState) {
                         // 初期化中
                         UiInitializeState.LOADING -> {
@@ -202,7 +202,7 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                                     // TODO 表示アイテムが空のときの表示
                                     formData.todoItems.forEach {
                                         key(it.uuid) {
-                                            // TODO リストアイテムの並び替えと削除ができるようにする
+                                            // TODO NEXT リストアイテムの並び替えと削除ができるようにする
                                             WorkTodoFormColumnItem(
                                                 todoFormData = it,
                                                 modifier = Modifier.clickable {
@@ -351,7 +351,12 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                             Spacer(Modifier.height(dimensionResource(id = R.dimen.padding_medium_large)))
                         }
 
-                        // エラーがあった場合
+                        // アイテムが見つからず終了
+                        UiInitializeState.NOT_FOUND_EXCEPTION -> {
+                            // TODO 初期化しようとしたがアイテムが見つからなかったので失敗。これを通知して画面を閉じる（もしくは画面を閉じてから通知）
+                        }
+
+                        // 予期せぬエラーがあった場合
                         UiInitializeState.ERROR -> {
                             // TODO 初期化に失敗したことを通知して画面を閉じる（もしくは画面を閉じてから通知）
                         }

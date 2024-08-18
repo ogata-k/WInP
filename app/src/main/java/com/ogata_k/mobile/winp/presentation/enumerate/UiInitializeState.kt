@@ -6,19 +6,20 @@ package com.ogata_k.mobile.winp.presentation.enumerate
 enum class UiInitializeState {
     LOADING,
     INITIALIZED,
+    NOT_FOUND_EXCEPTION,
     ERROR;
 
     /**
      * 初期化済みの状態ならtrue
      */
     fun isInitialized(): Boolean {
-        return this == INITIALIZED || this == ERROR
+        return this != LOADING
     }
 
     /**
      * エラーがあるならtrue
      */
     fun hasError(): Boolean {
-        return this == ERROR
+        return this == ERROR || this == NOT_FOUND_EXCEPTION
     }
 }
