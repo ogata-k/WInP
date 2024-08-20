@@ -19,7 +19,7 @@ enum class UiInitializeState {
     /**
      * エラーがあるならtrue
      */
-    fun hasError(): Boolean {
+    fun isError(): Boolean {
         return this == ERROR || this == NOT_FOUND_EXCEPTION
     }
 }

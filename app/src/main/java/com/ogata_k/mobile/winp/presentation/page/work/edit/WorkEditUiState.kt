@@ -4,12 +4,14 @@ import android.content.Context
 import com.ogata_k.mobile.winp.R
 import com.ogata_k.mobile.winp.presentation.enumerate.UiFormState
 import com.ogata_k.mobile.winp.presentation.enumerate.UiInitializeState
+import com.ogata_k.mobile.winp.presentation.enumerate.UiNextScreenState
 import com.ogata_k.mobile.winp.presentation.model.work_form.WorkFormData
 import com.ogata_k.mobile.winp.presentation.model.work_form.WorkFormValidateExceptions
 import java.util.UUID
 
 data class WorkEditUiState(
     val initializeState: UiInitializeState,
+    val screenState: UiNextScreenState,
     val formState: UiFormState,
     val isInCreating: Boolean,
     val formData: WorkFormData,

@@ -1,5 +1,6 @@
 package com.ogata_k.mobile.winp.presentation.widgert.common
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.PaddingValues
@@ -20,18 +21,31 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import com.ogata_k.mobile.winp.R
+import com.ogata_k.mobile.winp.presentation.enumerate.UiNextScreenState
 
 /**
  * AppBarなどでの戻るボタン
  */
 @Composable
-fun AppBarBackButton(navController: NavController) {
-    IconButton(onClick = { navController.popBackStack() }) {
+fun AppBarBackButton(navController: NavController, getScreenState: (() -> UiNextScreenState)?) {
+    val callback: () -> Unit = {
+        getScreenState?.invoke()?.setState(navController)
+        // からならずPOPさせるために状態セットと画面POPは分ける
+        navController.popBackStack()
+    }
+
+    BackHandlerSetter { callback() }
+    IconButton(onClick = { callback() }) {
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
             contentDescription = stringResource(R.string.back),
         )
     }
+}
+
+@Composable
+private fun BackHandlerSetter(enabled: Boolean = true, callback: () -> Unit) {
+    BackHandler(enabled = enabled) { callback() }
 }
 
 @Composable

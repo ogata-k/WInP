@@ -25,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -35,6 +36,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.ogata_k.mobile.winp.R
 import com.ogata_k.mobile.winp.common.buildFullDatePatternFormatter
+import com.ogata_k.mobile.winp.presentation.enumerate.UiNextScreenState
 import com.ogata_k.mobile.winp.presentation.model.work.Work
 import com.ogata_k.mobile.winp.presentation.page.work.edit.WorkEditRouting
 import com.ogata_k.mobile.winp.presentation.widgert.common.ButtonLargeText
@@ -46,6 +48,7 @@ import com.ogata_k.mobile.winp.presentation.widgert.common.WithScaffoldSmallTopA
 import com.ogata_k.mobile.winp.presentation.widgert.common.fromDateToMills
 import com.ogata_k.mobile.winp.presentation.widgert.common.fromMillsToDate
 import com.ogata_k.mobile.winp.presentation.widgert.work.WorkItem
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -60,7 +63,6 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
         text = stringResource(id = R.string.app_name),
         canChangeColor = false,
         actions = {
-            // TODO 作成成功して戻った時にページャー更新具処理を行わせたい
             IconButton(onClick = { navController.navigate(WorkEditRouting(WorkEditRouting.CREATE_WORK_ID).toPath()) }) {
                 Icon(
                     imageVector = Icons.Filled.Add,
@@ -71,6 +73,9 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
     ) { modifier, appBar ->
         val snackbarHostState = remember { SnackbarHostState() }
 
+        // TODO remove
+        val scope = rememberCoroutineScope()
+
         Scaffold(
             modifier = modifier,
             topBar = appBar,
@@ -78,6 +83,17 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
                 SnackbarHost(hostState = snackbarHostState)
             },
         ) { padding ->
+            LaunchedEffect(UiNextScreenState.takeState(navController, false)) {
+                val nextScreenState = UiNextScreenState.takeState(navController, true)
+                // TODO 実際の実装に置き換える(作成更新削除などの実行ができたときはリストを更新するみたいな処理を行う)
+                scope.launch {
+                    if (nextScreenState?.isDoneAction() == true) {
+                        snackbarHostState.showSnackbar(nextScreenState.toString())
+                        workPagingItems.refresh()
+                    }
+                }
+            }
+
             Column(
                 modifier = Modifier.padding(padding),
             ) {
@@ -112,7 +128,7 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
                             horizontal = dimensionResource(id = R.dimen.padding_medium_large),
                         )
                     ) {
-                        // TODO 編集成功して戻った時にページャー更新具処理を行わせたい
+                        // TODO 詳細画面に遷移させる
                         // 編集画面への遷移
                         navController.navigate(WorkEditRouting(work.id).toPath())
                     }

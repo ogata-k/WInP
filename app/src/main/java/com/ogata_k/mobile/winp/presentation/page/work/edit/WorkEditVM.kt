@@ -3,6 +3,7 @@ package com.ogata_k.mobile.winp.presentation.page.work.edit
 import androidx.lifecycle.viewModelScope
 import com.ogata_k.mobile.winp.presentation.enumerate.UiFormState
 import com.ogata_k.mobile.winp.presentation.enumerate.UiInitializeState
+import com.ogata_k.mobile.winp.presentation.enumerate.UiNextScreenState
 import com.ogata_k.mobile.winp.presentation.enumerate.ValidationException
 import com.ogata_k.mobile.winp.presentation.enumerate.ValidationExceptionType
 import com.ogata_k.mobile.winp.presentation.model.work_form.WorkFormData
@@ -37,7 +38,9 @@ class WorkEditVM @Inject constructor() : AbstractViewModel<WorkEditVMState, Work
             WorkEditVMState(
                 // 初期状態は未初期化状態とする
                 initializeState = UiInitializeState.LOADING,
+                screenState = UiNextScreenState.LOADING,
                 formState = UiFormState.NOT_INITIALIZE,
+                isInCreating = isInCreating(WorkEditRouting.CREATE_WORK_ID),
                 workId = WorkEditRouting.CREATE_WORK_ID,
                 formData = WorkFormData.empty(),
                 validateExceptions = WorkFormValidateExceptions.empty(),
@@ -80,9 +83,11 @@ class WorkEditVM @Inject constructor() : AbstractViewModel<WorkEditVMState, Work
                 todoItems = emptyList(),
             )
             val newVmState = vmState.copy(
-                workId = workId,
                 initializeState = UiInitializeState.INITIALIZED,
+                screenState = UiNextScreenState.INITIALIZED,
                 formState = UiFormState.FORM_EDITING,
+                isInCreating = true,
+                workId = workId,
                 formData = formData,
                 validateExceptions = validateFormData(formData, vmState.isInShowEditingTodoForm),
             )
@@ -92,7 +97,7 @@ class WorkEditVM @Inject constructor() : AbstractViewModel<WorkEditVMState, Work
             return
         }
 
-        val newVmState = vmState.copy(workId = workId)
+        val newVmState = vmState.copy(isInCreating = false, workId = workId)
         updateVMState(newVmState)
 
         // DBデータでFormの初期化をしたときに初期化を完了とする
@@ -125,6 +130,7 @@ class WorkEditVM @Inject constructor() : AbstractViewModel<WorkEditVMState, Work
             updateVMState(
                 readVMState().copy(
                     initializeState = UiInitializeState.INITIALIZED,
+                    screenState = UiNextScreenState.INITIALIZED,
                     formState = UiFormState.FORM_EDITING,
                     formData = formData,
                     validateExceptions = validateFormData(
@@ -516,7 +522,13 @@ class WorkEditVM @Inject constructor() : AbstractViewModel<WorkEditVMState, Work
 
             // TODO 作成や更新の結果を通知する
             val result = Random.nextInt() % 3 != 0
-            updateVMState(readVMState().copy(formState = if (result) UiFormState.SUCCESS_ACTION else UiFormState.FAIL_ACTION))
+            val oldVmState = readVMState()
+            updateVMState(
+                oldVmState.copy(
+                    screenState = if (result) (if (oldVmState.isInCreating) UiNextScreenState.CREATED else UiNextScreenState.UPDATED) else UiNextScreenState.ERROR,
+                    formState = if (result) UiFormState.SUCCESS_ACTION else UiFormState.FAIL_ACTION,
+                )
+            )
         }
     }
 
