@@ -1,5 +1,8 @@
 package com.ogata_k.mobile.winp.presentation.widgert.work_form
 
+import androidx.compose.animation.animateColor
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,9 +21,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
@@ -32,6 +37,10 @@ import com.ogata_k.mobile.winp.presentation.model.work_form.WorkTodoFormData
 import com.ogata_k.mobile.winp.presentation.widgert.common.BodyMediumText
 import java.util.UUID
 
+/**
+ * WorkTodoのColumn系のためのFormアイテム
+ * 更新することによって完了未完了状態が変更するので、色を変化させて通知できるようにしている。
+ */
 @Composable
 fun WorkTodoFormColumnItem(
     todoFormData: WorkTodoFormData,
@@ -50,23 +59,42 @@ fun WorkTodoFormColumnItem(
         lineTo(0f, size.height)
     }
 
-    val isCompleted: Boolean = todoFormData.isCompleted
+    val isCompleted = todoFormData.isCompleted
+    val transition = updateTransition(isCompleted, label = "completed state")
+    val checkIconColor: Color by transition.animateColor(
+        transitionSpec = {
+            tween(durationMillis = 500)
+        }, label = "checkIconColor"
+    ) { state ->
+        if (state) {
+            colorResource(id = R.color.completed_check)
+        } else {
+            // 未完了なら背景色と同じ色を指定して、実質非表示とする。
+            colorResource(id = R.color.not_completed_work_todo)
+        }
+    }
+    val containerColor: Color by transition.animateColor(
+        transitionSpec = {
+            tween(durationMillis = 500)
+        }, label = "containerColor"
+    ) { state ->
+        if (state) {
+            colorResource(id = R.color.completed_work_todo)
+        } else {
+            colorResource(id = R.color.not_completed_work_todo)
+        }
+    }
+    val contentColor: Color = contentColorFor(containerColor)
     Card(
         // 角が角張った長方形を想定し、Modifierでチケット風に調整する
         shape = RectangleShape,
         modifier = Modifier
             .clip(shape)
             .then(modifier),
-        colors = if (isCompleted)
-            CardDefaults.cardColors().copy(
-                containerColor = colorResource(id = R.color.completed_work_todo),
-                contentColor = contentColorFor(colorResource(id = R.color.completed_work_todo)),
-            )
-        else
-            CardDefaults.cardColors().copy(
-                containerColor = colorResource(id = R.color.not_completed_work_todo),
-                contentColor = contentColorFor(colorResource(id = R.color.not_completed_work_todo)),
-            ),
+        colors = CardDefaults.cardColors().copy(
+            containerColor = containerColor,
+            contentColor = contentColor,
+        ),
     ) {
         Row(
             modifier = Modifier
@@ -81,13 +109,10 @@ fun WorkTodoFormColumnItem(
             Icon(
                 modifier = Modifier.size(checkIconSize),
                 imageVector = Icons.Filled.Check,
+                // 説明は即時更新
                 contentDescription = if (isCompleted) stringResource(id = R.string.completed_work_todo)
                 else stringResource(id = R.string.not_completed_work_todo),
-                // 未完了なら背景色と同じ色を指定して、実質非表示とする。
-                tint = if (isCompleted)
-                    colorResource(id = R.color.completed_check)
-                else
-                    colorResource(id = R.color.not_completed_work_todo),
+                tint = checkIconColor,
             )
             Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_large)))
             VerticalDivider(color = MaterialTheme.colorScheme.onBackground)

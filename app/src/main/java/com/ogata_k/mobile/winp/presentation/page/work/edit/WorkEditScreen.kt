@@ -1,10 +1,11 @@
 package com.ogata_k.mobile.winp.presentation.page.work.edit
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -13,6 +14,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -25,11 +29,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -47,12 +51,12 @@ import com.ogata_k.mobile.winp.presentation.enumerate.toErrorMessage
 import com.ogata_k.mobile.winp.presentation.widgert.common.AppBarBackButton
 import com.ogata_k.mobile.winp.presentation.widgert.common.ButtonLargeText
 import com.ogata_k.mobile.winp.presentation.widgert.common.ButtonMediumText
-import com.ogata_k.mobile.winp.presentation.widgert.common.ColumnScrollBar
 import com.ogata_k.mobile.winp.presentation.widgert.common.DraggableBottomSheet
 import com.ogata_k.mobile.winp.presentation.widgert.common.ErrorText
 import com.ogata_k.mobile.winp.presentation.widgert.common.FormLabel
 import com.ogata_k.mobile.winp.presentation.widgert.common.FormTitle
 import com.ogata_k.mobile.winp.presentation.widgert.common.HeadlineSmallText
+import com.ogata_k.mobile.winp.presentation.widgert.common.LazyColumnScrollBar
 import com.ogata_k.mobile.winp.presentation.widgert.common.MaxLengthTextField
 import com.ogata_k.mobile.winp.presentation.widgert.common.RadioButtonWithLabel
 import com.ogata_k.mobile.winp.presentation.widgert.common.TitleMediumText
@@ -66,7 +70,7 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalTime
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
     val uiState: WorkEditUiState by viewModel.uiStateFlow.collectAsStateWithLifecycle()
@@ -79,7 +83,6 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
     ) { modifier, appBar ->
         val screenScope = rememberCoroutineScope()
         val snackbarHostState = remember { SnackbarHostState() }
-        val scrollState = rememberScrollState()
 
         Scaffold(
             modifier = modifier,
@@ -88,288 +91,332 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                 SnackbarHost(hostState = snackbarHostState)
             },
         ) { padding ->
-            Box {
-                Column(
-                    modifier = Modifier
-                        .verticalScroll(scrollState)
-                        .padding(padding)
-                        .padding(dimensionResource(id = R.dimen.padding_large)),
-                    horizontalAlignment = Alignment.Start,
-                ) {
-                    // TODO DBのエラーハンドリング(snackbarHostState.showSnackBar()かToast)をするためにinitializedをScreenLoadResult的なSealedClassにする->次はここから。
-                    when (uiState.initializeState) {
-                        // 初期化中
-                        UiInitializeState.LOADING -> {
-                            CircularProgressIndicator(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .wrapContentWidth(Alignment.CenterHorizontally)
-                                    .padding(dimensionResource(id = R.dimen.padding_medium))
-                            )
-                        }
-                        // 初期化完了
-                        UiInitializeState.INITIALIZED -> {
-                            val formData = uiState.formData
-                            val workValidateExceptions = uiState.validateExceptions
+            // TODO DBのエラーハンドリング(snackbarHostState.showSnackBar()かToast)をするためにinitializedをScreenLoadResult的なSealedClassにする->次はここから。
+            when (uiState.initializeState) {
+                // 初期化中
+                UiInitializeState.LOADING -> {
+                    Column(
+                        modifier = Modifier
+                            .padding(padding)
+                            .padding(dimensionResource(id = R.dimen.padding_large)),
+                        horizontalAlignment = Alignment.Start,
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentWidth(Alignment.CenterHorizontally)
+                                .padding(dimensionResource(id = R.dimen.padding_medium))
+                        )
+                    }
+                }
+                // 初期化完了
+                UiInitializeState.INITIALIZED -> {
+                    val listState = rememberLazyListState()
 
-                            FormBlock(
-                                title = stringResource(id = R.string.work_title),
-                                errorMessage = workValidateExceptions.title.toErrorMessage(
-                                    LocalContext.current
-                                ),
-                                formTitleAndError = { t, e ->
-                                    WithCounterTitle(
-                                        title = t,
-                                        current = formData.title.length,
-                                        max = WorkEditVM.TITLE_MAX_LENGTH,
-                                    )
+                    val formData = uiState.formData
+                    val workValidateExceptions = uiState.validateExceptions
+                    Box {
+                        LazyColumn(
+                            modifier = Modifier.padding(padding),
+                            state = listState,
+                            horizontalAlignment = Alignment.Start,
+                            contentPadding = PaddingValues(dimensionResource(id = R.dimen.padding_large)),
+                            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
+                        ) {
+                            item {
+                                FormBlock(
+                                    title = stringResource(id = R.string.work_title),
+                                    errorMessage = workValidateExceptions.title.toErrorMessage(
+                                        LocalContext.current
+                                    ),
+                                    formTitleAndError = { t, e ->
+                                        WithCounterTitle(
+                                            title = t,
+                                            current = formData.title.length,
+                                            max = WorkEditVM.TITLE_MAX_LENGTH,
+                                        )
 
-                                    if (e != null) {
-                                        ErrorText(text = e)
-                                    }
-                                },
-                                isRequired = true,
-                            ) {
-                                MaxLengthTextField(
-                                    modifier = Modifier.weight(1f),
-                                    value = formData.title,
-                                    onValueChange = {
-                                        viewModel.updateFormTitle(it)
-                                    },
-                                    maxLength = WorkEditVM.TITLE_MAX_LENGTH,
-                                    isError = workValidateExceptions.title.hasError(),
-                                )
-                            }
-
-                            FormBlock(
-                                title = stringResource(id = R.string.work_description),
-                                errorMessage = workValidateExceptions.description.toErrorMessage(
-                                    LocalContext.current
-                                ),
-                                formTitleAndError = { t, e ->
-                                    WithCounterTitle(
-                                        title = t,
-                                        current = formData.description.length,
-                                        max = WorkEditVM.DESCRIPTION_MAX_LENGTH,
-                                    )
-
-                                    if (e != null) {
-                                        ErrorText(text = e)
-                                    }
-                                },
-                                isRequired = true,
-                            ) {
-                                MaxLengthTextField(
-                                    modifier = Modifier.weight(1f),
-                                    value = formData.description,
-                                    onValueChange = {
-                                        viewModel.updateFormDescription(it)
-                                    },
-                                    minLines = 5,
-                                    maxLength = WorkEditVM.DESCRIPTION_MAX_LENGTH,
-                                    isError = workValidateExceptions.description.hasError(),
-                                )
-                            }
-
-                            FormBlock(
-                                stringResource(id = R.string.work_todo),
-                                // formTitle内でカスタマイズ
-                                isRequired = null,
-                                formTitleAndError = { t, e ->
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Column(modifier = Modifier.weight(1f)) {
-                                            FormLabel(isRequired = false)
-                                            FormTitle(title = t)
+                                        if (e != null) {
+                                            ErrorText(text = e)
                                         }
-                                        IconButton(onClick = {
-                                            viewModel.showWorkTodoCreateForm()
-                                        }) {
-                                            Icon(
-                                                imageVector = Icons.Filled.Add,
-                                                contentDescription = stringResource(R.string.create_work_todo),
-                                            )
-                                        }
-                                    }
-
-                                    if (e != null) {
-                                        ErrorText(text = e)
-                                    }
-                                },
-                            ) {
-                                Column(
-                                    verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
+                                    },
+                                    isRequired = true,
                                 ) {
-                                    // TODO 表示アイテムが空のときの表示
-                                    formData.todoItems.forEach {
-                                        key(it.uuid) {
-                                            // TODO NEXT リストアイテムの並び替えと削除ができるようにする
-                                            WorkTodoFormColumnItem(
-                                                todoFormData = it,
-                                                modifier = Modifier.clickable {
-                                                    viewModel.showWorkTodoForm(uuid = it.uuid)
-                                                }
+                                    MaxLengthTextField(
+                                        modifier = Modifier.weight(1f),
+                                        value = formData.title,
+                                        onValueChange = {
+                                            viewModel.updateFormTitle(it)
+                                        },
+                                        maxLength = WorkEditVM.TITLE_MAX_LENGTH,
+                                        isError = workValidateExceptions.title.hasError(),
+                                    )
+                                }
+                            }
+
+                            item {
+                                FormBlock(
+                                    title = stringResource(id = R.string.work_description),
+                                    errorMessage = workValidateExceptions.description.toErrorMessage(
+                                        LocalContext.current
+                                    ),
+                                    formTitleAndError = { t, e ->
+                                        WithCounterTitle(
+                                            title = t,
+                                            current = formData.description.length,
+                                            max = WorkEditVM.DESCRIPTION_MAX_LENGTH,
+                                        )
+
+                                        if (e != null) {
+                                            ErrorText(text = e)
+                                        }
+                                    },
+                                    isRequired = true,
+                                ) {
+                                    MaxLengthTextField(
+                                        modifier = Modifier.weight(1f),
+                                        value = formData.description,
+                                        onValueChange = {
+                                            viewModel.updateFormDescription(it)
+                                        },
+                                        minLines = 5,
+                                        maxLength = WorkEditVM.DESCRIPTION_MAX_LENGTH,
+                                        isError = workValidateExceptions.description.hasError(),
+                                    )
+                                }
+                            }
+
+                            //
+                            // リスト表示をしてLazyColumnをネストさせるためのFormBlockの実装のインライン化はここから
+                            //
+                            item {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        FormLabel(isRequired = false)
+                                        FormTitle(title = stringResource(id = R.string.work_todo))
+                                    }
+                                    IconButton(onClick = {
+                                        viewModel.showWorkTodoCreateForm()
+                                    }) {
+                                        Icon(
+                                            imageVector = Icons.Filled.Add,
+                                            contentDescription = stringResource(
+                                                R.string.create_work_todo
+                                            ),
+                                        )
+                                    }
+                                }
+                                // エラーの表示は不要
+                            }
+                            // TODO 表示アイテムが空のときの表示
+                            if (formData.todoItems.isEmpty()) {
+                                item {
+                                    // TODO これはダミーなのでちゃんとした表示にする
+                                    Text("タスクで対応の状態を管理したい事柄があれば、右上の＋ボタンから追加できます。")
+                                }
+                            }
+
+                            itemsIndexed(
+                                items = formData.todoItems,
+                                key = { _, item -> item.uuid },
+                            ) { _, item ->
+                                // TODO 1 リストアイテムの削除  削除ボタンで削除させる？ シート上で削除させる？
+                                // TODO 2 リストアイテムの並び替え  左端に並び替えでつまむためのボタンを設ける？
+                                WorkTodoFormColumnItem(
+                                    todoFormData = item,
+                                    modifier = Modifier
+                                        .animateItemPlacement()
+                                        .padding(
+                                            horizontal = dimensionResource(id = R.dimen.padding_small),
+                                        )
+                                        .clickable {
+                                            viewModel.showWorkTodoForm(uuid = item.uuid)
+                                        }
+                                )
+                            }
+                            item {
+                                // リスト要素の下なので少し余白を大きめに設ける
+                                Spacer(Modifier.height(dimensionResource(id = R.dimen.padding_medium)))
+                            }
+                            //
+                            // リスト表示をしてLazyColumnをネストさせるためのFormBlockの実装のインライン化はここまで
+                            //
+
+                            item {
+                                FormBlock(
+                                    title = stringResource(id = R.string.work_began_at),
+                                    errorMessage = workValidateExceptions.beganDateTime.toErrorMessage(
+                                        LocalContext.current
+                                    ) { context, type ->
+                                        if (type is ValidationExceptionType.NeedBiggerThanDatetime) {
+                                            return@toErrorMessage String.format(
+                                                context.getString(R.string.validation_exception_inconsistent_order_for_before),
+                                                context.getString(R.string.work_began_at),
+                                                context.getString(R.string.work_ended_at)
                                             )
                                         }
-                                    }
+
+                                        return@toErrorMessage null
+                                    },
+                                ) {
+                                    DateTimeForm(
+                                        date = formData.beganDate,
+                                        isInShowDatePicker = uiState.isInShowBeganDatePicker,
+                                        switchShowDatePicker = {
+                                            viewModel.showBeganDatePicker(it)
+                                        },
+                                        updateDate = {
+                                            viewModel.updateBeganDate(it)
+                                        },
+                                        time = formData.beganTime,
+                                        isInShowTimePicker = uiState.isInShowBeganTimePicker,
+                                        switchShowTimePicker = {
+                                            viewModel.showBeganTimePicker(it)
+                                        },
+                                        updateTime = {
+                                            viewModel.updateBeganTime(it)
+                                        },
+                                        isError = workValidateExceptions.beganDateTime.hasError(),
+                                    )
                                 }
+                            }
 
-                                if (uiState.isInShowEditingTodoForm) {
-                                    TaskTodoBottomSheetForm(viewModel, uiState)
+                            item {
+                                FormBlock(
+                                    stringResource(id = R.string.work_ended_at),
+                                    errorMessage = workValidateExceptions.endedDateTime.toErrorMessage(
+                                        LocalContext.current
+                                    ) { context, type ->
+                                        if (type is ValidationExceptionType.NeedSmallerThanDatetime) {
+                                            return@toErrorMessage String.format(
+                                                context.getString(R.string.validation_exception_inconsistent_order_for_after),
+                                                context.getString(R.string.work_ended_at),
+                                                context.getString(R.string.work_began_at)
+                                            )
+                                        }
+
+                                        return@toErrorMessage null
+                                    },
+                                ) {
+                                    DateTimeForm(
+                                        date = formData.endedDate,
+                                        isInShowDatePicker = uiState.isInShowEndedDatePicker,
+                                        switchShowDatePicker = {
+                                            viewModel.showEndedDatePicker(it)
+                                        },
+                                        updateDate = {
+                                            viewModel.updateEndedDate(it)
+                                        },
+                                        time = formData.endedTime,
+                                        isInShowTimePicker = uiState.isInShowEndedTimePicker,
+                                        switchShowTimePicker = {
+                                            viewModel.showEndedTimePicker(it)
+                                        },
+                                        updateTime = {
+                                            viewModel.updateEndedTime(it)
+                                        },
+                                        isError = workValidateExceptions.endedDateTime.hasError(),
+                                    )
                                 }
                             }
 
-                            FormBlock(
-                                title = stringResource(id = R.string.work_began_at),
-                                errorMessage = workValidateExceptions.beganDateTime.toErrorMessage(
-                                    LocalContext.current
-                                ) { context, type ->
-                                    if (type is ValidationExceptionType.NeedBiggerThanDatetime) {
-                                        return@toErrorMessage String.format(
-                                            context.getString(R.string.validation_exception_inconsistent_order_for_before),
-                                            context.getString(R.string.work_began_at),
-                                            context.getString(R.string.work_ended_at)
-                                        )
-                                    }
-
-                                    return@toErrorMessage null
-                                },
-                            ) {
-                                DateTimeForm(
-                                    date = formData.beganDate,
-                                    isInShowDatePicker = uiState.isInShowBeganDatePicker,
-                                    switchShowDatePicker = {
-                                        viewModel.showBeganDatePicker(it)
-                                    },
-                                    updateDate = {
-                                        viewModel.updateBeganDate(it)
-                                    },
-                                    time = formData.beganTime,
-                                    isInShowTimePicker = uiState.isInShowBeganTimePicker,
-                                    switchShowTimePicker = {
-                                        viewModel.showBeganTimePicker(it)
-                                    },
-                                    updateTime = {
-                                        viewModel.updateBeganTime(it)
-                                    },
-                                    isError = workValidateExceptions.beganDateTime.hasError(),
-                                )
+                            item {
+                                // 作成更新のボタンの直前なので余白を余分に設ける
+                                Spacer(Modifier.height(dimensionResource(id = R.dimen.padding_small)))
                             }
-
-                            FormBlock(
-                                stringResource(id = R.string.work_ended_at),
-                                errorMessage = workValidateExceptions.endedDateTime.toErrorMessage(
-                                    LocalContext.current
-                                ) { context, type ->
-                                    if (type is ValidationExceptionType.NeedSmallerThanDatetime) {
-                                        return@toErrorMessage String.format(
-                                            context.getString(R.string.validation_exception_inconsistent_order_for_after),
-                                            context.getString(R.string.work_ended_at),
-                                            context.getString(R.string.work_began_at)
-                                        )
-                                    }
-
-                                    return@toErrorMessage null
-                                },
-                            ) {
-                                DateTimeForm(
-                                    date = formData.endedDate,
-                                    isInShowDatePicker = uiState.isInShowEndedDatePicker,
-                                    switchShowDatePicker = {
-                                        viewModel.showEndedDatePicker(it)
-                                    },
-                                    updateDate = {
-                                        viewModel.updateEndedDate(it)
-                                    },
-                                    time = formData.endedTime,
-                                    isInShowTimePicker = uiState.isInShowEndedTimePicker,
-                                    switchShowTimePicker = {
-                                        viewModel.showEndedTimePicker(it)
-                                    },
-                                    updateTime = {
-                                        viewModel.updateEndedTime(it)
-                                    },
-                                    isError = workValidateExceptions.endedDateTime.hasError(),
-                                )
-                            }
-
-                            Spacer(Modifier.height(dimensionResource(id = R.dimen.padding_medium_large)))
 
                             val validWork = !workValidateExceptions.hasError()
-                            WithLoadingButton(
-                                modifier = Modifier.align(Alignment.CenterHorizontally),
-                                // 入力内容のチェックだけでなく、フォームの状態的に実行できる状態かもチェック
-                                enabled = validWork && uiState.formState.canDoAction(),
-                                isLoading = uiState.formState.isInDoingAction(),
-                                onClick = { viewModel.createOrUpdateWorkItem() },
-                            ) {
-                                ButtonLargeText(
-                                    text = if (uiState.isInCreating)
-                                        stringResource(id = R.string.create)
-                                    else
-                                        stringResource(id = R.string.update)
+                            item {
+                                Box(
+                                    modifier = Modifier.fillParentMaxWidth(),
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    WithLoadingButton(
+                                        // 入力内容のチェックだけでなく、フォームの状態的に実行できる状態かもチェック
+                                        enabled = validWork && uiState.formState.canDoAction(),
+                                        isLoading = uiState.formState.isInDoingAction(),
+                                        onClick = { viewModel.createOrUpdateWorkItem() },
+                                    ) {
+                                        ButtonLargeText(
+                                            text = if (uiState.isInCreating)
+                                                stringResource(id = R.string.create)
+                                            else
+                                                stringResource(id = R.string.update)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
+                        // Formが長くなってきたのでスクロールを表示するようにする
+                        LazyColumnScrollBar(
+                            listState = listState,
+                            isAlwaysShowScrollBar = false,
+                        )
+                    }
+
+                    // 外に出したいが、Composableの中でないといけないので余白の指定と一緒に指定する
+                    if (uiState.isInShowEditingTodoForm) {
+                        TaskTodoBottomSheetForm(viewModel, uiState)
+                    }
+
+                    // TODO 今は仮実装だが、uiState.formStateを見て成功や失敗なら通知して画面を閉じて一覧に戻る
+                    if (uiState.formState.isSuccess()) {
+                        // TODO 実際の処理に置き換える
+                        LaunchedEffect(
+                            uiState.formState,
+                            snackbarHostState
+                        ) {
+                            screenScope.launch {
+                                val message = if (uiState.isInCreating) {
+                                    "（仮実装）作成に成功しました。"
+                                } else {
+                                    "（仮実装）更新に成功しました。"
+                                }
+                                snackbarHostState.showSnackbar(message)
+
+                                // スナックバーの表示が消えてから少し待って有効化
+                                delay(300)
+
+                                // 状態をセットしつつ現在の作成編集画面を閉じる
+                                uiState.screenState.popWithSetState(
+                                    navController
                                 )
                             }
-
-                            // TODO 今は仮実装だが、uiState.formStateを見て成功や失敗なら通知して画面を閉じて一覧に戻る
-                            if (uiState.formState.isSuccess()) {
-                                // TODO 実際の処理に置き換える
-                                LaunchedEffect(uiState.formState, snackbarHostState) {
-                                    screenScope.launch {
-                                        val message = if (uiState.isInCreating) {
-                                            "（仮実装）作成に成功しました。"
-                                        } else {
-                                            "（仮実装）更新に成功しました。"
-                                        }
-                                        snackbarHostState.showSnackbar(message)
-
-                                        // スナックバーの表示が消えてから少し待って有効化
-                                        delay(300)
-
-                                        // 状態をセットしつつ現在の作成編集画面を閉じる
-                                        uiState.screenState.popWithSetState(navController)
-                                    }
-                                }
-                            }
-
-                            if (uiState.formState.isFailure()) {
-                                // TODO 実際の処理に置き換える
-                                LaunchedEffect(uiState.formState, snackbarHostState) {
-                                    screenScope.launch {
-                                        val message = if (uiState.isInCreating) {
-                                            "（仮実装）作成に失敗しました。"
-                                        } else {
-                                            "（仮実装）更新に失敗しました。"
-                                        }
-                                        snackbarHostState.showSnackbar(message)
-
-                                        // スナックバーの表示が消えてから少し待って有効化
-                                        delay(300)
-                                        viewModel.updateToEditingFormState()
-                                    }
-                                }
-                            }
-
-
-                            Spacer(Modifier.height(dimensionResource(id = R.dimen.padding_medium_large)))
                         }
+                    }
 
-                        // アイテムが見つからず終了
-                        UiInitializeState.NOT_FOUND_EXCEPTION -> {
-                            // TODO 初期化しようとしたがアイテムが見つからなかったので失敗。これを通知して画面を閉じる（もしくは画面を閉じてから通知）
-                        }
+                    if (uiState.formState.isFailure()) {
+                        // TODO 実際の処理に置き換える
+                        LaunchedEffect(
+                            uiState.formState,
+                            snackbarHostState
+                        ) {
+                            screenScope.launch {
+                                val message = if (uiState.isInCreating) {
+                                    "（仮実装）作成に失敗しました。"
+                                } else {
+                                    "（仮実装）更新に失敗しました。"
+                                }
+                                snackbarHostState.showSnackbar(message)
 
-                        // 予期せぬエラーがあった場合
-                        UiInitializeState.ERROR -> {
-                            // TODO 初期化に失敗したことを通知して画面を閉じる（もしくは画面を閉じてから通知）
+                                // スナックバーの表示が消えてから少し待って有効化
+                                delay(300)
+                                viewModel.updateToEditingFormState()
+                            }
                         }
                     }
                 }
 
-                // Formが長くなってきたのでスクロールを表示するようにする
-                ColumnScrollBar(
-                    scrollState = scrollState,
-                    isAlwaysShowScrollBar = false,
-                )
+                // アイテムが見つからず終了
+                UiInitializeState.NOT_FOUND_EXCEPTION -> {
+                    // TODO 初期化しようとしたがアイテムが見つからなかったので失敗。これを通知して画面を閉じる（もしくは画面を閉じてから通知）
+                }
+
+                // 予期せぬエラーがあった場合
+                UiInitializeState.ERROR -> {
+                    // TODO 初期化に失敗したことを通知して画面を閉じる（もしくは画面を閉じてから通知）
+                }
             }
         }
     }
@@ -413,7 +460,7 @@ private fun WithCounterTitle(
 }
 
 @Composable
-private fun ColumnScope.FormBlock(
+private fun FormBlock(
     title: String,
     // 自前でハンドリングしたい場合や非表示の場合はnullを指定する
     isRequired: Boolean? = false,
@@ -442,7 +489,6 @@ private fun ColumnScope.FormBlock(
     ) {
         content(errorMessage)
     }
-    Spacer(Modifier.height(dimensionResource(id = R.dimen.padding_medium)))
 }
 
 @Composable
