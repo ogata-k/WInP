@@ -226,7 +226,7 @@ class WorkEditVM @Inject constructor() : AbstractViewModel<WorkEditVMState, Work
         val newVmState = vmState.copy(
             isInShowEditingTodoForm = true,
             formData = newFormData,
-            validateExceptions = validateFormData(newFormData, vmState.isInShowEditingTodoForm),
+            validateExceptions = validateFormData(newFormData, true),
         )
         updateVMState(newVmState)
     }
