@@ -14,4 +14,5 @@
     <color name="not_completed_work_todo">#C6DDF6</color>
     <color name="required_label_color">#FF0000</color>
     <color name="optional_label_color">#888888</color>
+    <color name="dismiss_background_color">#FF0E0E</color>
 </resources>

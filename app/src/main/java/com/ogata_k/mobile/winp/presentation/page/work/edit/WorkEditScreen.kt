@@ -1,6 +1,8 @@
 package com.ogata_k.mobile.winp.presentation.page.work.edit
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,9 +11,11 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,6 +25,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
@@ -29,8 +34,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -39,6 +46,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -49,6 +57,7 @@ import com.ogata_k.mobile.winp.presentation.enumerate.ValidationExceptionType
 import com.ogata_k.mobile.winp.presentation.enumerate.hasError
 import com.ogata_k.mobile.winp.presentation.enumerate.toErrorMessage
 import com.ogata_k.mobile.winp.presentation.widgert.common.AppBarBackButton
+import com.ogata_k.mobile.winp.presentation.widgert.common.BodyMediumText
 import com.ogata_k.mobile.winp.presentation.widgert.common.ButtonLargeText
 import com.ogata_k.mobile.winp.presentation.widgert.common.ButtonMediumText
 import com.ogata_k.mobile.winp.presentation.widgert.common.DraggableBottomSheet
@@ -208,11 +217,11 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                                 }
                                 // エラーの表示は不要
                             }
-                            // TODO 表示アイテムが空のときの表示
+
+
                             if (formData.todoItems.isEmpty()) {
                                 item {
-                                    // TODO これはダミーなのでちゃんとした表示にする
-                                    Text("タスクで対応の状態を管理したい事柄があれば、右上の＋ボタンから追加できます。")
+                                    BodyMediumText(stringResource(R.string.form_help_to_add_work_todo_form))
                                 }
                             }
 
@@ -220,20 +229,62 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                                 items = formData.todoItems,
                                 key = { _, item -> item.uuid },
                             ) { _, item ->
-                                // TODO 1 リストアイテムの削除  削除ボタンで削除させる？ シート上で削除させる？
+                                val dismissState = rememberSwipeToDismissBoxState(
+                                    initialValue = SwipeToDismissBoxValue.Settled,
+                                    confirmValueChange = {
+                                        if (it == SwipeToDismissBoxValue.StartToEnd) {
+                                            viewModel.removeWorkTodoForm(item.uuid)
+
+                                            return@rememberSwipeToDismissBoxState true
+                                        }
+
+                                        return@rememberSwipeToDismissBoxState false
+                                    },
+                                    positionalThreshold = { it * .4f },
+                                )
                                 // TODO 2 リストアイテムの並び替え  左端に並び替えでつまむためのボタンを設ける？
-                                WorkTodoFormColumnItem(
-                                    todoFormData = item,
+                                SwipeToDismissBox(
+                                    state = dismissState,
                                     modifier = Modifier
+                                        .animateContentSize()
                                         .animateItemPlacement()
                                         .padding(
                                             horizontal = dimensionResource(id = R.dimen.padding_small),
                                         )
                                         .clickable {
-                                            viewModel.showWorkTodoForm(uuid = item.uuid)
+                                            if (dismissState.currentValue == SwipeToDismissBoxValue.Settled) {
+                                                viewModel.showWorkTodoForm(uuid = item.uuid)
+                                            }
+                                        },
+                                    enableDismissFromStartToEnd = true,
+                                    enableDismissFromEndToStart = false,
+                                    backgroundContent = {
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .background(colorResource(id = R.color.dismiss_background_color)),
+                                            contentAlignment = Alignment.CenterStart,
+                                        ) {
+                                            Icon(
+                                                modifier = Modifier
+                                                    .padding(
+                                                        vertical = dimensionResource(id = R.dimen.padding_medium),
+                                                        horizontal = dimensionResource(id = R.dimen.padding_large),
+                                                    )
+                                                    .size(dimensionResource(id = R.dimen.icon_size_medium)),
+                                                imageVector = Icons.Filled.Delete,
+                                                contentDescription = stringResource(id = R.string.delete_work_todo),
+                                            )
                                         }
-                                )
+                                    },
+                                ) {
+                                    WorkTodoFormColumnItem(
+                                        todoFormData = item,
+                                        modifier = Modifier,
+                                    )
+                                }
                             }
+
                             item {
                                 // リスト要素の下なので少し余白を大きめに設ける
                                 Spacer(Modifier.height(dimensionResource(id = R.dimen.padding_medium)))

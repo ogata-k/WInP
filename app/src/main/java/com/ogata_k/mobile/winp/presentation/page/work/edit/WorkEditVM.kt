@@ -232,6 +232,27 @@ class WorkEditVM @Inject constructor() : AbstractViewModel<WorkEditVMState, Work
     }
 
     /**
+     * 指定されたUUIDのWorkTodoFormデータを削除
+     */
+    fun removeWorkTodoForm(uuid: UUID) {
+        val vmState = readVMState()
+        val newWorkTodoForms: MutableList<WorkTodoFormData> = mutableListOf()
+        vmState.formData.todoItems.forEach {
+            if (it.uuid != uuid) {
+                newWorkTodoForms.add(it)
+            }
+        }
+        val newFormData = vmState.formData.copy(
+            todoItems = newWorkTodoForms,
+        )
+        val newVmState = vmState.copy(
+            formData = newFormData,
+            validateExceptions = validateFormData(newFormData, vmState.isInShowEditingTodoForm),
+        )
+        updateVMState(newVmState)
+    }
+
+    /**
      * 作成/編集中の対象となっているタスクTODOの完了状態を更新する
      */
     fun updateWorkTodoFormCompleted(isCompleted: Boolean) {
