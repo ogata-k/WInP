@@ -51,6 +51,7 @@
 
     <!-- フォームヘルプ -->
     <string name="form_help_to_add_work_todo_form">タスクで対応状況を管理したい事柄があれば、右上の＋ボタンから追加できます。</string>
+    <string name="form_help_to_modify_work_todo_form">アイテムをタップすることで編集、右にスワイプすることで削除、長押ししてドラッグすることで並び替えが可能です。</string>
 
     <!-- バリデーションエラー -->
     <string name="validation_exception_empty_select_value">値を選択してください。</string>

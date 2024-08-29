@@ -218,10 +218,11 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                                 // エラーの表示は不要
                             }
 
-
-                            if (formData.todoItems.isEmpty()) {
-                                item {
+                            item {
+                                if (formData.todoItems.isEmpty()) {
                                     BodyMediumText(stringResource(R.string.form_help_to_add_work_todo_form))
+                                } else {
+                                    BodyMediumText(stringResource(R.string.form_help_to_modify_work_todo_form))
                                 }
                             }
 
