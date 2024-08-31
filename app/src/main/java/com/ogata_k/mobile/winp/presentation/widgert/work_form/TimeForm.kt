@@ -35,6 +35,7 @@ fun TimeFormColumnItem(
     switchShowTimePicker: (toShow: Boolean) -> Unit,
     updateTime: (time: LocalTime?) -> Unit,
     modifier: Modifier = Modifier,
+    canEdit: Boolean = true,
     canDelete: Boolean = true,
     isError: Boolean = false,
 ) {
@@ -42,7 +43,10 @@ fun TimeFormColumnItem(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        IconButton(onClick = { switchShowTimePicker(true) }) {
+        IconButton(
+            onClick = { switchShowTimePicker(true) },
+            enabled = canEdit,
+        ) {
             Icon(
                 modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_large)),
                 imageVector = Icons.Filled.AccessTime,
@@ -63,7 +67,10 @@ fun TimeFormColumnItem(
         )
         if (canDelete) {
             Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_small)))
-            IconButton(onClick = { updateTime(null) }) {
+            IconButton(
+                onClick = { updateTime(null) },
+                enabled = canEdit,
+            ) {
                 Icon(
                     modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_medium)),
                     imageVector = Icons.Filled.Close,
@@ -82,17 +89,23 @@ fun TimeFormColumnItem(
             state = timePickerState,
             onDismissRequest = { /* ignore background dismiss */ },
             dismissButton = {
-                Button(onClick = {
-                    switchShowTimePicker(false)
-                }) {
+                Button(
+                    onClick = {
+                        switchShowTimePicker(false)
+                    },
+                    enabled = canEdit,
+                ) {
                     ButtonLargeText(text = stringResource(R.string.cancel))
                 }
             },
             confirmButton = {
-                Button(onClick = {
-                    updateTime(LocalTime.of(timePickerState.hour, timePickerState.minute))
-                    switchShowTimePicker(false)
-                }) {
+                Button(
+                    onClick = {
+                        updateTime(LocalTime.of(timePickerState.hour, timePickerState.minute))
+                        switchShowTimePicker(false)
+                    },
+                    enabled = canEdit,
+                ) {
                     ButtonLargeText(text = stringResource(R.string.ok))
                 }
             },

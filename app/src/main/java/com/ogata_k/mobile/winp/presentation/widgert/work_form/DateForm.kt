@@ -38,6 +38,7 @@ fun DateFormColumnItem(
     switchShowDatePicker: (toShow: Boolean) -> Unit,
     updateDate: (date: LocalDate?) -> Unit,
     modifier: Modifier = Modifier,
+    canEdit: Boolean = true,
     canDelete: Boolean = true,
     isError: Boolean = false,
 ) {
@@ -45,7 +46,10 @@ fun DateFormColumnItem(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        IconButton(onClick = { switchShowDatePicker(true) }) {
+        IconButton(
+            onClick = { switchShowDatePicker(true) },
+            enabled = canEdit,
+        ) {
             Icon(
                 modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_large)),
                 imageVector = Icons.Filled.DateRange,
@@ -66,7 +70,10 @@ fun DateFormColumnItem(
         )
         if (canDelete) {
             Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_small)))
-            IconButton(onClick = { updateDate(null) }) {
+            IconButton(
+                onClick = { updateDate(null) },
+                enabled = canEdit,
+            ) {
                 Icon(
                     modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_medium)),
                     imageVector = Icons.Filled.Close,
@@ -84,21 +91,27 @@ fun DateFormColumnItem(
             state = datePickerState,
             onDismissRequest = { /* ignore background dismiss */ },
             dismissButton = {
-                Button(onClick = {
-                    switchShowDatePicker(false)
-                }) {
+                Button(
+                    onClick = {
+                        switchShowDatePicker(false)
+                    },
+                    enabled = canEdit,
+                ) {
                     ButtonLargeText(text = stringResource(R.string.cancel))
                 }
             },
             confirmButton = {
-                Button(onClick = {
-                    val dateTimestamp: Long? =
-                        datePickerState.selectedDateMillis
-                    if (dateTimestamp != null) {
-                        updateDate(fromMillsToDate(dateTimestamp))
-                    }
-                    switchShowDatePicker(false)
-                }) {
+                Button(
+                    onClick = {
+                        val dateTimestamp: Long? =
+                            datePickerState.selectedDateMillis
+                        if (dateTimestamp != null) {
+                            updateDate(fromMillsToDate(dateTimestamp))
+                        }
+                        switchShowDatePicker(false)
+                    },
+                    enabled = canEdit,
+                ) {
                     ButtonLargeText(text = stringResource(R.string.ok))
                 }
             },

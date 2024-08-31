@@ -72,7 +72,7 @@ import com.ogata_k.mobile.winp.presentation.widgert.common.WithLoadingButton
 import com.ogata_k.mobile.winp.presentation.widgert.common.WithScaffoldSmallTopAppBar
 import com.ogata_k.mobile.winp.presentation.widgert.common.draggableColumnContainer
 import com.ogata_k.mobile.winp.presentation.widgert.common.draggableColumnItems
-import com.ogata_k.mobile.winp.presentation.widgert.common.rememberDragDropState
+import com.ogata_k.mobile.winp.presentation.widgert.common.rememberDragDropColumnState
 import com.ogata_k.mobile.winp.presentation.widgert.work_form.DateFormColumnItem
 import com.ogata_k.mobile.winp.presentation.widgert.work_form.TimeFormColumnItem
 import com.ogata_k.mobile.winp.presentation.widgert.work_form.WorkTodoFormColumnItem
@@ -123,12 +123,14 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                 // 初期化完了
                 UiInitializeState.INITIALIZED -> {
                     val formData = uiState.formData
+                    val isInDoing = uiState.formState.isInDoingAction()
+                    val canEditForm = uiState.formState.canEditForm()
                     val workValidateExceptions = uiState.validateExceptions
 
                     val listState = rememberLazyListState()
 
                     val dragDropState =
-                        rememberDragDropState(
+                        rememberDragDropColumnState(
                             lazyListState = listState,
                             draggableItemsNum = formData.todoItems.size,
                             onMove = { fromIndex, toIndex ->
@@ -138,7 +140,7 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                     Box(modifier = Modifier.padding(padding)) {
                         LazyColumn(
                             modifier = Modifier
-                                .draggableColumnContainer(dragDropState),
+                                .draggableColumnContainer(dragDropState, canEditForm),
                             state = listState,
                             horizontalAlignment = Alignment.Start,
                             contentPadding = PaddingValues(dimensionResource(id = R.dimen.padding_large)),
@@ -165,6 +167,7 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                                 ) {
                                     MaxLengthTextField(
                                         modifier = Modifier.weight(1f),
+                                        readOnly = !canEditForm,
                                         value = formData.title,
                                         onValueChange = {
                                             viewModel.updateFormTitle(it)
@@ -196,6 +199,7 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                                 ) {
                                     MaxLengthTextField(
                                         modifier = Modifier.weight(1f),
+                                        readOnly = !canEditForm,
                                         value = formData.description,
                                         onValueChange = {
                                             viewModel.updateFormDescription(it)
@@ -216,9 +220,12 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                                         FormLabel(isRequired = false)
                                         FormTitle(title = stringResource(id = R.string.work_todo))
                                     }
-                                    IconButton(onClick = {
-                                        viewModel.showWorkTodoCreateForm()
-                                    }) {
+                                    IconButton(
+                                        onClick = {
+                                            viewModel.showWorkTodoCreateForm()
+                                        },
+                                        enabled = canEditForm,
+                                    ) {
                                         Icon(
                                             imageVector = Icons.Filled.Add,
                                             contentDescription = stringResource(
@@ -265,12 +272,13 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                                         .padding(
                                             horizontal = dimensionResource(id = R.dimen.padding_small),
                                         )
-                                        .clickable {
+                                        .clickable(enabled = canEditForm) {
                                             if (dismissState.currentValue == SwipeToDismissBoxValue.Settled) {
                                                 viewModel.showWorkTodoForm(uuid = item.uuid)
                                             }
                                         },
-                                    enableDismissFromStartToEnd = true,
+                                    // フォームとして編集ができる状態ならスワイプ削除も有効化
+                                    enableDismissFromStartToEnd = canEditForm,
                                     enableDismissFromEndToStart = false,
                                     backgroundContent = {
                                         Box(
@@ -294,7 +302,6 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                                     content = {
                                         WorkTodoFormColumnItem(
                                             todoFormData = item,
-                                            modifier = Modifier,
                                         )
                                     },
                                 )
@@ -326,6 +333,7 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                                     },
                                 ) {
                                     DateTimeForm(
+                                        canEdit = canEditForm,
                                         date = formData.beganDate,
                                         isInShowDatePicker = uiState.isInShowBeganDatePicker,
                                         switchShowDatePicker = {
@@ -365,6 +373,7 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                                     },
                                 ) {
                                     DateTimeForm(
+                                        canEdit = canEditForm,
                                         date = formData.endedDate,
                                         isInShowDatePicker = uiState.isInShowEndedDatePicker,
                                         switchShowDatePicker = {
@@ -400,7 +409,7 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                                     WithLoadingButton(
                                         // 入力内容のチェックだけでなく、フォームの状態的に実行できる状態かもチェック
                                         enabled = validWork && uiState.formState.canDoAction(),
-                                        isLoading = uiState.formState.isInDoingAction(),
+                                        isLoading = isInDoing,
                                         onClick = { viewModel.createOrUpdateWorkItem() },
                                     ) {
                                         ButtonLargeText(
@@ -568,6 +577,7 @@ private fun DateTimeForm(
     switchShowTimePicker: (toShow: Boolean) -> Unit,
     updateTime: (time: LocalTime?) -> Unit,
     modifier: Modifier = Modifier,
+    canEdit: Boolean = true,
     canDelete: Boolean = true,
     isError: Boolean = false,
 ) {
@@ -577,6 +587,7 @@ private fun DateTimeForm(
             isInShowDatePicker = isInShowDatePicker,
             switchShowDatePicker = switchShowDatePicker,
             updateDate = updateDate,
+            canEdit = canEdit,
             canDelete = canDelete,
             isError = isError,
         )
@@ -586,6 +597,7 @@ private fun DateTimeForm(
             isInShowTimePicker = isInShowTimePicker,
             switchShowTimePicker = switchShowTimePicker,
             updateTime = updateTime,
+            canEdit = canEdit,
             canDelete = canDelete,
             isError = isError,
         )

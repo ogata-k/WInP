@@ -64,7 +64,14 @@ inline fun <T : Any> LazyListScope.draggableColumnItems(
  *
  * ※ 基本的にLazyColumnのModifierの中で一番最後に指定する。
  */
-fun Modifier.draggableColumnContainer(dragDropState: DragDropColumnState): Modifier {
+fun Modifier.draggableColumnContainer(
+    dragDropState: DragDropColumnState,
+    canDrag: Boolean = true
+): Modifier {
+    if (!canDrag) {
+        return this
+    }
+
     return this.then(
         pointerInput(dragDropState) {
             detectDragGesturesAfterLongPress(
@@ -157,7 +164,7 @@ class DragDropColumnState(
 }
 
 @Composable
-fun rememberDragDropState(
+fun rememberDragDropColumnState(
     lazyListState: LazyListState,
     onMove: (Int, Int) -> Unit,
     draggableItemsNum: Int

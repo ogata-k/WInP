@@ -37,4 +37,11 @@ enum class UiFormState {
     fun isFailure(): Boolean {
         return this == FAIL_ACTION
     }
+
+    /**
+     * Formが編集可能な状態ならtrue
+     */
+    fun canEditForm(): Boolean {
+        return canDoAction() || isFailure()
+    }
 }
