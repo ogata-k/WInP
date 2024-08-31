@@ -435,38 +435,19 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                         TaskTodoBottomSheetForm(viewModel, uiState)
                     }
 
-                    // TODO 今は仮実装だが、uiState.formStateを見て成功や失敗なら通知して画面を閉じて一覧に戻る
-                    if (uiState.formState.isSuccess()) {
-                        // TODO 実際の処理に置き換える
-                        LaunchedEffect(
-                            uiState.formState,
-                            snackbarHostState
-                        ) {
-                            screenScope.launch {
-                                val message = if (uiState.isInCreating) {
-                                    "（仮実装）作成に成功しました。"
-                                } else {
-                                    "（仮実装）更新に成功しました。"
-                                }
-                                snackbarHostState.showSnackbar(message)
-
-                                // スナックバーの表示が消えてから少し待って有効化
-                                delay(300)
-
-                                // 状態をセットしつつ現在の作成編集画面を閉じる
-                                uiState.screenState.popWithSetState(
-                                    navController
-                                )
-                            }
+                    // TODO 実際の処理に置き換える
+                    LaunchedEffect(
+                        uiState.formState,
+                        snackbarHostState
+                    ) {
+                        if (uiState.formState.isSuccess()) {
+                            // 処理に成功したときはすぐに閉じる
+                            uiState.screenState.popWithSetState(
+                                navController
+                            )
                         }
-                    }
 
-                    if (uiState.formState.isFailure()) {
-                        // TODO 実際の処理に置き換える
-                        LaunchedEffect(
-                            uiState.formState,
-                            snackbarHostState
-                        ) {
+                        if (uiState.formState.isFailure()) {
                             screenScope.launch {
                                 val message = if (uiState.isInCreating) {
                                     "（仮実装）作成に失敗しました。"

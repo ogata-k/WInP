@@ -12,6 +12,8 @@ import com.ogata_k.mobile.winp.presentation.model.work_form.WorkTodoFormData
 import com.ogata_k.mobile.winp.presentation.model.work_form.WorkTodoFormValidateExceptions
 import com.ogata_k.mobile.winp.presentation.page.AbstractViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -541,16 +543,15 @@ class WorkEditVM @Inject constructor() : AbstractViewModel<WorkEditVMState, Work
         val newVmState = vmState.copy(formState = UiFormState.DOING_ACTION)
         updateVMState(newVmState)
 
-        // TODO 実際の実装にする
-        viewModelScope.launch {
-            // TODO 作成や更新をする
+        @OptIn(DelicateCoroutinesApi::class)
+        // アプリを強制停止する場合を除いて、実行中に画面をpopしたりしたときなどに最後まで実行されないのは困るのでGlobalScopeで実行する
+        GlobalScope.launch {
+            // TODO このスコープ内の実相を実際の実装にする
             delay(3000)
 
-            // TODO 作成や更新中に画面操作できないようにローディング表示させる
-
-            // TODO 作成や更新の結果を通知する
             val result = Random.nextInt() % 3 != 0
             val oldVmState = readVMState()
+            // 実行結果を通知
             updateVMState(
                 oldVmState.copy(
                     screenState = if (result) (if (oldVmState.isInCreating) UiNextScreenState.CREATED else UiNextScreenState.UPDATED) else UiNextScreenState.ERROR,
