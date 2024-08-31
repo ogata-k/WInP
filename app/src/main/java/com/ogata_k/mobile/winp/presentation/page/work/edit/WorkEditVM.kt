@@ -33,24 +33,23 @@ class WorkEditVM @Inject constructor() : AbstractViewModel<WorkEditVMState, Work
         const val WORK_TODO_ITEM_DESCRIPTION_MAX_LENGTH = 50
     }
 
-    override val viewModelStateFlow: MutableStateFlow<WorkEditVMState> =
-        MutableStateFlow(
-            WorkEditVMState(
-                // 初期状態は未初期化状態とする
-                initializeState = UiInitializeState.LOADING,
-                screenState = UiNextScreenState.LOADING,
-                formState = UiFormState.NOT_INITIALIZE,
-                isInCreating = isInCreating(WorkEditRouting.CREATE_WORK_ID),
-                workId = WorkEditRouting.CREATE_WORK_ID,
-                formData = WorkFormData.empty(),
-                validateExceptions = WorkFormValidateExceptions.empty(),
-                isInShowEditingTodoForm = false,
-                isInShowBeganDatePicker = false,
-                isInShowBeganTimePicker = false,
-                isInShowEndedDatePicker = false,
-                isInShowEndedTimePicker = false,
-            )
+    override val viewModelStateFlow: MutableStateFlow<WorkEditVMState> = MutableStateFlow(
+        WorkEditVMState(
+            // 初期状態は未初期化状態とする
+            initializeState = UiInitializeState.LOADING,
+            screenState = UiNextScreenState.LOADING,
+            formState = UiFormState.NOT_INITIALIZE,
+            isInCreating = isInCreating(WorkEditRouting.CREATE_WORK_ID),
+            workId = WorkEditRouting.CREATE_WORK_ID,
+            formData = WorkFormData.empty(),
+            validateExceptions = WorkFormValidateExceptions.empty(),
+            isInShowEditingTodoForm = false,
+            isInShowBeganDatePicker = false,
+            isInShowBeganTimePicker = false,
+            isInShowEndedDatePicker = false,
+            isInShowEndedTimePicker = false,
         )
+    )
 
     override val uiStateFlow: StateFlow<WorkEditUiState> =
         asUIStateFlow(viewModelScope, viewModelStateFlow)
@@ -134,8 +133,7 @@ class WorkEditVM @Inject constructor() : AbstractViewModel<WorkEditVMState, Work
                     formState = UiFormState.FORM_EDITING,
                     formData = formData,
                     validateExceptions = validateFormData(
-                        formData,
-                        readVMState().isInShowEditingTodoForm
+                        formData, readVMState().isInShowEditingTodoForm
                     ),
                 )
             )
@@ -220,8 +218,7 @@ class WorkEditVM @Inject constructor() : AbstractViewModel<WorkEditVMState, Work
 
         val vmState = readVMState()
         val newFormData = vmState.formData.copy(
-            editingTodoItem = searchWorkTodoFormByUuid(uuid)
-                ?: WorkTodoFormData.empty(uuid)
+            editingTodoItem = searchWorkTodoFormByUuid(uuid) ?: WorkTodoFormData.empty(uuid)
         )
         val newVmState = vmState.copy(
             isInShowEditingTodoForm = true,
@@ -236,12 +233,28 @@ class WorkEditVM @Inject constructor() : AbstractViewModel<WorkEditVMState, Work
      */
     fun removeWorkTodoForm(uuid: UUID) {
         val vmState = readVMState()
-        val newWorkTodoForms: MutableList<WorkTodoFormData> = mutableListOf()
-        vmState.formData.todoItems.forEach {
-            if (it.uuid != uuid) {
-                newWorkTodoForms.add(it)
+        val newWorkTodoForms: List<WorkTodoFormData> =
+            vmState.formData.todoItems.toMutableList().filter { it.uuid == uuid }
+
+        val newFormData = vmState.formData.copy(
+            todoItems = newWorkTodoForms,
+        )
+        val newVmState = vmState.copy(
+            formData = newFormData,
+            validateExceptions = validateFormData(newFormData, vmState.isInShowEditingTodoForm),
+        )
+        updateVMState(newVmState)
+    }
+
+    /**
+     * 指定された位置にあるWorkTodoFormデータを入れ替える
+     */
+    fun swapWorkTodoItem(fromIndex: Int, toIndex: Int) {
+        val vmState = readVMState()
+        val newWorkTodoForms: List<WorkTodoFormData> =
+            vmState.formData.todoItems.toMutableList().apply {
+                add(toIndex, removeAt(fromIndex))
             }
-        }
         val newFormData = vmState.formData.copy(
             todoItems = newWorkTodoForms,
         )
@@ -322,8 +335,7 @@ class WorkEditVM @Inject constructor() : AbstractViewModel<WorkEditVMState, Work
 
         val newVmState = vmState.copy(
             // 問題なくリストを更新できたのでフォームを非表示にする
-            isInShowEditingTodoForm = false,
-            formData = vmState.formData.copy(
+            isInShowEditingTodoForm = false, formData = vmState.formData.copy(
                 todoItems = newTodoItems,
             )
         )
@@ -422,8 +434,7 @@ class WorkEditVM @Inject constructor() : AbstractViewModel<WorkEditVMState, Work
      * 入力内容をバリデーションする
      */
     private fun validateFormData(
-        formData: WorkFormData,
-        isInShowEditingTodoForm: Boolean
+        formData: WorkFormData, isInShowEditingTodoForm: Boolean
     ): WorkFormValidateExceptions {
         val titleValidated = if (formData.title.isEmpty()) ValidationException.of(
             ValidationExceptionType.EmptyValue(false)
@@ -447,15 +458,13 @@ class WorkEditVM @Inject constructor() : AbstractViewModel<WorkEditVMState, Work
 
         val beganDateTimeValidated = if (formData.beganDate != null) {
             if (formData.endedDate != null && LocalDateTime.of(
-                    formData.beganDate,
-                    formData.beganTime ?: LocalTime.MIN
+                    formData.beganDate, formData.beganTime ?: LocalTime.MIN
                 ) >= LocalDateTime.of(formData.endedDate, formData.endedTime ?: LocalTime.MAX)
             ) {
                 ValidationException.of(
                     ValidationExceptionType.NeedSmallerThanDatetime(
                         LocalDateTime.of(
-                            formData.endedDate,
-                            formData.endedTime ?: LocalTime.MAX
+                            formData.endedDate, formData.endedTime ?: LocalTime.MAX
                         )
                     )
                 )
@@ -470,15 +479,13 @@ class WorkEditVM @Inject constructor() : AbstractViewModel<WorkEditVMState, Work
 
         val endedDateTimeValidated = if (formData.endedDate != null) {
             if (formData.beganDate != null && LocalDateTime.of(
-                    formData.beganDate,
-                    formData.beganTime ?: LocalTime.MIN
+                    formData.beganDate, formData.beganTime ?: LocalTime.MIN
                 ) >= LocalDateTime.of(formData.endedDate, formData.endedTime ?: LocalTime.MAX)
             ) {
                 ValidationException.of(
                     ValidationExceptionType.NeedBiggerThanDatetime(
                         LocalDateTime.of(
-                            formData.beganDate,
-                            formData.beganTime ?: LocalTime.MIN
+                            formData.beganDate, formData.beganTime ?: LocalTime.MIN
                         )
                     )
                 )

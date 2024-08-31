@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -71,6 +70,9 @@ import com.ogata_k.mobile.winp.presentation.widgert.common.RadioButtonWithLabel
 import com.ogata_k.mobile.winp.presentation.widgert.common.TitleMediumText
 import com.ogata_k.mobile.winp.presentation.widgert.common.WithLoadingButton
 import com.ogata_k.mobile.winp.presentation.widgert.common.WithScaffoldSmallTopAppBar
+import com.ogata_k.mobile.winp.presentation.widgert.common.draggableColumnContainer
+import com.ogata_k.mobile.winp.presentation.widgert.common.draggableColumnItems
+import com.ogata_k.mobile.winp.presentation.widgert.common.rememberDragDropState
 import com.ogata_k.mobile.winp.presentation.widgert.work_form.DateFormColumnItem
 import com.ogata_k.mobile.winp.presentation.widgert.work_form.TimeFormColumnItem
 import com.ogata_k.mobile.winp.presentation.widgert.work_form.WorkTodoFormColumnItem
@@ -120,13 +122,23 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                 }
                 // 初期化完了
                 UiInitializeState.INITIALIZED -> {
-                    val listState = rememberLazyListState()
-
                     val formData = uiState.formData
                     val workValidateExceptions = uiState.validateExceptions
-                    Box {
+
+                    val listState = rememberLazyListState()
+
+                    val dragDropState =
+                        rememberDragDropState(
+                            lazyListState = listState,
+                            draggableItemsNum = formData.todoItems.size,
+                            onMove = { fromIndex, toIndex ->
+                                viewModel.swapWorkTodoItem(fromIndex, toIndex)
+                            })
+
+                    Box(modifier = Modifier.padding(padding)) {
                         LazyColumn(
-                            modifier = Modifier.padding(padding),
+                            modifier = Modifier
+                                .draggableColumnContainer(dragDropState),
                             state = listState,
                             horizontalAlignment = Alignment.Start,
                             contentPadding = PaddingValues(dimensionResource(id = R.dimen.padding_large)),
@@ -226,10 +238,11 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                                 }
                             }
 
-                            itemsIndexed(
+                            draggableColumnItems(
                                 items = formData.todoItems,
                                 key = { _, item -> item.uuid },
-                            ) { _, item ->
+                                dragDropState = dragDropState,
+                            ) { modifier, item ->
                                 val dismissState = rememberSwipeToDismissBoxState(
                                     initialValue = SwipeToDismissBoxValue.Settled,
                                     confirmValueChange = {
@@ -243,10 +256,10 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                                     },
                                     positionalThreshold = { it * .4f },
                                 )
-                                // TODO 2 リストアイテムの並び替え  左端に並び替えでつまむためのボタンを設ける？
+
                                 SwipeToDismissBox(
                                     state = dismissState,
-                                    modifier = Modifier
+                                    modifier = modifier
                                         .animateContentSize()
                                         .animateItemPlacement()
                                         .padding(
@@ -278,12 +291,13 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                                             )
                                         }
                                     },
-                                ) {
-                                    WorkTodoFormColumnItem(
-                                        todoFormData = item,
-                                        modifier = Modifier,
-                                    )
-                                }
+                                    content = {
+                                        WorkTodoFormColumnItem(
+                                            todoFormData = item,
+                                            modifier = Modifier,
+                                        )
+                                    },
+                                )
                             }
 
                             item {
