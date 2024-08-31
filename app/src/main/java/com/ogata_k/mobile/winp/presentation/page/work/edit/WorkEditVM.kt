@@ -234,7 +234,7 @@ class WorkEditVM @Inject constructor() : AbstractViewModel<WorkEditVMState, Work
     fun removeWorkTodoForm(uuid: UUID) {
         val vmState = readVMState()
         val newWorkTodoForms: List<WorkTodoFormData> =
-            vmState.formData.todoItems.toMutableList().filter { it.uuid == uuid }
+            vmState.formData.todoItems.toMutableList().filter { it.uuid != uuid }
 
         val newFormData = vmState.formData.copy(
             todoItems = newWorkTodoForms,
