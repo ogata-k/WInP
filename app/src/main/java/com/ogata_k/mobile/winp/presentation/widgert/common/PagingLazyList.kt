@@ -32,6 +32,7 @@ import com.ogata_k.mobile.winp.R
 fun <Item : Any> PagingLoadColumn(
     pagingItems: LazyPagingItems<Item>,
     modifier: Modifier = Modifier,
+    listModifier: Modifier = Modifier,
     state: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
     reverseLayout: Boolean = false,
@@ -54,9 +55,9 @@ fun <Item : Any> PagingLoadColumn(
     itemBuilder: @Composable (item: Item) -> Unit,
 ) {
     // @todo 必要ならPullToRefreshを実装
-    Box {
+    Box(modifier = modifier) {
         LazyColumn(
-            modifier = modifier.fillMaxSize(),
+            modifier = listModifier.fillMaxSize(),
             state = state,
             contentPadding = contentPadding,
             reverseLayout = reverseLayout,
