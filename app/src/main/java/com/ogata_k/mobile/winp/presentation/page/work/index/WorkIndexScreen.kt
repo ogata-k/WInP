@@ -76,6 +76,7 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
         // TODO remove
         val scope = rememberCoroutineScope()
 
+        // @todo pull to refreshで更新できるようにする
         Scaffold(
             modifier = modifier,
             topBar = appBar,
