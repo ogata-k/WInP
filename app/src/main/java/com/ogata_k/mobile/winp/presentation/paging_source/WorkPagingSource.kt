@@ -24,7 +24,7 @@ class WorkPagingSource(searchDate: LocalDate? = null) : PagingSource<Int, Work>(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Work> {
         try {
             // @todo DBを使った実装に置き換える
-            delay(3000)
+            delay(1000)
             // Params to load a page to the start of the list.
             if (params is LoadParams.Prepend) {
                 throw IllegalStateException("Cannot fetch prepend data")
