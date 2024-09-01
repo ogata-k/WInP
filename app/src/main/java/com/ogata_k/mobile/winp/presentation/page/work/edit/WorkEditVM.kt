@@ -14,6 +14,7 @@ import com.ogata_k.mobile.winp.presentation.page.AbstractViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -544,13 +545,13 @@ class WorkEditVM @Inject constructor() : AbstractViewModel<WorkEditVMState, Work
         updateVMState(newVmState)
 
         viewModelScope.launch {
-            var result: Boolean = false
             // アプリを強制停止する場合を除いて、実行中に画面をpopしたりしたときなどに最後まで実行されないのは困る
-            launch(Dispatchers.IO + SupervisorJob()) {
+            val result = async(Dispatchers.IO + SupervisorJob()) {
                 // TODO このスコープ内の実相を実際の実装にする
                 delay(5000)
-                result = Random.nextInt() % 3 != 0
-            }.join()
+                val result = Random.nextInt() % 3 != 0
+                return@async result
+            }.await()
 
             val oldVmState = readVMState()
             // 実行結果を通知
