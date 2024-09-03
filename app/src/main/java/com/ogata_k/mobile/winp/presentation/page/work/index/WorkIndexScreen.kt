@@ -73,7 +73,6 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
     ) { modifier, appBar ->
         val snackbarHostState = remember { SnackbarHostState() }
 
-        // TODO remove
         val scope = rememberCoroutineScope()
 
         // @todo pull to refreshで更新できるようにする
@@ -84,17 +83,6 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
                 SnackbarHost(hostState = snackbarHostState)
             },
         ) { padding ->
-            LaunchedEffect(UiNextScreenState.takeState(navController, false)) {
-                val nextScreenState = UiNextScreenState.takeState(navController, true)
-                // TODO 実際の実装に置き換える(作成更新削除などの実行ができたときはリストを更新するみたいな処理を行う)
-                scope.launch {
-                    if (nextScreenState?.isDoneAction() == true) {
-                        snackbarHostState.showSnackbar(nextScreenState.toString())
-                        workPagingItems.refresh()
-                    }
-                }
-            }
-
             Column(
                 modifier = Modifier.padding(padding),
             ) {
@@ -132,6 +120,15 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
                         // TODO 詳細画面に遷移させる
                         // 編集画面への遷移
                         navController.navigate(WorkEditRouting(work.id).toPath())
+                    }
+                }
+            }
+
+            LaunchedEffect(UiNextScreenState.takeState(navController, false)) {
+                val nextScreenState = UiNextScreenState.takeState(navController, true)
+                scope.launch {
+                    if (nextScreenState?.isDoneAction() == true) {
+                        workPagingItems.refresh()
                     }
                 }
             }

@@ -1,5 +1,6 @@
 package com.ogata_k.mobile.winp.presentation.page.work.edit
 
+import android.widget.Toast
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -102,7 +103,6 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                 SnackbarHost(hostState = snackbarHostState)
             },
         ) { padding ->
-            // TODO DBのエラーハンドリング(snackbarHostState.showSnackBar()かToast)をするためにinitializedをScreenLoadResult的なSealedClassにする->次はここから。
             when (uiState.initializeState) {
                 // 初期化中
                 UiInitializeState.LOADING -> {
@@ -435,26 +435,40 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                         TaskTodoBottomSheetForm(viewModel, uiState)
                     }
 
-                    // TODO 実際の処理に置き換える
-                    LaunchedEffect(
-                        uiState.formState,
-                        snackbarHostState
-                    ) {
-                        if (uiState.formState.isSuccess()) {
+                    if (uiState.formState.isSuccess()) {
+                        Toast.makeText(
+                            LocalContext.current,
+                            if (uiState.isInCreating)
+                                stringResource(R.string.succeed_create)
+                            else
+                                stringResource(R.string.succeeded_update),
+                            Toast.LENGTH_LONG
+                        ).show()
+
+                        // 画面POPの処理をLaunchedEffectで行わないと戻った先で値をハンドリングできない
+                        LaunchedEffect(true) {
                             // 処理に成功したときはすぐに閉じる
                             uiState.screenState.popWithSetState(
                                 navController
                             )
                         }
+                    }
 
-                        if (uiState.formState.isFailure()) {
+                    if (uiState.formState.isFailure()) {
+                        val failedMessage =
+                            if (uiState.isInCreating)
+                                stringResource(R.string.failed_create)
+                            else
+                                stringResource(R.string.failed_update)
+                        LaunchedEffect(
+                            snackbarHostState
+                        ) {
                             screenScope.launch {
-                                val message = if (uiState.isInCreating) {
-                                    "（仮実装）作成に失敗しました。"
-                                } else {
-                                    "（仮実装）更新に失敗しました。"
-                                }
-                                snackbarHostState.showSnackbar(message)
+                                // 画面を跨がない通知はスナックバーで表示する
+                                snackbarHostState.showSnackbar(
+                                    failedMessage,
+                                    withDismissAction = true
+                                )
 
                                 // スナックバーの表示が消えてから少し待って有効化
                                 delay(300)
@@ -466,12 +480,34 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
 
                 // アイテムが見つからず終了
                 UiInitializeState.NOT_FOUND_EXCEPTION -> {
-                    // TODO 初期化しようとしたがアイテムが見つからなかったので失敗。これを通知して画面を閉じる（もしくは画面を閉じてから通知）
+                    Toast.makeText(
+                        LocalContext.current,
+                        stringResource(R.string.failed_open_form_by_not_found_edit_target_task),
+                        Toast.LENGTH_LONG
+                    ).show()
+                    // 画面POPの処理をLaunchedEffectで行わないと戻った先で値をハンドリングできない
+                    LaunchedEffect(true) {
+                        // 続いての処理はできないので前の画面に戻る
+                        uiState.screenState.popWithSetState(
+                            navController
+                        )
+                    }
                 }
 
                 // 予期せぬエラーがあった場合
                 UiInitializeState.ERROR -> {
-                    // TODO 初期化に失敗したことを通知して画面を閉じる（もしくは画面を閉じてから通知）
+                    Toast.makeText(
+                        LocalContext.current,
+                        stringResource(R.string.failed_initialize_form),
+                        Toast.LENGTH_LONG
+                    ).show()
+                    // 画面POPの処理をLaunchedEffectで行わないと戻った先で値をハンドリングできない
+                    LaunchedEffect(true) {
+                        // 続いての処理はできないので前の画面に戻る
+                        uiState.screenState.popWithSetState(
+                            navController
+                        )
+                    }
                 }
             }
         }

@@ -63,10 +63,18 @@
     <string name="validation_exception_invalid_date_time">日時のフォーマットが不正です。</string>
     <string name="validation_exception_need_date">日にちも入力してください。</string>
     <string name="validation_exception_need_bigger_than_other_date_time">%sより未来の日時を入力してください。</string>
-    >
     <string name="validation_exception_need_smaller_than_other_date_time">%sより過去の日時を入力してください。</string>
     <string name="validation_exception_inconsistent_order_for_before">%sは%sより前の値を指定してください。</string>
     <string name="validation_exception_inconsistent_order_for_after">%sは%sより後の値を指定してください。</string>
+
+    <!-- 成功 OR エラー -->
+    <string name="succeed_create">作成しました。</string>
+    <string name="succeeded_update">更新しました。</string>
+    <string name="failed_create">作成できませんでした。</string>
+    <string name="failed_update">更新できました。</string>
+    <string name="failed_open_form_by_not_found_edit_target_task">編集対象のタスクが見つかりませんでした。</string>
+    <string name="failed_initialize_form">フォームの初期化に失敗しました。</string>
+
 
     <!-- その他 -->
 </resources>
