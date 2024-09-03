@@ -261,7 +261,7 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
 
                                         return@rememberSwipeToDismissBoxState false
                                     },
-                                    positionalThreshold = { it * .4f },
+                                    positionalThreshold = { it * .6f },
                                 )
 
                                 SwipeToDismissBox(
