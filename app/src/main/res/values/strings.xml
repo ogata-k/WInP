@@ -21,6 +21,7 @@
 
     <!-- CRUD操作 -->
     <string name="create_work">タスクを作成</string>
+    <string name="edit_work">タスクを編集</string>
     <string name="create_work_todo">タスクTODOを作成</string>
     <string name="delete_work_todo">タスクTODOを削除</string>
 

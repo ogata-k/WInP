@@ -12,6 +12,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.ogata_k.mobile.winp.presentation.constant.AsCreate
 import com.ogata_k.mobile.winp.presentation.page.composableByRouting
+import com.ogata_k.mobile.winp.presentation.page.work.detail.WorkDetailRouting
+import com.ogata_k.mobile.winp.presentation.page.work.detail.WorkDetailScreen
+import com.ogata_k.mobile.winp.presentation.page.work.detail.WorkDetailVM
 import com.ogata_k.mobile.winp.presentation.page.work.edit.WorkEditRouting
 import com.ogata_k.mobile.winp.presentation.page.work.edit.WorkEditScreen
 import com.ogata_k.mobile.winp.presentation.page.work.edit.WorkEditVM
@@ -44,6 +47,23 @@ fun SetupRouting(navController: NavHostController) {
             val vm: WorkIndexVM = hiltViewModel()
             WorkIndexScreen(navController = navController, viewModel = vm)
         }
+
+        // Workの詳細
+        composableByRouting(WorkDetailRouting) { entry ->
+            val vm: WorkDetailVM = hiltViewModel()
+
+            val workId: Int? = entry.arguments?.getInt(WorkDetailRouting.WORK_ID_KEY)
+            LaunchedEffect(true) {
+                if (workId == null) {
+                    vm.failInitializeByInvalidWorkId()
+                } else {
+                    vm.initialize(workId)
+                }
+            }
+
+            WorkDetailScreen(navController = navController, viewModel = vm)
+        }
+
         // Workの作成編集
         composableByRouting(WorkEditRouting) { entry ->
             val vm: WorkEditVM = hiltViewModel()

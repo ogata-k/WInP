@@ -1,4 +1,4 @@
-package com.ogata_k.mobile.winp.presentation.page.work.edit
+package com.ogata_k.mobile.winp.presentation.page.work.detail
 
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavType
@@ -6,12 +6,12 @@ import androidx.navigation.navArgument
 import com.ogata_k.mobile.winp.presentation.page.IRouting
 import com.ogata_k.mobile.winp.presentation.page.ISetupRouting
 
-class WorkEditRouting(private val workId: Int) : IRouting {
+class WorkDetailRouting(private val workId: Int) : IRouting {
     companion object : ISetupRouting {
         const val WORK_ID_KEY = "work_id"
 
         override val routingPath: String
-            get() = "work/{$WORK_ID_KEY}/edit"
+            get() = "work/{$WORK_ID_KEY}"
 
         override val routingArguments: List<NamedNavArgument>
             get() = listOf(
@@ -23,5 +23,5 @@ class WorkEditRouting(private val workId: Int) : IRouting {
             )
     }
 
-    override fun toPath(): String = "work/$workId/edit"
+    override fun toPath(): String = "work/$workId"
 }

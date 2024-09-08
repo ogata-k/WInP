@@ -43,6 +43,7 @@ import com.ogata_k.mobile.winp.common.formatter.buildFullDatePatternFormatter
 import com.ogata_k.mobile.winp.presentation.constant.AsCreate
 import com.ogata_k.mobile.winp.presentation.enumerate.UiNextScreenState
 import com.ogata_k.mobile.winp.presentation.model.work.Work
+import com.ogata_k.mobile.winp.presentation.page.work.detail.WorkDetailRouting
 import com.ogata_k.mobile.winp.presentation.page.work.edit.WorkEditRouting
 import com.ogata_k.mobile.winp.presentation.widgert.common.ButtonLargeText
 import com.ogata_k.mobile.winp.presentation.widgert.common.DefaultErrorColumnItemBuilder
@@ -79,7 +80,7 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
         val snackbarHostState = remember { SnackbarHostState() }
 
         val pullToRefreshState = rememberPullToRefreshState()
-        val scope = rememberCoroutineScope()
+        val screenScope = rememberCoroutineScope()
 
         Scaffold(
             modifier = modifier,
@@ -126,7 +127,7 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
                             )
                         ) {
                             // 編集画面への遷移
-                            navController.navigate(WorkEditRouting(work.id).toPath())
+                            navController.navigate(WorkDetailRouting(work.id).toPath())
                         }
                     }
                 }
@@ -146,7 +147,7 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
 
             LaunchedEffect(UiNextScreenState.takeState(navController, false)) {
                 val nextScreenState = UiNextScreenState.takeState(navController, true)
-                scope.launch {
+                screenScope.launch {
                     if (nextScreenState?.isDoneAction() == true) {
                         workPagingItems.refresh()
                     }
