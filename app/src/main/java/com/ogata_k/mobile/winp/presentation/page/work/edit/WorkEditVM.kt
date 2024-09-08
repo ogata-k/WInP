@@ -215,7 +215,10 @@ class WorkEditVM @Inject constructor(
     fun showWorkTodoForm(uuid: UUID?) {
         if (uuid == null) {
             val vmState = readVMState()
-            val newVmState = vmState.copy(isInShowEditingTodoForm = false)
+            val newVmState = vmState.copy(
+                isInShowEditingTodoForm = false,
+                validateExceptions = validateFormData(vmState.formData, false),
+            )
             updateVMState(newVmState)
             return
         }
