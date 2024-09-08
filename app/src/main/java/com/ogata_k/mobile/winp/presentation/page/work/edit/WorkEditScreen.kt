@@ -46,6 +46,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -93,6 +94,7 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
             AppBarBackButton(navController = navController) { uiState.screenState }
         }
     ) { modifier, appBar ->
+        val focusManager = LocalFocusManager.current
         val screenScope = rememberCoroutineScope()
         val snackbarHostState = remember { SnackbarHostState() }
 
@@ -222,6 +224,7 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                                     }
                                     IconButton(
                                         onClick = {
+                                            focusManager.clearFocus()
                                             viewModel.showWorkTodoCreateForm()
                                         },
                                         enabled = canEditForm,
@@ -410,7 +413,10 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                                         // 入力内容のチェックだけでなく、フォームの状態的に実行できる状態かもチェック
                                         enabled = validWork && uiState.formState.canDoAction(),
                                         isLoading = isInDoing,
-                                        onClick = { viewModel.createOrUpdateWorkItem() },
+                                        onClick = {
+                                            focusManager.clearFocus()
+                                            viewModel.createOrUpdateWorkItem()
+                                        },
                                     ) {
                                         ButtonLargeText(
                                             text = if (uiState.isInCreating)
@@ -635,6 +641,7 @@ private fun TaskTodoBottomSheetForm(
             skipPartiallyExpanded = true
         ),
     ) {
+        val focusManager = LocalFocusManager.current
         // スクロールバーを表示させるとシートのサイズがうまく決まらないようなので、Columnに指定してスクロールはさせるがスクロールバーは表示させない
         val sheetScrollState = rememberScrollState()
 
@@ -672,15 +679,15 @@ private fun TaskTodoBottomSheetForm(
                     RadioButtonWithLabel(
                         selected = !todoItemFormData.isCompleted,
                         onClick = {
-                            viewModel.updateWorkTodoFormCompleted(
-                                false
-                            )
+                            focusManager.clearFocus()
+                            viewModel.updateWorkTodoFormCompleted(false)
                         },
                         text = stringResource(id = R.string.not_completed),
                     )
                     RadioButtonWithLabel(
                         selected = todoItemFormData.isCompleted,
                         onClick = {
+                            focusManager.clearFocus()
                             viewModel.updateWorkTodoFormCompleted(
                                 true
                             )
@@ -725,7 +732,10 @@ private fun TaskTodoBottomSheetForm(
             FilledTonalButton(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 enabled = validWorkTodo,
-                onClick = { viewModel.applyEditingToWorkTodoItems() },
+                onClick = {
+                    focusManager.clearFocus()
+                    viewModel.applyEditingToWorkTodoItems()
+                },
             ) {
                 ButtonMediumText(
                     text = if (isInCreateWorkTodo)
