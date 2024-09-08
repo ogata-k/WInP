@@ -71,7 +71,7 @@
     <string name="succeed_create">作成しました</string>
     <string name="succeeded_update">更新しました</string>
     <string name="failed_create">作成できませんでした</string>
-    <string name="failed_update">更新できました</string>
+    <string name="failed_update">更新できませんでした</string>
     <string name="failed_open_form_by_not_found_edit_target_task">編集対象のタスクが見つかりませんでした</string>
     <string name="failed_initialize_form">フォームの初期化に失敗しました</string>
 
