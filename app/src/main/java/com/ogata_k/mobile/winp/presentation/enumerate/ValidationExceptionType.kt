@@ -2,7 +2,7 @@ package com.ogata_k.mobile.winp.presentation.enumerate
 
 import android.content.Context
 import com.ogata_k.mobile.winp.R
-import com.ogata_k.mobile.winp.common.buildFullDateTimePatternFormatter
+import com.ogata_k.mobile.winp.common.formatter.buildFullDateTimePatternFormatter
 import java.time.LocalDateTime
 import java.util.Optional
 

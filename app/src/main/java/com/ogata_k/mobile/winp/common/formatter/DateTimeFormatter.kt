@@ -1,4 +1,4 @@
-package com.ogata_k.mobile.winp.common
+package com.ogata_k.mobile.winp.common.formatter
 
 import java.time.format.DateTimeFormatter
 

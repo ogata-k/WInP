@@ -10,6 +10,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import com.ogata_k.mobile.winp.presentation.constant.AsCreate
 import com.ogata_k.mobile.winp.presentation.page.composableByRouting
 import com.ogata_k.mobile.winp.presentation.page.work.edit.WorkEditRouting
 import com.ogata_k.mobile.winp.presentation.page.work.edit.WorkEditScreen
@@ -49,7 +50,7 @@ fun SetupRouting(navController: NavHostController) {
 
             // デフォルトは作成
             val workId = entry.arguments?.getInt(WorkEditRouting.WORK_ID_KEY)
-                ?: WorkEditRouting.CREATE_WORK_ID
+                ?: AsCreate.CREATING_ID
             LaunchedEffect(true) {
                 vm.initializeForm(workId)
             }

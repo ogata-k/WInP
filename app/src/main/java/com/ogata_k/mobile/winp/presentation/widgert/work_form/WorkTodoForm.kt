@@ -35,6 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.ogata_k.mobile.winp.R
 import com.ogata_k.mobile.winp.presentation.model.work_form.WorkTodoFormData
 import com.ogata_k.mobile.winp.presentation.widgert.common.BodyMediumText
+import java.time.LocalDateTime
 import java.util.UUID
 
 /**
@@ -135,7 +136,7 @@ private fun NotCompletedWorkTodoFormColumnItemPreview() {
         uuid = UUID.randomUUID(),
         id = null,
         description = "未完了のタスクTODOアイテム\n少なくともこれはやっておかなければいけないので忘れずに行うこと。",
-        isCompleted = false,
+        completedAt = null,
     )
 
     WorkTodoFormColumnItem(todoFormData)
@@ -148,7 +149,7 @@ private fun CompletedWorkTodoFormColumnItemPreview() {
         uuid = UUID.randomUUID(),
         id = null,
         description = "完了済みのタスクTODOアイテム\n少なくともこれはやっておかなければいけないので忘れずに行うこと。",
-        isCompleted = true,
+        completedAt = LocalDateTime.now(),
     )
 
     WorkTodoFormColumnItem(todoFormData)
@@ -161,7 +162,7 @@ private fun LargeTextCompletedWorkTodoFormColumnItemPreview() {
         uuid = UUID.randomUUID(),
         id = null,
         description = "完了済みのタスクTODOアイテム",
-        isCompleted = true,
+        completedAt = LocalDateTime.now(),
     )
 
     WorkTodoFormColumnItem(todoFormData)
@@ -174,7 +175,7 @@ private fun SmallTextCompletedWorkTodoFormColumnItemPreview() {
         uuid = UUID.randomUUID(),
         id = null,
         description = "完了済みのタスクTODOアイテム",
-        isCompleted = true,
+        completedAt = LocalDateTime.now(),
     )
 
     WorkTodoFormColumnItem(todoFormData)

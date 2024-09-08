@@ -1,0 +1,37 @@
+package com.ogata_k.mobile.winp.presentation.use_case.work
+
+import com.ogata_k.mobile.winp.domain.model.work.Work
+import com.ogata_k.mobile.winp.domain.model.work.WorkTodo
+import com.ogata_k.mobile.winp.domain.use_case.work.GetWorkAsyncUseCase
+import com.ogata_k.mobile.winp.domain.use_case.work.GetWorkInput
+import com.ogata_k.mobile.winp.domain.use_case.work.GetWorkOutput
+import kotlinx.coroutines.delay
+import java.time.LocalDateTime
+
+class IGetWorkAsyncUseCase : GetWorkAsyncUseCase {
+    override suspend fun call(input: GetWorkInput): GetWorkOutput {
+        // @todo 実際の実装にする
+        delay(500)
+        val todoItems: MutableList<WorkTodo> = mutableListOf()
+        (0..5).forEach { index ->
+            todoItems.add(
+                WorkTodo(
+                    id = index + 1,
+                    description = "対応するTODO%d".format(index + 1),
+                    completedAt = if (index % 3 == 0) LocalDateTime.now() else null,
+                )
+            )
+        }
+        return GetWorkOutput.success(
+            Work(
+                id = input.workId,
+                title = "編集中",
+                description = "これは編集中タスクの説明です。",
+                beganAt = LocalDateTime.now(),
+                endedAt = null,
+                completedAt = null,
+                workTodos = todoItems,
+            )
+        )
+    }
+}

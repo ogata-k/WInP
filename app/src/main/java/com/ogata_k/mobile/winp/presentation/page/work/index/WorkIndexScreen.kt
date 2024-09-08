@@ -35,7 +35,8 @@ import androidx.navigation.NavController
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.ogata_k.mobile.winp.R
-import com.ogata_k.mobile.winp.common.buildFullDatePatternFormatter
+import com.ogata_k.mobile.winp.common.formatter.buildFullDatePatternFormatter
+import com.ogata_k.mobile.winp.presentation.constant.AsCreate
 import com.ogata_k.mobile.winp.presentation.enumerate.UiNextScreenState
 import com.ogata_k.mobile.winp.presentation.model.work.Work
 import com.ogata_k.mobile.winp.presentation.page.work.edit.WorkEditRouting
@@ -63,7 +64,7 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
         text = stringResource(id = R.string.app_name),
         canChangeColor = false,
         actions = {
-            IconButton(onClick = { navController.navigate(WorkEditRouting(WorkEditRouting.CREATE_WORK_ID).toPath()) }) {
+            IconButton(onClick = { navController.navigate(WorkEditRouting(AsCreate.CREATING_ID).toPath()) }) {
                 Icon(
                     imageVector = Icons.Filled.Add,
                     contentDescription = stringResource(R.string.create_work),

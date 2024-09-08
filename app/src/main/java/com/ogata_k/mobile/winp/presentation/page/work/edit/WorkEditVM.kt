@@ -1,6 +1,13 @@
 package com.ogata_k.mobile.winp.presentation.page.work.edit
 
 import androidx.lifecycle.viewModelScope
+import com.ogata_k.mobile.winp.domain.use_case.work.CreateWorkAsyncUseCase
+import com.ogata_k.mobile.winp.domain.use_case.work.CreateWorkInput
+import com.ogata_k.mobile.winp.domain.use_case.work.GetWorkAsyncUseCase
+import com.ogata_k.mobile.winp.domain.use_case.work.GetWorkInput
+import com.ogata_k.mobile.winp.domain.use_case.work.UpdateWorkAsyncUseCase
+import com.ogata_k.mobile.winp.domain.use_case.work.UpdateWorkInput
+import com.ogata_k.mobile.winp.presentation.constant.AsCreate
 import com.ogata_k.mobile.winp.presentation.enumerate.UiFormState
 import com.ogata_k.mobile.winp.presentation.enumerate.UiInitializeState
 import com.ogata_k.mobile.winp.presentation.enumerate.UiNextScreenState
@@ -15,7 +22,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -24,10 +30,13 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.util.UUID
 import javax.inject.Inject
-import kotlin.random.Random
 
 @HiltViewModel
-class WorkEditVM @Inject constructor() : AbstractViewModel<WorkEditVMState, WorkEditUiState>() {
+class WorkEditVM @Inject constructor(
+    private val getWorkUseCase: GetWorkAsyncUseCase,
+    private val createWorkUseCase: CreateWorkAsyncUseCase,
+    private val updateWorkUseCase: UpdateWorkAsyncUseCase,
+) : AbstractViewModel<WorkEditVMState, WorkEditUiState>() {
     companion object {
         const val TITLE_MAX_LENGTH = 30
 
@@ -42,8 +51,8 @@ class WorkEditVM @Inject constructor() : AbstractViewModel<WorkEditVMState, Work
             initializeState = UiInitializeState.LOADING,
             screenState = UiNextScreenState.LOADING,
             formState = UiFormState.NOT_INITIALIZE,
-            isInCreating = isInCreating(WorkEditRouting.CREATE_WORK_ID),
-            workId = WorkEditRouting.CREATE_WORK_ID,
+            isInCreating = isInCreating(AsCreate.CREATING_ID),
+            workId = AsCreate.CREATING_ID,
             formData = WorkFormData.empty(),
             validateExceptions = WorkFormValidateExceptions.empty(),
             isInShowEditingTodoForm = false,
@@ -60,7 +69,7 @@ class WorkEditVM @Inject constructor() : AbstractViewModel<WorkEditVMState, Work
     /**
      * タスク作成中かどうかを判定
      */
-    private fun isInCreating(workId: Int): Boolean = workId == WorkEditRouting.CREATE_WORK_ID
+    private fun isInCreating(workId: Int): Boolean = workId == AsCreate.CREATING_ID
 
     /**
      * FormDataを初期化
@@ -75,12 +84,14 @@ class WorkEditVM @Inject constructor() : AbstractViewModel<WorkEditVMState, Work
         if (isInCreating(workId)) {
             // 作成用のフォームデータ
             val formData = WorkFormData(
+                id = workId,
                 title = "",
                 description = "",
                 beganDate = null,
                 beganTime = null,
                 endedDate = null,
                 endedTime = null,
+                completedAt = null,
                 editingTodoItem = WorkTodoFormData.empty(UUID.randomUUID()),
                 todoItems = emptyList(),
             )
@@ -103,32 +114,22 @@ class WorkEditVM @Inject constructor() : AbstractViewModel<WorkEditVMState, Work
         updateVMState(newVmState)
 
         // DBデータでFormの初期化をしたときに初期化を完了とする
-        // TODO 実際の実装にする
         viewModelScope.launch {
-            delay(500)
-            val todoItems: MutableList<WorkTodoFormData> = mutableListOf()
-            (0..5).forEach { index ->
-                todoItems.add(
-                    WorkTodoFormData(
-                        uuid = generateNotUsingWorkTodoUuid(),
-                        id = index + 1,
-                        description = "対応するTODO%d".format(index + 1),
-                        isCompleted = index % 3 == 0,
+            // 編集用のフォームデータ
+            val workResult = getWorkUseCase.call(GetWorkInput(workId))
+            if (workResult.isFailure) {
+                updateVMState(
+                    readVMState().copy(
+                        initializeState = UiInitializeState.NOT_FOUND_EXCEPTION,
+                        screenState = UiNextScreenState.ERROR,
+                        formState = UiFormState.NOT_INITIALIZE,
                     )
                 )
+
+                return@launch
             }
-            // 編集用のフォームデータ
-            // TODO これらの値はDBなどから取ってきた値にする
-            val formData = WorkFormData(
-                title = "編集中",
-                description = "これは編集中タスクの説明です。",
-                beganDate = LocalDate.now(),
-                beganTime = LocalTime.now(),
-                endedDate = null,
-                endedTime = null,
-                editingTodoItem = WorkTodoFormData.empty(UUID.randomUUID()),
-                todoItems = todoItems,
-            )
+
+            val formData = WorkFormData.fromDomainModel(workResult.getOrThrow())
             updateVMState(
                 readVMState().copy(
                     initializeState = UiInitializeState.INITIALIZED,
@@ -273,8 +274,10 @@ class WorkEditVM @Inject constructor() : AbstractViewModel<WorkEditVMState, Work
      */
     fun updateWorkTodoFormCompleted(isCompleted: Boolean) {
         val vmState = readVMState()
-        val newWorkTodoFormData = vmState.formData.editingTodoItem.copy(
-            isCompleted = isCompleted,
+        val oldWorkTodoFormData = vmState.formData.editingTodoItem
+        val newWorkTodoFormData = oldWorkTodoFormData.copy(
+            completedAt = if (isCompleted) oldWorkTodoFormData.completedAt
+                ?: LocalDateTime.now() else null,
         )
         val newFormData = vmState.formData.copy(
             editingTodoItem = newWorkTodoFormData,
@@ -546,19 +549,20 @@ class WorkEditVM @Inject constructor() : AbstractViewModel<WorkEditVMState, Work
 
         viewModelScope.launch {
             // アプリを強制停止する場合を除いて、実行中に画面をpopしたりしたときなどに最後まで実行されないのは困る
-            val result = async(Dispatchers.IO + SupervisorJob()) {
-                // TODO このスコープ内の実相を実際の実装にする
-                delay(5000)
-                val result = Random.nextInt() % 3 != 0
-                return@async result
+            val result: Result<Unit> = async(Dispatchers.IO + SupervisorJob()) {
+                if (isInCreating(vmState.workId)) {
+                    return@async createWorkUseCase.call(CreateWorkInput(vmState.formData.toDomainModel()))
+                } else {
+                    return@async updateWorkUseCase.call(UpdateWorkInput(vmState.formData.toDomainModel()))
+                }
             }.await()
 
             val oldVmState = readVMState()
             // 実行結果を通知
             updateVMState(
                 oldVmState.copy(
-                    screenState = if (result) (if (oldVmState.isInCreating) UiNextScreenState.CREATED else UiNextScreenState.UPDATED) else UiNextScreenState.ERROR,
-                    formState = if (result) UiFormState.SUCCESS_ACTION else UiFormState.FAIL_ACTION,
+                    screenState = if (result.isSuccess) (if (oldVmState.isInCreating) UiNextScreenState.CREATED else UiNextScreenState.UPDATED) else UiNextScreenState.ERROR,
+                    formState = if (result.isSuccess) UiFormState.SUCCESS_ACTION else UiFormState.FAIL_ACTION,
                 )
             )
         }

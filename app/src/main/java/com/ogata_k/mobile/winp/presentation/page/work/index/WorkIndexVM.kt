@@ -5,6 +5,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import androidx.paging.compose.LazyPagingItems
+import com.ogata_k.mobile.winp.domain.use_case.work.FetchPageWorksAsyncUseCase
 import com.ogata_k.mobile.winp.presentation.model.work.Work
 import com.ogata_k.mobile.winp.presentation.page.AbstractViewModel
 import com.ogata_k.mobile.winp.presentation.paging_source.WorkPagingSource
@@ -15,7 +16,9 @@ import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
-class WorkIndexVM @Inject constructor() : AbstractViewModel<WorkIndexVMState, WorkIndexUiState>() {
+class WorkIndexVM @Inject constructor(
+    private val fetchPageWorksUseCase: FetchPageWorksAsyncUseCase
+) : AbstractViewModel<WorkIndexVMState, WorkIndexUiState>() {
     companion object {
         // 初回ページサイズ
         const val INITIAL_PAGE_SIZE: Int = 100
@@ -39,8 +42,10 @@ class WorkIndexVM @Inject constructor() : AbstractViewModel<WorkIndexVMState, Wo
                     enablePlaceholders = false,
                 ),
                 pagingSourceFactory = {
-                    // @todo UseCaseなどから呼び出して取得する
-                    WorkPagingSource(searchDate = readVMState().searchDate)
+                    WorkPagingSource(
+                        searchDate = readVMState().searchDate,
+                        fetchPageWorksUseCase
+                    )
                 }
             )
                 .flow
