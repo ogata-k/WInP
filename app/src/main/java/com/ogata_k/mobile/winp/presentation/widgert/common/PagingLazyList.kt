@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,6 +29,7 @@ import com.ogata_k.mobile.winp.R
 /**
  * ページの差分読み込みを意識したLazyColumn
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun <Item : Any> PagingLoadColumn(
     pagingItems: LazyPagingItems<Item>,
@@ -54,7 +56,6 @@ fun <Item : Any> PagingLoadColumn(
     footerBuilder: LazyListScope.(refreshLoadState: LoadState, isLoadedItemEmpty: Boolean) -> Unit = { _, _ -> },
     itemBuilder: @Composable (item: Item) -> Unit,
 ) {
-    // @todo 必要ならPullToRefreshを実装
     Box(modifier = modifier) {
         LazyColumn(
             modifier = listModifier.fillMaxSize(),
@@ -114,7 +115,6 @@ private fun <Item : Any> LazyListScope.buildPagingListItems(
     footerBuilder: LazyListScope.(refreshLoadState: LoadState, isLoadedItemEmpty: Boolean) -> Unit = { _, _ -> },
     itemBuilder: @Composable (item: Item) -> Unit,
 ) {
-    // @todo 必要ならPullToRefreshを実装
     val loadStates = pagingItems.loadState.mediator ?: pagingItems.loadState.source
     val refreshLoadState = loadStates.refresh  // 更新時
     val prependLoadState = loadStates.prepend  // 前データを読み込む時

@@ -2,6 +2,7 @@ package com.ogata_k.mobile.winp.presentation.page.work.index
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,6 +21,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -28,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -74,9 +78,9 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
     ) { modifier, appBar ->
         val snackbarHostState = remember { SnackbarHostState() }
 
+        val pullToRefreshState = rememberPullToRefreshState()
         val scope = rememberCoroutineScope()
 
-        // @todo pull to refreshで更新できるようにする
         Scaffold(
             modifier = modifier,
             topBar = appBar,
@@ -84,44 +88,59 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
                 SnackbarHost(hostState = snackbarHostState)
             },
         ) { padding ->
-            Column(
-                modifier = Modifier.padding(padding),
+            Box(
+                modifier = Modifier
+                    .nestedScroll(pullToRefreshState.nestedScrollConnection)
+                    .padding(padding),
             ) {
-                WorkIndexHeader(
-                    uiState = uiState,
-                    switchShowDatePickerForSearch = { toShow ->
-                        viewModel.showDatePickerForSearch(toShow)
-                    },
-                    updateAndHideDialogSearchQuery = { date ->
-                        viewModel.updateAndHideDialogSearchQuery(
-                            workPagingItems,
-                            date,
-                        )
-                    },
-                )
-                PagingLoadColumn(
-                    pagingItems = workPagingItems,
-                    errorItemBuilder = { state ->
-                        val errorMessage = state.error.message ?: "UNKNOWN ERROR"
-                        LaunchedEffect(errorMessage, snackbarHostState) {
-                            snackbarHostState.showSnackbar(
-                                message = errorMessage,
-                                withDismissAction = true,
+                Column {
+                    WorkIndexHeader(
+                        uiState = uiState,
+                        switchShowDatePickerForSearch = { toShow ->
+                            viewModel.showDatePickerForSearch(toShow)
+                        },
+                        updateAndHideDialogSearchQuery = { date ->
+                            viewModel.updateAndHideDialogSearchQuery(
+                                workPagingItems,
+                                date,
                             )
+                        },
+                    )
+                    PagingLoadColumn(
+                        pagingItems = workPagingItems,
+                        errorItemBuilder = { state ->
+                            val errorMessage = state.error.message ?: "UNKNOWN ERROR"
+                            LaunchedEffect(errorMessage, snackbarHostState) {
+                                snackbarHostState.showSnackbar(
+                                    message = errorMessage,
+                                    withDismissAction = true,
+                                )
+                            }
+                            DefaultErrorColumnItemBuilder(state = state)
+                        },
+                    ) { work ->
+                        WorkItem(
+                            work, modifier = Modifier.padding(
+                                vertical = dimensionResource(id = R.dimen.padding_medium),
+                                horizontal = dimensionResource(id = R.dimen.padding_medium_large),
+                            )
+                        ) {
+                            // 編集画面への遷移
+                            navController.navigate(WorkEditRouting(work.id).toPath())
                         }
-                        DefaultErrorColumnItemBuilder(state = state)
-                    },
-                ) { work ->
-                    WorkItem(
-                        work, modifier = Modifier.padding(
-                            vertical = dimensionResource(id = R.dimen.padding_medium),
-                            horizontal = dimensionResource(id = R.dimen.padding_medium_large),
-                        )
-                    ) {
-                        // TODO 詳細画面に遷移させる
-                        // 編集画面への遷移
-                        navController.navigate(WorkEditRouting(work.id).toPath())
                     }
+                }
+
+                PullToRefreshContainer(
+                    state = pullToRefreshState,
+                    modifier = Modifier.align(Alignment.TopCenter),
+                )
+            }
+
+            if (pullToRefreshState.isRefreshing) {
+                LaunchedEffect(Unit) {
+                    workPagingItems.refresh()
+                    pullToRefreshState.endRefresh()
                 }
             }
 

@@ -72,7 +72,7 @@ class WorkIndexVM @Inject constructor(
     fun updateAndHideDialogSearchQuery(workPagingItems: LazyPagingItems<Work>, date: LocalDate) {
         val vmState = readVMState()
         if (vmState.searchDate == date) {
-            // 検索条件が変化していないのでスキップ
+            // 検索条件が変化していないのでリフレッシュはせずに終了
             val newVmState = vmState.copy(isInSearchDate = false)
             updateVMState(newVmState)
             return
