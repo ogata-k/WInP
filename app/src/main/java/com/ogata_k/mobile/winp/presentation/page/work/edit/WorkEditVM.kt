@@ -145,6 +145,24 @@ class WorkEditVM @Inject constructor(
     }
 
     /**
+     * FormDataの完了状態を更新
+     */
+    fun updateWorkFormCompleted(isCompleted: Boolean) {
+        val vmState = readVMState()
+        val oldFormData = vmState.formData
+        val newFormData = oldFormData.copy(
+            completedAt = if (isCompleted) oldFormData.completedAt
+                ?: LocalDateTime.now() else null,
+        )
+        val newVmState = vmState.copy(
+            formData = newFormData,
+            validateExceptions = validateFormData(newFormData, vmState.isInShowEditingTodoForm),
+        )
+
+        updateVMState(newVmState)
+    }
+
+    /**
      * FormDataのタイトルを更新
      */
     fun updateFormTitle(value: String) {
@@ -529,6 +547,7 @@ class WorkEditVM @Inject constructor(
         }
 
         return WorkFormValidateExceptions(
+            isCompleted = ValidationException.empty(),
             title = titleValidated,
             description = descriptionValidated,
             beganDateTime = beganDateTimeValidated,

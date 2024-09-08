@@ -150,6 +150,35 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                         ) {
                             item {
                                 FormBlock(
+                                    title = stringResource(id = R.string.complete_state),
+                                    errorMessage = workValidateExceptions.isCompleted.toErrorMessage(
+                                        LocalContext.current
+                                    ),
+                                    isRequired = true,
+                                ) {
+                                    Column {
+                                        RadioButtonWithLabel(
+                                            selected = !formData.isCompleted,
+                                            onClick = {
+                                                focusManager.clearFocus()
+                                                viewModel.updateWorkFormCompleted(false)
+                                            },
+                                            text = stringResource(id = R.string.not_completed),
+                                        )
+                                        RadioButtonWithLabel(
+                                            selected = formData.isCompleted,
+                                            onClick = {
+                                                focusManager.clearFocus()
+                                                viewModel.updateWorkFormCompleted(true)
+                                            },
+                                            text = stringResource(id = R.string.completed),
+                                        )
+                                    }
+                                }
+                            }
+
+                            item {
+                                FormBlock(
                                     title = stringResource(id = R.string.work_title),
                                     errorMessage = workValidateExceptions.title.toErrorMessage(
                                         LocalContext.current
@@ -671,7 +700,7 @@ private fun TaskTodoBottomSheetForm(
             )
 
             FormBlock(
-                title = stringResource(id = R.string.work_todo_complete_state),
+                title = stringResource(id = R.string.complete_state),
                 errorMessage = todoItemValidateExceptions.isCompleted.toErrorMessage(LocalContext.current),
                 isRequired = true,
             ) {
@@ -688,9 +717,7 @@ private fun TaskTodoBottomSheetForm(
                         selected = todoItemFormData.isCompleted,
                         onClick = {
                             focusManager.clearFocus()
-                            viewModel.updateWorkTodoFormCompleted(
-                                true
-                            )
+                            viewModel.updateWorkTodoFormCompleted(true)
                         },
                         text = stringResource(id = R.string.completed),
                     )

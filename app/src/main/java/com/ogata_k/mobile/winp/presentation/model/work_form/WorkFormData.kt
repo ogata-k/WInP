@@ -89,6 +89,7 @@ data class WorkFormData(
  * Workフォームデータのエラー一覧
  */
 data class WorkFormValidateExceptions(
+    val isCompleted: ValidationException,
     val title: ValidationException,
     val description: ValidationException,
     val beganDateTime: ValidationException,
@@ -98,6 +99,7 @@ data class WorkFormValidateExceptions(
     companion object {
         fun empty(): WorkFormValidateExceptions {
             return WorkFormValidateExceptions(
+                isCompleted = ValidationException.empty(),
                 title = ValidationException.empty(),
                 description = ValidationException.empty(),
                 beganDateTime = ValidationException.empty(),
@@ -111,6 +113,6 @@ data class WorkFormValidateExceptions(
      * エラーがあればtrue
      */
     fun hasError(): Boolean {
-        return title.hasError() || description.hasError() || beganDateTime.hasError() || endedDateTime.hasError() || editingTodoItem.hasError()
+        return isCompleted.hasError() || title.hasError() || description.hasError() || beganDateTime.hasError() || endedDateTime.hasError() || editingTodoItem.hasError()
     }
 }

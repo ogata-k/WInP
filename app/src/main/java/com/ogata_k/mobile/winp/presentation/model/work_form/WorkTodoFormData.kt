@@ -55,14 +55,14 @@ data class WorkTodoFormData(
  * WorkTodoフォームデータのエラー一覧
  */
 data class WorkTodoFormValidateExceptions(
-    val description: ValidationException,
     val isCompleted: ValidationException,
+    val description: ValidationException,
 ) {
     companion object {
         fun empty(): WorkTodoFormValidateExceptions {
             return WorkTodoFormValidateExceptions(
-                description = ValidationException.empty(),
                 isCompleted = ValidationException.empty(),
+                description = ValidationException.empty(),
             )
         }
     }
@@ -71,6 +71,6 @@ data class WorkTodoFormValidateExceptions(
      * エラーがあればtrue
      */
     fun hasError(): Boolean {
-        return description.hasError() || isCompleted.hasError()
+        return isCompleted.hasError() || description.hasError()
     }
 }

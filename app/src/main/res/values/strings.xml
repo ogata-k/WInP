@@ -40,7 +40,7 @@
     <string name="work_title">タイトル</string>
     <string name="work_description">説明</string>
     <string name="work_todo">タスクTODO</string>
-    <string name="work_todo_complete_state">状態</string>
+    <string name="complete_state">状態</string>
     <string name="completed">完了済み</string>
     <string name="not_completed">未完了</string>
     <string name="completed_work_todo">完了済みタスクTODO</string>
