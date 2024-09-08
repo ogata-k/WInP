@@ -21,7 +21,7 @@ class WorkIndexVM @Inject constructor(
 ) : AbstractViewModel<WorkIndexVMState, WorkIndexUiState>() {
     companion object {
         // 初回ページサイズ
-        const val INITIAL_PAGE_SIZE: Int = 100
+        const val INITIAL_PAGE_SIZE: Int = 50
 
         // 差分のページサイズ
         const val PAGE_SIZE: Int = 50
