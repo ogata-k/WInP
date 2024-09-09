@@ -38,11 +38,11 @@ fun WorkItem(work: Work, modifier: Modifier = Modifier, onClick: () -> Unit) {
     Card(
         onClick = onClick,
         modifier = modifier,
-        colors = if (!work.hasPeriod) CardDefaults.cardColors().copy(
-            containerColor = colorResource(id = R.color.pending_work_item),
-            contentColor = contentColorFor(colorResource(id = R.color.pending_work_item)),
+        colors = if (work.isCompleted) CardDefaults.cardColors().copy(
+            containerColor = colorResource(id = R.color.completed_work_item),
+            contentColor = contentColorFor(colorResource(id = R.color.completed_work_item)),
         )
-        else if (!work.isCompleted && work.isExpired) CardDefaults.cardColors().copy(
+        else if (work.isExpired) CardDefaults.cardColors().copy(
             containerColor = colorResource(id = R.color.expired_work_item),
             contentColor = contentColorFor(colorResource(id = R.color.expired_work_item)),
         )
@@ -65,7 +65,7 @@ fun WorkItem(work: Work, modifier: Modifier = Modifier, onClick: () -> Unit) {
                         tint = colorResource(id = R.color.completed_check),
                         modifier = Modifier
                             .padding(end = dimensionResource(id = R.dimen.padding_small))
-                            .size((MaterialTheme.typography.bodySmall.fontSize.value * 1.2).dp)
+                            .size((MaterialTheme.typography.bodySmall.fontSize.value * 1.4).dp)
                     )
                     val formattedPair =
                         work.splitToFormattedPeriod(buildFullDateTimePatternFormatter())

@@ -7,10 +7,10 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="pending_work_item">#FF888888</color>
-    <color name="expired_work_item">#F48FB1</color>
-    <color name="completed_check">#4CAF50</color>
-    <color name="completed_work_todo">#C4EFA4</color>
+    <color name="completed_work_item">#CEF4B7</color>
+    <color name="expired_work_item">#FFA1BD</color>
+    <color name="completed_check">#399F3D</color>
+    <color name="completed_work_todo">#CEF4B7</color>
     <color name="not_completed_work_todo">#C6DDF6</color>
     <color name="required_label_color">#FF0000</color>
     <color name="optional_label_color">#888888</color>

@@ -23,15 +23,18 @@ class IGetWorkAsyncUseCase : GetWorkAsyncUseCase {
             )
         }
 
+        val now = LocalDateTime.now()
         return GetWorkOutput.success(
             Work(
                 id = input.workId,
                 title = "編集可能",
-                description = "これは${LocalDateTime.now()}に作成された、作成済みのタスクの説明です。",
-                beganAt = LocalDateTime.now(),
-                endedAt = null,
+                description = "これは${now}に作成された、作成済みのタスクの説明です。",
+                beganAt = if (input.workId % 8 == 0) now.minusSeconds(200.toLong()) else null,
+                endedAt = if (input.workId % 23 == 0) now.minusSeconds(100.toLong())
+                else if (input.workId % 7 == 0) now.plusDays(2)
+                else null,
                 completedAt = if (input.workId % 3 == 0) LocalDateTime.now() else null,
-                workTodos = todoItems,
+                workTodos = emptyList(),
             )
         )
     }

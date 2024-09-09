@@ -7,7 +7,7 @@
 
     <!-- 一般共通 -->
     <string name="period_with_range">%s ～ %s</string>
-    <string name="none_period">未定</string>
+    <string name="none_period" />
 
     <!-- 操作 -->
     <string name="select_date">日にちを入力</string>
