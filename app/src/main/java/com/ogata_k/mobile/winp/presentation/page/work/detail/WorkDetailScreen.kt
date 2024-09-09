@@ -47,18 +47,20 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
             AppBarBackButton(navController = navController) { uiState.screenState }
         },
         actions = {
-            IconButton(
-                onClick = {
-                    // 編集画面への遷移
-                    navController.navigate(WorkEditRouting(uiState.workId).toPath())
-                },
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.EditNote,
-                    contentDescription = stringResource(
-                        R.string.edit_work
-                    ),
-                )
+            if (uiState.initializeState == UiInitializeState.INITIALIZED) {
+                IconButton(
+                    onClick = {
+                        // 編集画面への遷移
+                        navController.navigate(WorkEditRouting(uiState.workId).toPath())
+                    },
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.EditNote,
+                        contentDescription = stringResource(
+                            R.string.edit_work
+                        ),
+                    )
+                }
             }
         },
     ) { modifier, appBar ->
@@ -95,14 +97,13 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                 UiInitializeState.INITIALIZED -> {
                     // 初期化が完了してエラーがない状態のはずなので、エラーを無視してgetして問題なし
                     val work: Work = uiState.work.get()
-                    // TODO
-                    Text("詳細画面", modifier = Modifier.padding(padding))
+                    Text(work.toString(), modifier = Modifier.padding(padding))
 
                     LaunchedEffect(UiNextScreenState.takeState(navController, false)) {
                         val nextScreenState = UiNextScreenState.takeState(navController, true)
                         screenScope.launch {
-                            if (nextScreenState != null && nextScreenState.isDoneAction()) {
-                                viewModel.updateNextScreenState(nextScreenState)
+                            if (nextScreenState != null) {
+                                viewModel.updateNextScreenStateWithReloadLaunch(nextScreenState)
                             }
                         }
                     }
@@ -112,7 +113,7 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                 UiInitializeState.NOT_FOUND_EXCEPTION -> {
                     Toast.makeText(
                         LocalContext.current,
-                        stringResource(R.string.failed_open_form_by_not_found_edit_target_task),
+                        stringResource(R.string.failed_initialize_by_not_found_task_exception),
                         Toast.LENGTH_LONG
                     ).show()
                     // 画面POPの処理をLaunchedEffectで行わないと戻った先で値をハンドリングできない
@@ -128,7 +129,7 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                 UiInitializeState.ERROR -> {
                     Toast.makeText(
                         LocalContext.current,
-                        stringResource(R.string.failed_initialize_form),
+                        stringResource(R.string.failed_initialize_by_error),
                         Toast.LENGTH_LONG
                     ).show()
                     // 画面POPの処理をLaunchedEffectで行わないと戻った先で値をハンドリングできない

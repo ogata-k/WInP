@@ -533,7 +533,7 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                 UiInitializeState.ERROR -> {
                     Toast.makeText(
                         LocalContext.current,
-                        stringResource(R.string.failed_initialize_form),
+                        stringResource(R.string.failed_initialize_by_error),
                         Toast.LENGTH_LONG
                     ).show()
                     // 画面POPの処理をLaunchedEffectで行わないと戻った先で値をハンドリングできない

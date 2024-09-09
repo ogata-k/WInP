@@ -71,7 +71,8 @@ enum class UiNextScreenState {
             CREATED,
             UPDATED,
             DELETED,
-            NOT_FOUND_EXCEPTION
+            NOT_FOUND_EXCEPTION,
+            ERROR
         ).contains(this)
     }
 }

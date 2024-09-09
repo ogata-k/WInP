@@ -88,7 +88,42 @@ class WorkDetailVM @Inject constructor(
     /**
      * 編集画面などの次の画面の状態を受けて保持している値を更新する
      */
-    fun updateNextScreenState(nextScreenState: UiNextScreenState) {
-        updateVMState(readVMState().copy(screenState = nextScreenState))
+    fun updateNextScreenStateWithReloadLaunch(nextScreenState: UiNextScreenState) {
+        if (!nextScreenState.isDoneAction()) {
+            // 実行したとみなせないなら何もせずに終了
+            return
+        }
+
+        val vmState = readVMState()
+            .copy(
+                initializeState = UiInitializeState.LOADING,
+                screenState = nextScreenState,
+            )
+        updateVMState(vmState)
+
+        viewModelScope.launch {
+            // 再度タスクデータを取得して更新を行う
+            val workResult = getWorkUseCase.call(GetWorkInput(vmState.workId))
+            if (workResult.isFailure) {
+                updateVMState(
+                    readVMState().copy(
+                        initializeState = UiInitializeState.NOT_FOUND_EXCEPTION,
+                        // この画面から派生する編集画面などでデータが見つからないエラーになる可能性
+                        // がある状態なのでscreenStateをエラーとして記録しておく
+                        screenState = UiNextScreenState.ERROR,
+                        work = Optional.empty(),
+                    )
+                )
+
+                return@launch
+            }
+
+            updateVMState(
+                readVMState().copy(
+                    initializeState = UiInitializeState.INITIALIZED,
+                    work = Optional.of(Work.fromDomainModel(workResult.getOrThrow())),
+                )
+            )
+        }
     }
 }

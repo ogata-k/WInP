@@ -22,14 +22,15 @@ class IGetWorkAsyncUseCase : GetWorkAsyncUseCase {
                 )
             )
         }
+
         return GetWorkOutput.success(
             Work(
                 id = input.workId,
-                title = "編集中",
-                description = "これは編集中タスクの説明です。",
+                title = "編集可能",
+                description = "これは${LocalDateTime.now()}に作成された、作成済みのタスクの説明です。",
                 beganAt = LocalDateTime.now(),
                 endedAt = null,
-                completedAt = null,
+                completedAt = if (input.workId % 3 == 0) LocalDateTime.now() else null,
                 workTodos = todoItems,
             )
         )
