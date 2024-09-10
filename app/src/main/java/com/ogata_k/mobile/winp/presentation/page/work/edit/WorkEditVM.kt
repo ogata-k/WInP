@@ -485,13 +485,17 @@ class WorkEditVM @Inject constructor(
 
         val beganDateTimeValidated = if (formData.beganDate != null) {
             if (formData.endedDate != null && LocalDateTime.of(
-                    formData.beganDate, formData.beganTime ?: LocalTime.MIN
+                    formData.beganDate,
+                    // 未指定の場合は画面で設定できる範囲の時間と分を最小値に設定する
+                    formData.beganTime ?: LocalTime.of(0, 0, 0)
                 ) >= LocalDateTime.of(formData.endedDate, formData.endedTime ?: LocalTime.MAX)
             ) {
                 ValidationException.of(
                     ValidationExceptionType.NeedSmallerThanDatetime(
                         LocalDateTime.of(
-                            formData.endedDate, formData.endedTime ?: LocalTime.MAX
+                            formData.endedDate,
+                            // 未指定の場合は画面で設定できる範囲の時間と分を最大値に設定する
+                            formData.endedTime ?: LocalTime.of(23, 59, 0)
                         )
                     )
                 )
