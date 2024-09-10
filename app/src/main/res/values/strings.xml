@@ -6,8 +6,8 @@
     <string name="navigate_to_detail">詳細を開く</string>
 
     <!-- 一般共通 -->
-    <string name="period_with_range">%s ～ %s</string>
-    <string name="none_period" />
+    <string name="period_range">～</string>
+    <string name="no_period">期限なし</string>
 
     <!-- 操作 -->
     <string name="select_date">日にちを入力</string>

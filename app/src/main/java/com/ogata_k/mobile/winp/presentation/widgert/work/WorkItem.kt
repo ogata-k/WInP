@@ -25,7 +25,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ogata_k.mobile.winp.R
-import com.ogata_k.mobile.winp.common.formatter.buildFullDateTimePatternFormatter
 import com.ogata_k.mobile.winp.presentation.model.work.Work
 import com.ogata_k.mobile.winp.presentation.theme.WInPTheme
 import com.ogata_k.mobile.winp.presentation.widgert.common.BodyMediumText
@@ -67,18 +66,12 @@ fun WorkItem(work: Work, modifier: Modifier = Modifier, onClick: () -> Unit) {
                             .padding(end = dimensionResource(id = R.dimen.padding_small))
                             .size((MaterialTheme.typography.bodySmall.fontSize.value * 1.4).dp)
                     )
-                    val formattedPair =
-                        work.splitToFormattedPeriod(buildFullDateTimePatternFormatter())
-                    BodySmallText(
-                        if (work.hasPeriod)
-                            stringResource(
-                                id = R.string.period_with_range,
-                                formattedPair.first,
-                                formattedPair.second
-                            )
-                        else
-                            stringResource(id = R.string.none_period),
-                    )
+                    val formattedPeriod =
+                        work.formatPeriod(
+                            rangeString = stringResource(id = R.string.period_range),
+                            noPeriodString = stringResource(id = R.string.no_period),
+                        )
+                    BodySmallText(formattedPeriod)
                 }
                 TitleLargeText(
                     work.title,

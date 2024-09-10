@@ -22,7 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.ogata_k.mobile.winp.R
-import com.ogata_k.mobile.winp.common.formatter.buildHourMinutePatternFormatter
+import com.ogata_k.mobile.winp.common.formatter.buildFullTimePatternFormatter
 import com.ogata_k.mobile.winp.presentation.widgert.common.ButtonLargeText
 import com.ogata_k.mobile.winp.presentation.widgert.common.DialogOfTimePicker
 import java.time.LocalTime
@@ -56,7 +56,7 @@ fun TimeFormColumnItem(
         }
         Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_medium)))
         TextField(
-            value = if (time == null) "" else buildHourMinutePatternFormatter().format(time),
+            value = if (time == null) "" else buildFullTimePatternFormatter().format(time),
             onValueChange = {},
             readOnly = true,
             modifier = Modifier

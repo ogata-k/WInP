@@ -3,7 +3,7 @@ package com.ogata_k.mobile.winp.common.formatter
 import java.time.format.DateTimeFormatter
 
 fun buildFullDateTimePatternFormatter(): DateTimeFormatter {
-    return DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss")
+    return DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm")
 }
 
 fun buildFullDatePatternFormatter(): DateTimeFormatter {
@@ -11,9 +11,5 @@ fun buildFullDatePatternFormatter(): DateTimeFormatter {
 }
 
 fun buildFullTimePatternFormatter(): DateTimeFormatter {
-    return DateTimeFormatter.ofPattern("HH:mm:ss")
-}
-
-fun buildHourMinutePatternFormatter(): DateTimeFormatter {
     return DateTimeFormatter.ofPattern("HH:mm")
 }

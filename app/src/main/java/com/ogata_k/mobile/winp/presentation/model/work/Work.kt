@@ -1,5 +1,8 @@
 package com.ogata_k.mobile.winp.presentation.model.work
 
+import com.ogata_k.mobile.winp.common.formatter.buildFullDatePatternFormatter
+import com.ogata_k.mobile.winp.common.formatter.buildFullDateTimePatternFormatter
+import com.ogata_k.mobile.winp.common.formatter.buildFullTimePatternFormatter
 import com.ogata_k.mobile.winp.presentation.model.FromDomain
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -42,5 +45,47 @@ data class Work(
         val formatEndedAt: String = endedAt?.format(formatter) ?: ""
 
         return Pair(formatBeganAt, formatEndedAt)
+    }
+
+    /**
+     * 期間を適切な条件でフォーマット
+     */
+    fun formatPeriod(rangeString: String, noPeriodString: String): String {
+        if (beganAt == null && endedAt == null) {
+            return noPeriodString
+        }
+
+        val dateFormatter = buildFullDatePatternFormatter()
+        val timeFormatter = buildFullTimePatternFormatter()
+        val dateTimeFormatter = buildFullDateTimePatternFormatter()
+
+        if (beganAt == null || endedAt == null) {
+            val formatBeganAt: String = beganAt?.format(dateTimeFormatter) ?: ""
+            val formatEndedAt: String = endedAt?.format(dateTimeFormatter) ?: ""
+            return "%s %s %s".format(formatBeganAt, rangeString, formatEndedAt)
+        }
+
+        // 同日の場合は時間だけレンジ表示
+        if (beganAt.toLocalDate() == endedAt.toLocalDate()) {
+            val formatDate: String = beganAt.toLocalDate().format(dateFormatter)
+            val formatBeganTime: String = beganAt.toLocalTime().format(timeFormatter)
+            val formatEndedTime: String = endedAt.toLocalTime().format(timeFormatter)
+            return "%s %s %s %s".format(formatDate, formatBeganTime, rangeString, formatEndedTime)
+        }
+
+        // 期間の両端の時間の場合は時間を省略して表示
+        val localTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+        // 文字列に変換して比較しているのはミリ秒までで比較するとDBで保存可能な条件を超えるため
+        if (beganAt.toLocalTime().format(localTimeFormatter) == "00:00" && endedAt.toLocalTime()
+                .format(localTimeFormatter) == "23:59"
+        ) {
+            val formatBeganDate: String = beganAt.toLocalDate().format(dateFormatter)
+            val formatEndedDate: String = endedAt.toLocalDate().format(dateFormatter)
+            return "%s %s %s".format(formatBeganDate, rangeString, formatEndedDate)
+        }
+
+        val formatBeganAt: String = beganAt.format(dateTimeFormatter)
+        val formatEndedAt: String = endedAt.format(dateTimeFormatter)
+        return "%s %s %s".format(formatBeganAt, rangeString, formatEndedAt)
     }
 }
