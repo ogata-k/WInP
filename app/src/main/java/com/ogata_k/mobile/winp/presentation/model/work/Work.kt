@@ -4,6 +4,7 @@ import com.ogata_k.mobile.winp.common.formatter.buildFullDatePatternFormatter
 import com.ogata_k.mobile.winp.common.formatter.buildFullDateTimePatternFormatter
 import com.ogata_k.mobile.winp.common.formatter.buildFullTimePatternFormatter
 import com.ogata_k.mobile.winp.presentation.model.FromDomain
+import com.ogata_k.mobile.winp.presentation.model.ToDomain
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import com.ogata_k.mobile.winp.domain.model.work.Work as DomainWork
@@ -18,7 +19,8 @@ data class Work(
     val beganAt: LocalDateTime?,
     val endedAt: LocalDateTime?,
     val completedAt: LocalDateTime?,
-) {
+    val todoItems: List<WorkTodo>,
+) : ToDomain<DomainWork> {
     companion object : FromDomain<DomainWork, Work> {
         override fun fromDomainModel(domain: DomainWork): Work {
             if (domain.id == null) {
@@ -32,6 +34,7 @@ data class Work(
                 beganAt = domain.beganAt,
                 endedAt = domain.endedAt,
                 completedAt = domain.completedAt,
+                todoItems = domain.workTodos.map { WorkTodo.fromDomainModel(it) },
             )
         }
     }
@@ -87,5 +90,17 @@ data class Work(
         val formatBeganAt: String = beganAt.format(dateTimeFormatter)
         val formatEndedAt: String = endedAt.format(dateTimeFormatter)
         return "%s %s %s".format(formatBeganAt, rangeString, formatEndedAt)
+    }
+
+    override fun toDomainModel(): DomainWork {
+        return DomainWork(
+            id = id,
+            title = title,
+            description = description,
+            beganAt = beganAt,
+            endedAt = endedAt,
+            completedAt = completedAt,
+            workTodos = todoItems.map { it.toDomainModel() },
+        )
     }
 }

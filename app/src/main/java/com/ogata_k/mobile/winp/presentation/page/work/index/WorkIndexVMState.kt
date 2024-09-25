@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 
 data class WorkIndexVMState(
+    // uiStateは常に初期化済みのうえ、アクション実行中もないので指定しない
     val isInSearchDate: Boolean,
     val searchDate: LocalDate,
     val workPagingData: Flow<PagingData<Work>>,

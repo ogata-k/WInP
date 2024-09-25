@@ -60,7 +60,18 @@ enum class UiNextScreenState {
      * エラーがあるならtrue
      */
     fun isError(): Boolean {
-        return this == ERROR || this == NOT_FOUND_EXCEPTION
+        return this == ERROR
+    }
+
+    /**
+     * アクションが成功しているならtrue
+     */
+    fun isActionSucceeded(): Boolean {
+        return arrayOf(
+            CREATED,
+            UPDATED,
+            DELETED,
+        ).contains(this)
     }
 
     /**

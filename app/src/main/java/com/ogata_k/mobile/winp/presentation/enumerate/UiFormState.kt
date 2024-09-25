@@ -5,16 +5,14 @@ package com.ogata_k.mobile.winp.presentation.enumerate
  */
 enum class UiFormState {
     NOT_INITIALIZE,
-    FORM_EDITING,
-    DOING_ACTION,
-    FAIL_ACTION,
-    SUCCESS_ACTION;
+    USING_FORM,
+    DOING_ACTION;
 
     /**
      * 作成や更新などのアクションが実行できる状態ならtrue
      */
     fun canDoAction(): Boolean {
-        return this == FORM_EDITING
+        return this == USING_FORM
     }
 
     /**
@@ -22,26 +20,5 @@ enum class UiFormState {
      */
     fun isInDoingAction(): Boolean {
         return this == DOING_ACTION
-    }
-
-    /**
-     * アクションに成功したならtrue
-     */
-    fun isSuccess(): Boolean {
-        return this == SUCCESS_ACTION
-    }
-
-    /**
-     * アクションに失敗したならtrue
-     */
-    fun isFailure(): Boolean {
-        return this == FAIL_ACTION
-    }
-
-    /**
-     * Formが編集可能な状態ならtrue
-     */
-    fun canEditForm(): Boolean {
-        return canDoAction() || isFailure()
     }
 }

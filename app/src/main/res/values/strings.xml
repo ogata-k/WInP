@@ -10,6 +10,7 @@
     <string name="no_period">期限なし</string>
 
     <!-- 操作 -->
+    <string name="menu_have_more_action">追加操作</string>
     <string name="select_date">日にちを入力</string>
     <string name="select_time">時間を入力</string>
     <string name="ok">OK</string>
@@ -18,18 +19,26 @@
     <string name="add">追加</string>
     <string name="create">作成</string>
     <string name="update">更新</string>
+    <string name="delete">削除</string>
+    <string name="confirm">確認</string>
+    <string name="dismiss">閉じる</string>
 
     <!-- CRUD操作 -->
     <string name="create_work">タスクを作成</string>
     <string name="edit_work">タスクを編集</string>
+    <string name="delete_work">タスクを削除</string>
     <string name="create_work_todo">タスクTODOを作成</string>
     <string name="delete_work_todo">タスクTODOを削除</string>
 
     <!-- タイトル -->
     <string name="title_create_work">タスク作成</string>
     <string name="title_edit_work">タスク編集</string>
+    <string name="title_delete_work">タスク削除</string>
     <string name="title_create_work_todo">タスクTODO作成</string>
     <string name="title_edit_work_todo">タスクTODO編集</string>
+
+    <!-- ダイアログコンテンツ -->
+    <string name="dialog_content_confirm_delete_work">タスクを削除します。よろしいですか。</string>
 
     <!-- フォーム共通 -->
     <string name="counter_format">%d／%d</string>

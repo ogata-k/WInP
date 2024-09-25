@@ -8,11 +8,9 @@ import com.ogata_k.mobile.winp.domain.use_case.work.GetWorkInput
 import com.ogata_k.mobile.winp.domain.use_case.work.UpdateWorkAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.UpdateWorkInput
 import com.ogata_k.mobile.winp.presentation.constant.AsCreate
-import com.ogata_k.mobile.winp.presentation.enumerate.UiFormState
-import com.ogata_k.mobile.winp.presentation.enumerate.UiInitializeState
-import com.ogata_k.mobile.winp.presentation.enumerate.UiNextScreenState
 import com.ogata_k.mobile.winp.presentation.enumerate.ValidationException
 import com.ogata_k.mobile.winp.presentation.enumerate.ValidationExceptionType
+import com.ogata_k.mobile.winp.presentation.model.common.UiLoadingState
 import com.ogata_k.mobile.winp.presentation.model.work_form.WorkFormData
 import com.ogata_k.mobile.winp.presentation.model.work_form.WorkFormValidateExceptions
 import com.ogata_k.mobile.winp.presentation.model.work_form.WorkTodoFormData
@@ -48,9 +46,7 @@ class WorkEditVM @Inject constructor(
     override val viewModelStateFlow: MutableStateFlow<WorkEditVMState> = MutableStateFlow(
         WorkEditVMState(
             // 初期状態は未初期化状態とする
-            initializeState = UiInitializeState.LOADING,
-            screenState = UiNextScreenState.LOADING,
-            formState = UiFormState.NOT_INITIALIZE,
+            uiLoadingState = UiLoadingState.initialState(),
             isInCreating = isInCreating(AsCreate.CREATING_ID),
             workId = AsCreate.CREATING_ID,
             formData = WorkFormData.empty(),
@@ -76,7 +72,7 @@ class WorkEditVM @Inject constructor(
      */
     fun initializeForm(workId: Int) {
         val vmState = readVMState()
-        if (vmState.initializeState.isInitialized()) {
+        if (vmState.uiLoadingState.initializeState.isInitialized()) {
             // 初期化済みなので追加対応の必要なし
             return
         }
@@ -96,9 +92,7 @@ class WorkEditVM @Inject constructor(
                 todoItems = emptyList(),
             )
             val newVmState = vmState.copy(
-                initializeState = UiInitializeState.INITIALIZED,
-                screenState = UiNextScreenState.INITIALIZED,
-                formState = UiFormState.FORM_EDITING,
+                uiLoadingState = vmState.uiLoadingState.toInitialized(),
                 isInCreating = true,
                 workId = workId,
                 formData = formData,
@@ -120,9 +114,7 @@ class WorkEditVM @Inject constructor(
             if (workResult.isFailure) {
                 updateVMState(
                     readVMState().copy(
-                        initializeState = UiInitializeState.NOT_FOUND_EXCEPTION,
-                        screenState = UiNextScreenState.ERROR,
-                        formState = UiFormState.NOT_INITIALIZE,
+                        uiLoadingState = readVMState().uiLoadingState.toInitializedWithNotFoundException(),
                     )
                 )
 
@@ -132,9 +124,7 @@ class WorkEditVM @Inject constructor(
             val formData = WorkFormData.fromDomainModel(workResult.getOrThrow())
             updateVMState(
                 readVMState().copy(
-                    initializeState = UiInitializeState.INITIALIZED,
-                    screenState = UiNextScreenState.INITIALIZED,
-                    formState = UiFormState.FORM_EDITING,
+                    uiLoadingState = readVMState().uiLoadingState.toInitialized(),
                     formData = formData,
                     validateExceptions = validateFormData(
                         formData, readVMState().isInShowEditingTodoForm
@@ -570,7 +560,7 @@ class WorkEditVM @Inject constructor(
             return
         }
 
-        val newVmState = vmState.copy(formState = UiFormState.DOING_ACTION)
+        val newVmState = vmState.copy(uiLoadingState = vmState.uiLoadingState.toDoingAction())
         updateVMState(newVmState)
 
         viewModelScope.launch {
@@ -587,8 +577,7 @@ class WorkEditVM @Inject constructor(
             // 実行結果を通知
             updateVMState(
                 oldVmState.copy(
-                    screenState = if (result.isSuccess) (if (oldVmState.isInCreating) UiNextScreenState.CREATED else UiNextScreenState.UPDATED) else UiNextScreenState.ERROR,
-                    formState = if (result.isSuccess) UiFormState.SUCCESS_ACTION else UiFormState.FAIL_ACTION,
+                    uiLoadingState = if (result.isSuccess) (if (oldVmState.isInCreating) oldVmState.uiLoadingState.toDoneCreate() else oldVmState.uiLoadingState.toDoneUpdate()) else oldVmState.uiLoadingState.toDoneWithError(),
                 )
             )
         }
@@ -599,7 +588,7 @@ class WorkEditVM @Inject constructor(
      */
     fun updateToEditingFormState() {
         val vmState = readVMState()
-        val newVmState = vmState.copy(formState = UiFormState.FORM_EDITING)
+        val newVmState = vmState.copy(uiLoadingState = vmState.uiLoadingState.forceToUsingForm())
         updateVMState(newVmState)
     }
 }

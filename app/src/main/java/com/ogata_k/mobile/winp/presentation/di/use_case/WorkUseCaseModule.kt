@@ -1,10 +1,12 @@
 package com.ogata_k.mobile.winp.presentation.di.use_case
 
 import com.ogata_k.mobile.winp.domain.use_case.work.CreateWorkAsyncUseCase
+import com.ogata_k.mobile.winp.domain.use_case.work.DeleteWorkAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.FetchPageWorksAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.GetWorkAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.UpdateWorkAsyncUseCase
 import com.ogata_k.mobile.winp.presentation.use_case.work.ICreateWorkAsyncUseCase
+import com.ogata_k.mobile.winp.presentation.use_case.work.IDeleteWorkAsyncUseCase
 import com.ogata_k.mobile.winp.presentation.use_case.work.IFetchPageWorksAsyncUseCase
 import com.ogata_k.mobile.winp.presentation.use_case.work.IGetWorkAsyncUseCase
 import com.ogata_k.mobile.winp.presentation.use_case.work.IUpdateWorkAsyncUseCase
@@ -34,5 +36,10 @@ object WorkUseCaseModule {
     @Provides
     fun updateWorkAsyncUseCase(): UpdateWorkAsyncUseCase {
         return IUpdateWorkAsyncUseCase()
+    }
+
+    @Provides
+    fun deleteWorkAsyncUseCase(): DeleteWorkAsyncUseCase {
+        return IDeleteWorkAsyncUseCase()
     }
 }

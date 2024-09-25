@@ -107,6 +107,8 @@ private fun WorkItemNoDeadlinePreview() {
         beganAt = LocalDateTime.now(),
         endedAt = null,
         completedAt = null,
+        // 一覧アイテムには表示しないので空を指定しておく
+        todoItems = emptyList(),
     )
 
     WInPTheme {
@@ -124,6 +126,8 @@ private fun WorkItemNoPeriodPreview() {
         beganAt = null,
         endedAt = null,
         completedAt = null,
+        // 一覧アイテムには表示しないので空を指定しておく
+        todoItems = emptyList(),
     )
 
     WInPTheme {
@@ -141,6 +145,8 @@ private fun NotCompletedNotExpiredWorkItemPreview() {
         beganAt = LocalDateTime.now(),
         endedAt = LocalDateTime.now().plusDays(1),
         completedAt = null,
+        // 一覧アイテムには表示しないので空を指定しておく
+        todoItems = emptyList(),
     )
 
     WInPTheme {
@@ -158,6 +164,8 @@ private fun NotCompletedExpiredWorkItemPreview() {
         beganAt = LocalDateTime.now().minusDays(2),
         endedAt = LocalDateTime.now().minusDays(1),
         completedAt = null,
+        // 一覧アイテムには表示しないので空を指定しておく
+        todoItems = emptyList(),
     )
 
     WInPTheme {
@@ -175,6 +183,8 @@ private fun CompletedWorkItemPreview() {
         beganAt = LocalDateTime.now().minusDays(1),
         endedAt = LocalDateTime.now().minusDays(1),
         completedAt = LocalDateTime.now(),
+        // 一覧アイテムには表示しないので空を指定しておく
+        todoItems = emptyList(),
     )
 
     WInPTheme {

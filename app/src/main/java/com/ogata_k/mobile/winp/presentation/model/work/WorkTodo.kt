@@ -1,6 +1,7 @@
 package com.ogata_k.mobile.winp.presentation.model.work
 
 import com.ogata_k.mobile.winp.presentation.model.FromDomain
+import com.ogata_k.mobile.winp.presentation.model.ToDomain
 import java.time.LocalDateTime
 import com.ogata_k.mobile.winp.domain.model.work.WorkTodo as DomainWorkTodo
 
@@ -11,7 +12,7 @@ data class WorkTodo(
     val id: Int,
     val description: String,
     val completedAt: LocalDateTime?,
-) {
+) : ToDomain<DomainWorkTodo> {
     companion object : FromDomain<DomainWorkTodo, WorkTodo> {
         override fun fromDomainModel(domain: DomainWorkTodo): WorkTodo {
             if (domain.id == null) {
@@ -24,5 +25,13 @@ data class WorkTodo(
                 completedAt = domain.completedAt,
             )
         }
+    }
+
+    override fun toDomainModel(): DomainWorkTodo {
+        return DomainWorkTodo(
+            id = id,
+            description = description,
+            completedAt = completedAt,
+        )
     }
 }

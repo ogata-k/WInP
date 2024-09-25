@@ -6,8 +6,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -30,9 +32,13 @@ import androidx.navigation.NavController
 import com.ogata_k.mobile.winp.R
 import com.ogata_k.mobile.winp.presentation.enumerate.UiInitializeState
 import com.ogata_k.mobile.winp.presentation.enumerate.UiNextScreenState
+import com.ogata_k.mobile.winp.presentation.model.common.UiLoadingState
 import com.ogata_k.mobile.winp.presentation.model.work.Work
 import com.ogata_k.mobile.winp.presentation.page.work.edit.WorkEditRouting
 import com.ogata_k.mobile.winp.presentation.widgert.common.AppBarBackButton
+import com.ogata_k.mobile.winp.presentation.widgert.common.ConfirmAlertDialog
+import com.ogata_k.mobile.winp.presentation.widgert.common.DropdownMenuButton
+import com.ogata_k.mobile.winp.presentation.widgert.common.TitleMediumText
 import com.ogata_k.mobile.winp.presentation.widgert.common.WithScaffoldSmallTopAppBar
 import kotlinx.coroutines.launch
 
@@ -40,14 +46,15 @@ import kotlinx.coroutines.launch
 @Composable
 fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
     val uiState: WorkDetailUiState by viewModel.uiStateFlow.collectAsStateWithLifecycle()
+    val uiLoadingState: UiLoadingState = uiState.uiLoadingState
 
     WithScaffoldSmallTopAppBar(
         text = null,
         navigationIcon = {
-            AppBarBackButton(navController = navController) { uiState.screenState }
+            AppBarBackButton(navController = navController) { uiLoadingState.screenState }
         },
         actions = {
-            if (uiState.initializeState == UiInitializeState.INITIALIZED) {
+            if (uiLoadingState.initializeState == UiInitializeState.INITIALIZED && uiState.work.isPresent) {
                 IconButton(
                     onClick = {
                         // 編集画面への遷移
@@ -75,7 +82,7 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
             },
         ) { padding ->
 
-            when (uiState.initializeState) {
+            when (uiLoadingState.initializeState) {
                 // 初期化中
                 UiInitializeState.LOADING -> {
                     Column(
@@ -119,7 +126,7 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                     // 画面POPの処理をLaunchedEffectで行わないと戻った先で値をハンドリングできない
                     LaunchedEffect(true) {
                         // 続いての処理はできないので前の画面に戻る
-                        uiState.screenState.popWithSetState(
+                        uiLoadingState.screenState.popWithSetState(
                             navController
                         )
                     }
@@ -135,7 +142,7 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                     // 画面POPの処理をLaunchedEffectで行わないと戻った先で値をハンドリングできない
                     LaunchedEffect(true) {
                         // 続いての処理はできないので前の画面に戻る
-                        uiState.screenState.popWithSetState(
+                        uiLoadingState.screenState.popWithSetState(
                             navController
                         )
                     }

@@ -2,17 +2,13 @@ package com.ogata_k.mobile.winp.presentation.page.work.edit
 
 import android.content.Context
 import com.ogata_k.mobile.winp.R
-import com.ogata_k.mobile.winp.presentation.enumerate.UiFormState
-import com.ogata_k.mobile.winp.presentation.enumerate.UiInitializeState
-import com.ogata_k.mobile.winp.presentation.enumerate.UiNextScreenState
+import com.ogata_k.mobile.winp.presentation.model.common.UiLoadingState
 import com.ogata_k.mobile.winp.presentation.model.work_form.WorkFormData
 import com.ogata_k.mobile.winp.presentation.model.work_form.WorkFormValidateExceptions
 import java.util.UUID
 
 data class WorkEditUiState(
-    val initializeState: UiInitializeState,
-    val screenState: UiNextScreenState,
-    val formState: UiFormState,
+    val uiLoadingState: UiLoadingState,
     val isInCreating: Boolean,
     val formData: WorkFormData,
     val validateExceptions: WorkFormValidateExceptions,
@@ -28,7 +24,7 @@ data class WorkEditUiState(
      * フォーム画面のタイトルを取得
      */
     fun getFormTitle(context: Context): String? {
-        if (!initializeState.isInitialized()) {
+        if (!uiLoadingState.initializeState.isInitialized()) {
             // 初期化がまだなのでセットができない
             return null
         }

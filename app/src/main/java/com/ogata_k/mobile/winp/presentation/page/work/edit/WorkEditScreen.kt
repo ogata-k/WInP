@@ -57,6 +57,7 @@ import com.ogata_k.mobile.winp.presentation.enumerate.UiInitializeState
 import com.ogata_k.mobile.winp.presentation.enumerate.ValidationExceptionType
 import com.ogata_k.mobile.winp.presentation.enumerate.hasError
 import com.ogata_k.mobile.winp.presentation.enumerate.toErrorMessage
+import com.ogata_k.mobile.winp.presentation.model.common.UiLoadingState
 import com.ogata_k.mobile.winp.presentation.widgert.common.AppBarBackButton
 import com.ogata_k.mobile.winp.presentation.widgert.common.BodyMediumText
 import com.ogata_k.mobile.winp.presentation.widgert.common.ButtonLargeText
@@ -87,11 +88,12 @@ import java.time.LocalTime
 @Composable
 fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
     val uiState: WorkEditUiState by viewModel.uiStateFlow.collectAsStateWithLifecycle()
+    val uiLoadingState: UiLoadingState = uiState.uiLoadingState
 
     WithScaffoldSmallTopAppBar(
         text = uiState.getFormTitle(LocalContext.current),
         navigationIcon = {
-            AppBarBackButton(navController = navController) { uiState.screenState }
+            AppBarBackButton(navController = navController) { uiLoadingState.screenState }
         }
     ) { modifier, appBar ->
         val focusManager = LocalFocusManager.current
@@ -105,7 +107,7 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                 SnackbarHost(hostState = snackbarHostState)
             },
         ) { padding ->
-            when (uiState.initializeState) {
+            when (uiLoadingState.initializeState) {
                 // 初期化中
                 UiInitializeState.LOADING -> {
                     Column(
@@ -125,8 +127,8 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                 // 初期化完了
                 UiInitializeState.INITIALIZED -> {
                     val formData = uiState.formData
-                    val isInDoing = uiState.formState.isInDoingAction()
-                    val canEditForm = uiState.formState.canEditForm()
+                    val isInDoing = uiLoadingState.formState.isInDoingAction()
+                    val canEditForm = uiLoadingState.formState.canDoAction()
                     val workValidateExceptions = uiState.validateExceptions
 
                     val listState = rememberLazyListState()
@@ -440,7 +442,7 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                                 ) {
                                     WithLoadingButton(
                                         // 入力内容のチェックだけでなく、フォームの状態的に実行できる状態かもチェック
-                                        enabled = validWork && uiState.formState.canDoAction(),
+                                        enabled = validWork && uiLoadingState.formState.canDoAction(),
                                         isLoading = isInDoing,
                                         onClick = {
                                             focusManager.clearFocus()
@@ -470,7 +472,7 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                         TaskTodoBottomSheetForm(viewModel, uiState)
                     }
 
-                    if (uiState.formState.isSuccess()) {
+                    if (uiLoadingState.screenState.isActionSucceeded()) {
                         Toast.makeText(
                             LocalContext.current,
                             if (uiState.isInCreating)
@@ -483,13 +485,13 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                         // 画面POPの処理をLaunchedEffectで行わないと戻った先で値をハンドリングできない
                         LaunchedEffect(true) {
                             // 処理に成功したときはすぐに閉じる
-                            uiState.screenState.popWithSetState(
+                            uiLoadingState.screenState.popWithSetState(
                                 navController
                             )
                         }
                     }
 
-                    if (uiState.formState.isFailure()) {
+                    if (uiLoadingState.screenState.isError()) {
                         val failedMessage =
                             if (uiState.isInCreating)
                                 stringResource(R.string.failed_create)
@@ -523,7 +525,7 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                     // 画面POPの処理をLaunchedEffectで行わないと戻った先で値をハンドリングできない
                     LaunchedEffect(true) {
                         // 続いての処理はできないので前の画面に戻る
-                        uiState.screenState.popWithSetState(
+                        uiLoadingState.screenState.popWithSetState(
                             navController
                         )
                     }
@@ -539,7 +541,7 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                     // 画面POPの処理をLaunchedEffectで行わないと戻った先で値をハンドリングできない
                     LaunchedEffect(true) {
                         // 続いての処理はできないので前の画面に戻る
-                        uiState.screenState.popWithSetState(
+                        uiLoadingState.screenState.popWithSetState(
                             navController
                         )
                     }
