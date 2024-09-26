@@ -215,4 +215,13 @@ class WorkDetailVM @Inject constructor(
             )
         }
     }
+
+    /**
+     * フォームを操作可能な状態にする
+     */
+    fun updateToEditingFormState() {
+        val vmState = readVMState()
+        val newVmState = vmState.copy(uiLoadingState = vmState.uiLoadingState.forceToUsingForm())
+        updateVMState(newVmState)
+    }
 }

@@ -149,6 +149,9 @@ data class UiLoadingState(
      * フォーム操作可能な状態に強制する
      */
     fun forceToUsingForm(): UiLoadingState {
-        return copy(formState = UiFormState.USING_FORM)
+        return copy(
+            initializeState = UiInitializeState.INITIALIZED,
+            formState = UiFormState.USING_FORM,
+        )
     }
 }

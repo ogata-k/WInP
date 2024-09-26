@@ -40,6 +40,7 @@ import com.ogata_k.mobile.winp.presentation.widgert.common.ConfirmAlertDialog
 import com.ogata_k.mobile.winp.presentation.widgert.common.DropdownMenuButton
 import com.ogata_k.mobile.winp.presentation.widgert.common.TitleMediumText
 import com.ogata_k.mobile.winp.presentation.widgert.common.WithScaffoldSmallTopAppBar
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -66,6 +67,48 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                         contentDescription = stringResource(
                             R.string.edit_work
                         ),
+                    )
+                }
+                DropdownMenuButton(
+                    expanded = uiState.inShowMoreAction,
+                    showMoreAction = { viewModel.showMoreAction(it) },
+                ) {
+                    // 削除するかダイアログで確認して問題ないなら削除処理を行う
+                    DropdownMenuItem(
+                        text = {
+                            TitleMediumText(stringResource(R.string.delete_work))
+                        },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Filled.Delete,
+                                contentDescription = stringResource(
+                                    R.string.delete_work
+                                ),
+                            )
+                        },
+                        onClick = {
+                            viewModel.showDeleteConfirmDialog(true)
+                        },
+                    )
+                }
+
+                if (uiState.inConfirmDelete) {
+                    ConfirmAlertDialog(
+                        dialogTitle = stringResource(R.string.title_delete_work),
+                        dialogText = stringResource(R.string.dialog_content_confirm_delete_work),
+                        onDismissRequest = {
+                            viewModel.showDeleteConfirmDialog(false)
+                        },
+                        confirmButtonAction = Pair(
+                            stringResource(R.string.delete)
+                        ) {
+                            viewModel.deleteWork()
+                        },
+                        // 削除処理という大事な処理なので戻るボタンでは閉じれなくする
+                        dismissOnBackPress = false,
+                        dismissOnClickOutside = false,
+                        confirmActionIsDanger = true,
+                        enabledButtons = uiState.uiLoadingState.formState.canDoAction(),
                     )
                 }
             }
@@ -106,6 +149,44 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                     val work: Work = uiState.work.get()
                     Text(work.toString(), modifier = Modifier.padding(padding))
 
+                    // この画面上の処理である削除処理が成功した時の処理
+                    if (uiLoadingState.screenState.isActionSucceeded()) {
+                        Toast.makeText(
+                            LocalContext.current,
+                            stringResource(R.string.succeeded_deleted),
+                            Toast.LENGTH_LONG
+                        ).show()
+
+                        // 画面POPの処理をLaunchedEffectで行わないと戻った先で値をハンドリングできない
+                        LaunchedEffect(true) {
+                            // 処理に成功したときはすぐに閉じる
+                            uiLoadingState.screenState.popWithSetState(
+                                navController
+                            )
+                        }
+                    }
+
+                    // この画面上の処理である削除処理が失敗した時の処理
+                    if (uiLoadingState.screenState.isError()) {
+                        val failedMessage = stringResource(R.string.failed_deleted)
+                        LaunchedEffect(
+                            snackbarHostState
+                        ) {
+                            screenScope.launch {
+                                // 画面を跨がない通知はスナックバーで表示する
+                                snackbarHostState.showSnackbar(
+                                    failedMessage,
+                                    withDismissAction = true
+                                )
+
+                                // スナックバーの表示が消えてから少し待って有効化
+                                delay(300)
+                                viewModel.updateToEditingFormState()
+                            }
+                        }
+                    }
+
+                    // 別画面からこの画面に戻ってきたときに状態を見て更新する
                     LaunchedEffect(UiNextScreenState.takeState(navController, false)) {
                         val nextScreenState = UiNextScreenState.takeState(navController, true)
                         screenScope.launch {

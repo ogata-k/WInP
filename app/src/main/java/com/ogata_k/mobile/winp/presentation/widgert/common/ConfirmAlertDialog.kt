@@ -1,7 +1,10 @@
 package com.ogata_k.mobile.winp.presentation.widgert.common
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -20,6 +23,7 @@ fun ConfirmAlertDialog(
     dismissOnBackPress: Boolean = true,
     dismissOnClickOutside: Boolean = true,
     confirmActionIsDanger: Boolean = false,
+    enabledButtons: Boolean = true,
 ) {
     AlertDialog(
         modifier = modifier,
@@ -28,10 +32,13 @@ fun ConfirmAlertDialog(
             dismissOnClickOutside = dismissOnClickOutside,
         ),
         icon = {
-            // 中央ぞろえのために空を指定
+            Icon(
+                imageVector = Icons.Filled.Info,
+                contentDescription = null,
+            )
         },
         title = {
-            TitleMediumText(text = dialogTitle)
+            TitleLargeText(text = dialogTitle)
         },
         text = {
             BodyMediumText(text = dialogText)
@@ -44,12 +51,14 @@ fun ConfirmAlertDialog(
                 DialogButton(
                     buttonText = stringResource(id = R.string.confirm),
                     action = onDismissRequest,
+                    enabled = enabledButtons,
                 )
             } else {
                 DialogButton(
                     buttonText = confirmButtonAction.first,
                     action = confirmButtonAction.second,
                     isDanger = confirmActionIsDanger,
+                    enabled = enabledButtons,
                 )
             }
         },
@@ -58,6 +67,7 @@ fun ConfirmAlertDialog(
                 DialogButton(
                     buttonText = stringResource(id = R.string.dismiss),
                     action = onDismissRequest,
+                    enabled = enabledButtons,
                 )
             }
         },
@@ -70,6 +80,7 @@ private fun DialogButton(
     action: () -> Unit,
     modifier: Modifier = Modifier,
     isDanger: Boolean = false,
+    enabled: Boolean = true,
 ) {
     var buttonColor = ButtonDefaults.textButtonColors()
     if (isDanger) {
@@ -80,10 +91,11 @@ private fun DialogButton(
     TextButton(
         modifier = modifier,
         colors = buttonColor,
+        enabled = enabled,
         onClick = {
             action()
         }
     ) {
-        ButtonMediumText(buttonText)
+        ButtonLargeText(buttonText)
     }
 }
