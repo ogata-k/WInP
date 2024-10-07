@@ -5,12 +5,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import com.ogata_k.mobile.winp.presentation.constant.AsCreate
 import com.ogata_k.mobile.winp.presentation.page.composableByRouting
 import com.ogata_k.mobile.winp.presentation.page.work.detail.WorkDetailRouting
 import com.ogata_k.mobile.winp.presentation.page.work.detail.WorkDetailScreen
@@ -45,6 +43,7 @@ fun SetupRouting(navController: NavHostController) {
         // Workの一覧
         composableByRouting(WorkIndexRouting) { _ ->
             val vm: WorkIndexVM = hiltViewModel()
+            vm.initializeVM()
             WorkIndexScreen(navController = navController, viewModel = vm)
         }
 
@@ -53,13 +52,10 @@ fun SetupRouting(navController: NavHostController) {
             val vm: WorkDetailVM = hiltViewModel()
 
             val workId: Int? = entry.arguments?.getInt(WorkDetailRouting.WORK_ID_KEY)
-            LaunchedEffect(true) {
-                if (workId == null) {
-                    vm.failInitializeByInvalidWorkId()
-                } else {
-                    vm.initialize(workId)
-                }
+            if (workId != null) {
+                vm.setWorkId(workId)
             }
+            vm.initializeVM()
 
             WorkDetailScreen(navController = navController, viewModel = vm)
         }
@@ -70,10 +66,10 @@ fun SetupRouting(navController: NavHostController) {
 
             // デフォルトは作成
             val workId = entry.arguments?.getInt(WorkEditRouting.WORK_ID_KEY)
-                ?: AsCreate.CREATING_ID
-            LaunchedEffect(true) {
-                vm.initializeForm(workId)
+            if (workId != null) {
+                vm.setWorkId(workId)
             }
+            vm.initializeVM()
 
             WorkEditScreen(navController = navController, viewModel = vm)
         }

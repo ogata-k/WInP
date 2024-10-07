@@ -19,20 +19,20 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.ogata_k.mobile.winp.R
-import com.ogata_k.mobile.winp.presentation.enumerate.UiInitializeState
-import com.ogata_k.mobile.winp.presentation.enumerate.UiNextScreenState
-import com.ogata_k.mobile.winp.presentation.model.common.UiLoadingState
+import com.ogata_k.mobile.winp.presentation.enumerate.ActionDoneResult
+import com.ogata_k.mobile.winp.presentation.enumerate.ScreenLoadingState
 import com.ogata_k.mobile.winp.presentation.model.work.Work
 import com.ogata_k.mobile.winp.presentation.page.work.edit.WorkEditRouting
 import com.ogata_k.mobile.winp.presentation.widgert.common.AppBarBackButton
@@ -46,16 +46,17 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
-    val uiState: WorkDetailUiState by viewModel.uiStateFlow.collectAsStateWithLifecycle()
-    val uiLoadingState: UiLoadingState = uiState.uiLoadingState
+    val uiState: WorkDetailUiState by viewModel.uiStateFlow.collectAsState()
+    val screenLoadingState = uiState.loadingState
+    val basicScreenState = uiState.basicState
 
     WithScaffoldSmallTopAppBar(
         text = null,
         navigationIcon = {
-            AppBarBackButton(navController = navController) { uiLoadingState.screenState }
+            AppBarBackButton(navController = navController)
         },
         actions = {
-            if (uiLoadingState.initializeState == UiInitializeState.INITIALIZED && uiState.work.isPresent) {
+            if (screenLoadingState.isNoErrorInitialized()) {
                 IconButton(
                     onClick = {
                         // 編集画面への遷移
@@ -108,7 +109,7 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                         dismissOnBackPress = false,
                         dismissOnClickOutside = false,
                         confirmActionIsDanger = true,
-                        enabledButtons = uiState.uiLoadingState.formState.canDoAction(),
+                        enabledButtons = basicScreenState.actionState.canLaunch(),
                     )
                 }
             }
@@ -125,9 +126,12 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
             },
         ) { padding ->
 
-            when (uiLoadingState.initializeState) {
+            // Eventを監視
+            viewModel.listenEvent(LocalLifecycleOwner.current)
+
+            when (screenLoadingState) {
                 // 初期化中
-                UiInitializeState.LOADING -> {
+                ScreenLoadingState.READY -> {
                     Column(
                         modifier = Modifier
                             .padding(padding)
@@ -144,61 +148,58 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                 }
 
                 // 初期化完了
-                UiInitializeState.INITIALIZED -> {
+                ScreenLoadingState.NO_ERROR_INITIALIZED -> {
                     // 初期化が完了してエラーがない状態のはずなので、エラーを無視してgetして問題なし
                     val work: Work = uiState.work.get()
                     Text(work.toString(), modifier = Modifier.padding(padding))
 
-                    // この画面上の処理である削除処理が成功した時の処理
-                    if (uiLoadingState.screenState.isActionSucceeded()) {
-                        Toast.makeText(
-                            LocalContext.current,
-                            stringResource(R.string.succeeded_deleted),
-                            Toast.LENGTH_LONG
-                        ).show()
-
-                        // 画面POPの処理をLaunchedEffectで行わないと戻った先で値をハンドリングできない
-                        LaunchedEffect(true) {
-                            // 処理に成功したときはすぐに閉じる
-                            uiLoadingState.screenState.popWithSetState(
-                                navController
-                            )
-                        }
-                    }
-
-                    // この画面上の処理である削除処理が失敗した時の処理
-                    if (uiLoadingState.screenState.isError()) {
-                        val failedMessage = stringResource(R.string.failed_deleted)
-                        LaunchedEffect(
-                            snackbarHostState
-                        ) {
-                            screenScope.launch {
-                                // 画面を跨がない通知はスナックバーで表示する
-                                snackbarHostState.showSnackbar(
-                                    failedMessage,
-                                    withDismissAction = true
-                                )
-
-                                // スナックバーの表示が消えてから少し待って有効化
-                                delay(300)
-                                viewModel.updateToEditingFormState()
+                    val actionDoneResult: ActionDoneResult? = uiState.peekActionDoneResult()
+                    if (actionDoneResult != null) {
+                        val text = actionDoneResult.toMessage()
+                        if (actionDoneResult.isSucceededAction()) {
+                            Toast.makeText(
+                                LocalContext.current,
+                                text,
+                                Toast.LENGTH_LONG
+                            ).show()
+                            // 重複実行させないようにLaunchedEffectを使う
+                            LaunchedEffect(
+                                actionDoneResult,
+                                basicScreenState.actionDoneResults.count()
+                            ) {
+                                if (actionDoneResult.isDeleteAction()) {
+                                    navController.popBackStack()
+                                } else {
+                                    if (basicScreenState.needForceUpdate) {
+                                        viewModel.reloadVMWithConsumeActionDoneResult()
+                                    } else {
+                                        viewModel.consumeActionDoneResult()
+                                    }
+                                }
                             }
-                        }
-                    }
+                        } else {
+                            LaunchedEffect(
+                                actionDoneResult,
+                                basicScreenState.actionDoneResults.count()
+                            ) {
+                                screenScope.launch {
+                                    // 画面を跨がない通知はスナックバーで表示する
+                                    snackbarHostState.showSnackbar(
+                                        text,
+                                        withDismissAction = true
+                                    )
 
-                    // 別画面からこの画面に戻ってきたときに状態を見て更新する
-                    LaunchedEffect(UiNextScreenState.takeState(navController, false)) {
-                        val nextScreenState = UiNextScreenState.takeState(navController, true)
-                        screenScope.launch {
-                            if (nextScreenState != null) {
-                                viewModel.updateNextScreenStateWithReloadLaunch(nextScreenState)
+                                    // スナックバーの表示が消えてから少し待って有効化
+                                    delay(300)
+                                }
+                                viewModel.consumeActionDoneResult()
                             }
                         }
                     }
                 }
 
                 // アイテムが見つからず終了
-                UiInitializeState.NOT_FOUND_EXCEPTION -> {
+                ScreenLoadingState.NOT_FOUND_EXCEPTION -> {
                     Toast.makeText(
                         LocalContext.current,
                         stringResource(R.string.failed_initialize_by_not_found_task_exception),
@@ -207,14 +208,12 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                     // 画面POPの処理をLaunchedEffectで行わないと戻った先で値をハンドリングできない
                     LaunchedEffect(true) {
                         // 続いての処理はできないので前の画面に戻る
-                        uiLoadingState.screenState.popWithSetState(
-                            navController
-                        )
+                        navController.popBackStack()
                     }
                 }
 
                 // 予期せぬエラーがあった場合
-                UiInitializeState.ERROR -> {
+                ScreenLoadingState.ERROR -> {
                     Toast.makeText(
                         LocalContext.current,
                         stringResource(R.string.failed_initialize_by_error),
@@ -223,9 +222,7 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                     // 画面POPの処理をLaunchedEffectで行わないと戻った先で値をハンドリングできない
                     LaunchedEffect(true) {
                         // 続いての処理はできないので前の画面に戻る
-                        uiLoadingState.screenState.popWithSetState(
-                            navController
-                        )
+                        navController.popBackStack()
                     }
                 }
             }

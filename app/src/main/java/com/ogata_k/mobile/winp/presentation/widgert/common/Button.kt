@@ -21,16 +21,13 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import com.ogata_k.mobile.winp.R
-import com.ogata_k.mobile.winp.presentation.enumerate.UiNextScreenState
 
 /**
  * AppBarなどでの戻るボタン
  */
 @Composable
-fun AppBarBackButton(navController: NavController, getScreenState: (() -> UiNextScreenState)?) {
+fun AppBarBackButton(navController: NavController) {
     val callback: () -> Unit = {
-        getScreenState?.invoke()?.setState(navController)
-        // からならずPOPさせるために状態セットと画面POPは分ける
         navController.popBackStack()
     }
 

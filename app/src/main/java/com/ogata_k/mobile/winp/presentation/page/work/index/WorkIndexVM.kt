@@ -1,11 +1,22 @@
 package com.ogata_k.mobile.winp.presentation.page.work.index
 
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import androidx.paging.compose.LazyPagingItems
 import com.ogata_k.mobile.winp.domain.use_case.work.FetchPageWorksAsyncUseCase
+import com.ogata_k.mobile.winp.presentation.enumerate.ScreenLoadingState
+import com.ogata_k.mobile.winp.presentation.event.EventBus
+import com.ogata_k.mobile.winp.presentation.event.work.FailedCreateWork
+import com.ogata_k.mobile.winp.presentation.event.work.FailedDeleteWork
+import com.ogata_k.mobile.winp.presentation.event.work.FailedUpdateWork
+import com.ogata_k.mobile.winp.presentation.event.work.NotFoundWork
+import com.ogata_k.mobile.winp.presentation.event.work.SucceededCreateWork
+import com.ogata_k.mobile.winp.presentation.event.work.SucceededDeleteWork
+import com.ogata_k.mobile.winp.presentation.event.work.SucceededUpdateWork
+import com.ogata_k.mobile.winp.presentation.model.common.BasicScreenState
 import com.ogata_k.mobile.winp.presentation.model.work.Work
 import com.ogata_k.mobile.winp.presentation.page.AbstractViewModel
 import com.ogata_k.mobile.winp.presentation.paging_source.WorkPagingSource
@@ -18,7 +29,7 @@ import javax.inject.Inject
 @HiltViewModel
 class WorkIndexVM @Inject constructor(
     private val fetchPageWorksUseCase: FetchPageWorksAsyncUseCase
-) : AbstractViewModel<WorkIndexVMState, WorkIndexUiState>() {
+) : AbstractViewModel<ScreenLoadingState, WorkIndexVMState, ScreenLoadingState, WorkIndexUiState>() {
     companion object {
         // 初回ページサイズ
         const val INITIAL_PAGE_SIZE: Int = 50
@@ -32,6 +43,10 @@ class WorkIndexVM @Inject constructor(
 
     override val viewModelStateFlow: MutableStateFlow<WorkIndexVMState> =
         MutableStateFlow(WorkIndexVMState(
+            // 最初から初期化済み。読み込みの状態を表現するのはPagerに任せる
+            loadingState = ScreenLoadingState.NO_ERROR_INITIALIZED,
+            basicState = BasicScreenState.initialState()
+                .updateInitialize(ScreenLoadingState.NO_ERROR_INITIALIZED),
             isInSearchDate = false,
             searchDate = LocalDate.now(),
             workPagingData = Pager(
@@ -56,6 +71,59 @@ class WorkIndexVM @Inject constructor(
         )
     override val uiStateFlow: StateFlow<WorkIndexUiState> =
         asUIStateFlow(viewModelScope, viewModelStateFlow)
+
+    override fun initializeVM() {
+        // None
+    }
+
+    override fun reloadVM() {
+        // PagerのリロードはPagerに任せるので、画面のリロードは関係ない
+    }
+
+    override fun reloadVMWithConsumeActionDoneResult() {
+        // PagerのリロードはPagerに任せるので、画面のリロードは関係ない
+        consumeActionDoneResult()
+    }
+
+    override fun replaceVMBasicScreenState(
+        viewModelState: WorkIndexVMState,
+        basicScreenState: BasicScreenState
+    ): WorkIndexVMState {
+        return viewModelState.copy(basicState = basicScreenState)
+    }
+
+    /**
+     * Eventの監視
+     */
+    fun listenEvent(
+        screenLifecycle: LifecycleOwner,
+        refreshListRequest: () -> Unit,
+    ) {
+        EventBus.onEvent<SucceededCreateWork>(screenLifecycle) {
+            refreshListRequest()
+        }
+        EventBus.onEvent<FailedCreateWork>(screenLifecycle) {
+            refreshListRequest()
+        }
+
+        EventBus.onEvent<SucceededUpdateWork>(screenLifecycle) {
+            refreshListRequest()
+        }
+        EventBus.onEvent<FailedUpdateWork>(screenLifecycle) {
+            refreshListRequest()
+        }
+
+        EventBus.onEvent<SucceededDeleteWork>(screenLifecycle) {
+            refreshListRequest()
+        }
+        EventBus.onEvent<FailedDeleteWork>(screenLifecycle) {
+            refreshListRequest()
+        }
+
+        EventBus.onEvent<NotFoundWork>(screenLifecycle) {
+            refreshListRequest()
+        }
+    }
 
     /**
      * 日にち検索ダイアログを表示(falseなら非表示化)

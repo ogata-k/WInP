@@ -8,9 +8,16 @@ import com.ogata_k.mobile.winp.domain.use_case.work.GetWorkInput
 import com.ogata_k.mobile.winp.domain.use_case.work.UpdateWorkAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.UpdateWorkInput
 import com.ogata_k.mobile.winp.presentation.constant.AsCreate
+import com.ogata_k.mobile.winp.presentation.enumerate.ActionDoneResult
+import com.ogata_k.mobile.winp.presentation.enumerate.ScreenLoadingState
 import com.ogata_k.mobile.winp.presentation.enumerate.ValidationException
 import com.ogata_k.mobile.winp.presentation.enumerate.ValidationExceptionType
-import com.ogata_k.mobile.winp.presentation.model.common.UiLoadingState
+import com.ogata_k.mobile.winp.presentation.event.EventBus
+import com.ogata_k.mobile.winp.presentation.event.work.FailedCreateWork
+import com.ogata_k.mobile.winp.presentation.event.work.FailedUpdateWork
+import com.ogata_k.mobile.winp.presentation.event.work.SucceededCreateWork
+import com.ogata_k.mobile.winp.presentation.event.work.SucceededUpdateWork
+import com.ogata_k.mobile.winp.presentation.model.common.BasicScreenState
 import com.ogata_k.mobile.winp.presentation.model.work_form.WorkFormData
 import com.ogata_k.mobile.winp.presentation.model.work_form.WorkFormValidateExceptions
 import com.ogata_k.mobile.winp.presentation.model.work_form.WorkTodoFormData
@@ -34,7 +41,7 @@ class WorkEditVM @Inject constructor(
     private val getWorkUseCase: GetWorkAsyncUseCase,
     private val createWorkUseCase: CreateWorkAsyncUseCase,
     private val updateWorkUseCase: UpdateWorkAsyncUseCase,
-) : AbstractViewModel<WorkEditVMState, WorkEditUiState>() {
+) : AbstractViewModel<ScreenLoadingState, WorkEditVMState, ScreenLoadingState, WorkEditUiState>() {
     companion object {
         const val TITLE_MAX_LENGTH = 30
 
@@ -46,7 +53,8 @@ class WorkEditVM @Inject constructor(
     override val viewModelStateFlow: MutableStateFlow<WorkEditVMState> = MutableStateFlow(
         WorkEditVMState(
             // 初期状態は未初期化状態とする
-            uiLoadingState = UiLoadingState.initialState(),
+            loadingState = ScreenLoadingState.READY,
+            basicState = BasicScreenState.initialState(),
             isInCreating = isInCreating(AsCreate.CREATING_ID),
             workId = AsCreate.CREATING_ID,
             formData = WorkFormData.empty(),
@@ -63,21 +71,27 @@ class WorkEditVM @Inject constructor(
         asUIStateFlow(viewModelScope, viewModelStateFlow)
 
     /**
-     * タスク作成中かどうかを判定
+     * workIdを初期化
      */
-    private fun isInCreating(workId: Int): Boolean = workId == AsCreate.CREATING_ID
-
-    /**
-     * FormDataを初期化
-     */
-    fun initializeForm(workId: Int) {
+    fun setWorkId(workId: Int) {
         val vmState = readVMState()
-        if (vmState.uiLoadingState.initializeState.isInitialized()) {
+        updateVMState(vmState.copy(workId = workId))
+    }
+
+    override fun initializeVM() {
+        var vmState = readVMState()
+        if (vmState.loadingState.isInitialized()) {
             // 初期化済みなので追加対応の必要なし
             return
         }
+        // 事前にsetWorkId()で設定しておく必要がある
+        val workId = vmState.workId
 
         if (isInCreating(workId)) {
+            // 作成中
+            vmState = vmState.copy(basicState = vmState.basicState.toDoingAction())
+            updateVMState(vmState)
+
             // 作成用のフォームデータ
             val formData = WorkFormData(
                 id = workId,
@@ -91,8 +105,10 @@ class WorkEditVM @Inject constructor(
                 editingTodoItem = WorkTodoFormData.empty(UUID.randomUUID()),
                 todoItems = emptyList(),
             )
+            val loadingState = ScreenLoadingState.NO_ERROR_INITIALIZED
             val newVmState = vmState.copy(
-                uiLoadingState = vmState.uiLoadingState.toInitialized(),
+                loadingState = loadingState,
+                basicState = vmState.basicState.updateInitialize(loadingState),
                 isInCreating = true,
                 workId = workId,
                 formData = formData,
@@ -104,17 +120,24 @@ class WorkEditVM @Inject constructor(
             return
         }
 
-        val newVmState = vmState.copy(isInCreating = false, workId = workId)
-        updateVMState(newVmState)
+        // 編集中
+        vmState = vmState.copy(
+            basicState = vmState.basicState.toDoingAction(),
+            isInCreating = false,
+            workId = workId,
+        )
+        updateVMState(vmState)
 
         // DBデータでFormの初期化をしたときに初期化を完了とする
         viewModelScope.launch {
             // 編集用のフォームデータ
             val workResult = getWorkUseCase.call(GetWorkInput(workId))
             if (workResult.isFailure) {
+                val loadingState = ScreenLoadingState.NOT_FOUND_EXCEPTION
                 updateVMState(
                     readVMState().copy(
-                        uiLoadingState = readVMState().uiLoadingState.toInitializedWithNotFoundException(),
+                        loadingState = loadingState,
+                        basicState = vmState.basicState.updateInitialize(loadingState),
                     )
                 )
 
@@ -122,9 +145,11 @@ class WorkEditVM @Inject constructor(
             }
 
             val formData = WorkFormData.fromDomainModel(workResult.getOrThrow())
+            val loadingState = ScreenLoadingState.NO_ERROR_INITIALIZED
             updateVMState(
                 readVMState().copy(
-                    uiLoadingState = readVMState().uiLoadingState.toInitialized(),
+                    loadingState = loadingState,
+                    basicState = vmState.basicState.updateInitialize(loadingState),
                     formData = formData,
                     validateExceptions = validateFormData(
                         formData, readVMState().isInShowEditingTodoForm
@@ -133,6 +158,53 @@ class WorkEditVM @Inject constructor(
             )
         }
     }
+
+    override fun reloadVM() {
+        reloadVMWithOptional(readVMState())
+    }
+
+    /**
+     * アクションの実行結果を消費しつつVMをリロードする
+     */
+    override fun reloadVMWithConsumeActionDoneResult() {
+        reloadVMWithOptional(readVMState()) { it.toConsumeActionDoneResult() }
+    }
+
+    /**
+     * 必要なら追加アクションを対応しつつVMをリロードする
+     */
+    private fun reloadVMWithOptional(
+        vmState: WorkEditVMState,
+        optionalUpdater: (basicState: BasicScreenState) -> BasicScreenState = { it }
+    ) {
+        if (readVMState().loadingState == ScreenLoadingState.READY) {
+            // 初期化中相当の時は無視する
+            return
+        }
+
+        val loadingState = ScreenLoadingState.READY
+        updateVMState(
+            vmState.copy(
+                loadingState = loadingState,
+                basicState = optionalUpdater(vmState.basicState.updateInitialize(loadingState)),
+            )
+        )
+
+        // 初期化をそのまま呼び出す
+        initializeVM()
+    }
+
+    override fun replaceVMBasicScreenState(
+        viewModelState: WorkEditVMState,
+        basicScreenState: BasicScreenState
+    ): WorkEditVMState {
+        return viewModelState.copy(basicState = basicScreenState)
+    }
+
+    /**
+     * タスク作成中かどうかを判定
+     */
+    private fun isInCreating(workId: Int): Boolean = workId == AsCreate.CREATING_ID
 
     /**
      * FormDataの完了状態を更新
@@ -555,12 +627,12 @@ class WorkEditVM @Inject constructor(
      */
     fun createOrUpdateWorkItem() {
         val vmState = readVMState()
-        if (vmState.validateExceptions.hasError()) {
+        if (!vmState.canLaunchAction() || vmState.validateExceptions.hasError()) {
             // エラーがある場合は作成や更新の処理を行わずに終了
             return
         }
 
-        val newVmState = vmState.copy(uiLoadingState = vmState.uiLoadingState.toDoingAction())
+        val newVmState = vmState.copy(basicState = vmState.basicState.toDoingAction())
         updateVMState(newVmState)
 
         viewModelScope.launch {
@@ -574,12 +646,30 @@ class WorkEditVM @Inject constructor(
             }.await()
 
             val oldVmState = readVMState()
+            val actionDoneResult =
+                if (result.isSuccess) (if (oldVmState.isInCreating) ActionDoneResult.SUCCEEDED_CREATE else ActionDoneResult.SUCCEEDED_UPDATE)
+                else (if (oldVmState.isInCreating) ActionDoneResult.FAILED_CREATE else ActionDoneResult.FAILED_UPDATE)
+            var newBasicState = oldVmState.basicState
+                .toDoneAction()
+                .toAcceptActionDoneResult(actionDoneResult)
+            if (result.isSuccess) {
+                newBasicState = newBasicState
+                    // 強制アップデートを要求する
+                    .toRequestForceUpdate()
+            }
             // 実行結果を通知
             updateVMState(
-                oldVmState.copy(
-                    uiLoadingState = if (result.isSuccess) (if (oldVmState.isInCreating) oldVmState.uiLoadingState.toDoneCreate() else oldVmState.uiLoadingState.toDoneUpdate()) else oldVmState.uiLoadingState.toDoneWithError(),
-                )
+                oldVmState.copy(basicState = newBasicState)
             )
+
+            val doneWorkEvent =
+                if (result.isSuccess) (if (oldVmState.isInCreating) SucceededCreateWork(workId = oldVmState.workId) else SucceededUpdateWork(
+                    workId = oldVmState.workId
+                ))
+                else (if (oldVmState.isInCreating) FailedCreateWork(workId = oldVmState.workId) else FailedUpdateWork(
+                    workId = oldVmState.workId
+                ))
+            EventBus.post(doneWorkEvent)
         }
     }
 
@@ -588,7 +678,7 @@ class WorkEditVM @Inject constructor(
      */
     fun updateToEditingFormState() {
         val vmState = readVMState()
-        val newVmState = vmState.copy(uiLoadingState = vmState.uiLoadingState.forceToUsingForm())
+        val newVmState = vmState.copy(basicState = vmState.basicState.toDoneAction())
         updateVMState(newVmState)
     }
 }

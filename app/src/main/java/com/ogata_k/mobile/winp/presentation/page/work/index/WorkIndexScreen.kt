@@ -26,22 +26,21 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.ogata_k.mobile.winp.R
 import com.ogata_k.mobile.winp.common.formatter.buildFullDatePatternFormatter
 import com.ogata_k.mobile.winp.presentation.constant.AsCreate
-import com.ogata_k.mobile.winp.presentation.enumerate.UiNextScreenState
 import com.ogata_k.mobile.winp.presentation.model.work.Work
 import com.ogata_k.mobile.winp.presentation.page.work.detail.WorkDetailRouting
 import com.ogata_k.mobile.winp.presentation.page.work.edit.WorkEditRouting
@@ -54,13 +53,12 @@ import com.ogata_k.mobile.winp.presentation.widgert.common.WithScaffoldSmallTopA
 import com.ogata_k.mobile.winp.presentation.widgert.common.fromDateToMills
 import com.ogata_k.mobile.winp.presentation.widgert.common.fromMillsToDate
 import com.ogata_k.mobile.winp.presentation.widgert.work.WorkItem
-import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
-    val uiState: WorkIndexUiState by viewModel.uiStateFlow.collectAsStateWithLifecycle()
+    val uiState: WorkIndexUiState by viewModel.uiStateFlow.collectAsState()
 
     // collect fLow and remember state and launch event
     val workPagingItems: LazyPagingItems<Work> = uiState.workPagingData.collectAsLazyPagingItems()
@@ -80,7 +78,11 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
         val snackbarHostState = remember { SnackbarHostState() }
 
         val pullToRefreshState = rememberPullToRefreshState()
-        val screenScope = rememberCoroutineScope()
+
+        // Eventを監視
+        viewModel.listenEvent(LocalLifecycleOwner.current) {
+            workPagingItems.refresh()
+        }
 
         Scaffold(
             modifier = modifier,
@@ -142,15 +144,6 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
                 LaunchedEffect(Unit) {
                     workPagingItems.refresh()
                     pullToRefreshState.endRefresh()
-                }
-            }
-
-            LaunchedEffect(UiNextScreenState.takeState(navController, false)) {
-                val nextScreenState = UiNextScreenState.takeState(navController, true)
-                screenScope.launch {
-                    if (nextScreenState?.isDoneAction() == true) {
-                        workPagingItems.refresh()
-                    }
                 }
             }
         }

@@ -1,20 +1,23 @@
 package com.ogata_k.mobile.winp.presentation.page.work.detail
 
-import com.ogata_k.mobile.winp.presentation.model.common.UiLoadingState
+import com.ogata_k.mobile.winp.presentation.enumerate.ScreenLoadingState
+import com.ogata_k.mobile.winp.presentation.model.common.BasicScreenState
 import com.ogata_k.mobile.winp.presentation.model.work.Work
-import com.ogata_k.mobile.winp.presentation.page.ToUiState
+import com.ogata_k.mobile.winp.presentation.page.IVMState
 import java.util.Optional
 
 data class WorkDetailVMState(
-    val uiLoadingState: UiLoadingState,
+    override val loadingState: ScreenLoadingState,
+    override val basicState: BasicScreenState,
     val workId: Int,
     val work: Optional<Work>,
     val inShowMoreAction: Boolean,
     val inConfirmDelete: Boolean,
-) : ToUiState<WorkDetailUiState> {
+) : IVMState<ScreenLoadingState, ScreenLoadingState, WorkDetailUiState> {
     override fun toUiState(): WorkDetailUiState {
         return WorkDetailUiState(
-            uiLoadingState = uiLoadingState,
+            loadingState = loadingState,
+            basicState = basicState,
             workId = workId,
             work = work,
             inShowMoreAction = inShowMoreAction,

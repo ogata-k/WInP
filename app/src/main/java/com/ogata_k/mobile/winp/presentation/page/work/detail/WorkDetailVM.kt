@@ -1,15 +1,20 @@
 package com.ogata_k.mobile.winp.presentation.page.work.detail
 
-import android.util.Log
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewModelScope
 import com.ogata_k.mobile.winp.domain.use_case.work.DeleteWorkAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.DeleteWorkInput
 import com.ogata_k.mobile.winp.domain.use_case.work.GetWorkAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.GetWorkInput
 import com.ogata_k.mobile.winp.presentation.constant.DummyID
-import com.ogata_k.mobile.winp.presentation.enumerate.UiInitializeState
-import com.ogata_k.mobile.winp.presentation.enumerate.UiNextScreenState
-import com.ogata_k.mobile.winp.presentation.model.common.UiLoadingState
+import com.ogata_k.mobile.winp.presentation.enumerate.ActionDoneResult
+import com.ogata_k.mobile.winp.presentation.enumerate.ScreenLoadingState
+import com.ogata_k.mobile.winp.presentation.event.EventBus
+import com.ogata_k.mobile.winp.presentation.event.work.FailedDeleteWork
+import com.ogata_k.mobile.winp.presentation.event.work.FailedUpdateWork
+import com.ogata_k.mobile.winp.presentation.event.work.SucceededDeleteWork
+import com.ogata_k.mobile.winp.presentation.event.work.SucceededUpdateWork
+import com.ogata_k.mobile.winp.presentation.model.common.BasicScreenState
 import com.ogata_k.mobile.winp.presentation.model.work.Work
 import com.ogata_k.mobile.winp.presentation.page.AbstractViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,109 +31,144 @@ import javax.inject.Inject
 class WorkDetailVM @Inject constructor(
     private val getWorkUseCase: GetWorkAsyncUseCase,
     private val deleteWorkUseCase: DeleteWorkAsyncUseCase,
-) : AbstractViewModel<WorkDetailVMState, WorkDetailUiState>() {
+) : AbstractViewModel<ScreenLoadingState, WorkDetailVMState, ScreenLoadingState, WorkDetailUiState>() {
     override val viewModelStateFlow: MutableStateFlow<WorkDetailVMState> = MutableStateFlow(
         WorkDetailVMState(
             // 初期状態は未初期化状態とする
-            uiLoadingState = UiLoadingState.initialState(),
+            loadingState = ScreenLoadingState.READY,
+            basicState = BasicScreenState.initialState(),
             workId = DummyID.INVALID_ID,
             work = Optional.empty(),
             inShowMoreAction = false,
             inConfirmDelete = false,
         )
     )
+
     override val uiStateFlow: StateFlow<WorkDetailUiState> =
         asUIStateFlow(viewModelScope, viewModelStateFlow)
 
     /**
-     * 初期化に失敗した
+     * workIdを初期化
      */
-    fun failInitializeByInvalidWorkId() {
-        Log.e(javaClass.name, "Invalid WorkId")
+    fun setWorkId(workId: Int) {
         val vmState = readVMState()
-        updateVMState(
-            vmState.copy(
-                uiLoadingState = vmState.uiLoadingState.toInitializedWithRuntimeException(),
-                work = Optional.empty(),
-            )
-        )
+        updateVMState(vmState.copy(workId = workId))
     }
 
-    /**
-     * 初期化
-     */
-    fun initialize(workId: Int) {
+    override fun initializeVM() {
         val vmState = readVMState()
-        if (vmState.uiLoadingState.initializeState.isInitialized()) {
+        if (vmState.loadingState.isInitialized()) {
             // 初期化済みなので追加対応の必要なし
             return
         }
+        // 事前にsetWorkId()で設定しておく必要がある
+        val workId = vmState.workId
 
-        val newVmState = vmState.copy(workId = workId)
-        updateVMState(newVmState)
-
-        // DBデータでFormの初期化をしたときに初期化を完了とする
-        viewModelScope.launch {
-            // 編集用のフォームデータ
-            val workResult = getWorkUseCase.call(GetWorkInput(workId))
-            if (workResult.isFailure) {
-                updateVMState(
-                    readVMState().copy(
-                        uiLoadingState = readVMState().uiLoadingState.toInitializedWithNotFoundException(),
-                        work = Optional.empty(),
-                    )
-                )
-
-                return@launch
-            }
-
+        if (workId == DummyID.INVALID_ID) {
+            // workId不正
+            val loadingState = ScreenLoadingState.ERROR
             updateVMState(
-                readVMState().copy(
-                    uiLoadingState = readVMState().uiLoadingState.toInitialized(),
-                    work = Optional.of(Work.fromDomainModel(workResult.getOrThrow())),
+                vmState.copy(
+                    loadingState = loadingState,
+                    basicState = vmState.basicState.updateInitialize(loadingState),
+                    work = Optional.empty(),
                 )
             )
+        } else {
+            // DBデータでFormの初期化をしたときに初期化を完了とする
+            viewModelScope.launch {
+                val workResult = getWorkUseCase.call(GetWorkInput(workId))
+                if (workResult.isFailure) {
+                    val loadingState = ScreenLoadingState.NOT_FOUND_EXCEPTION
+                    updateVMState(
+                        readVMState().copy(
+                            loadingState = loadingState,
+                            basicState = vmState.basicState.updateInitialize(loadingState),
+                            work = Optional.empty(),
+                        )
+                    )
+
+                    return@launch
+                }
+
+                val loadingState = ScreenLoadingState.NO_ERROR_INITIALIZED
+                updateVMState(
+                    readVMState().copy(
+                        loadingState = loadingState,
+                        basicState = vmState.basicState.updateInitialize(loadingState),
+                        work = Optional.of(Work.fromDomainModel(workResult.getOrThrow())),
+                    )
+                )
+            }
         }
     }
 
+    override fun reloadVM() {
+        reloadVMWithOptional(readVMState())
+    }
+
     /**
-     * 編集画面などの次の画面の状態を受けて保持している値を更新する
+     * アクションの実行結果を消費しつつVMをリロードする
      */
-    fun updateNextScreenStateWithReloadLaunch(nextScreenState: UiNextScreenState) {
-        if (!nextScreenState.isDoneAction() && !readVMState().uiLoadingState.formState.canDoAction()) {
-            // 実行したとみなせないなら何もせずに終了
+    override fun reloadVMWithConsumeActionDoneResult() {
+        reloadVMWithOptional(readVMState()) { it.toConsumeActionDoneResult() }
+    }
+
+    /**
+     * 必要なら追加アクションを対応しつつVMをリロードする
+     */
+    private fun reloadVMWithOptional(
+        vmState: WorkDetailVMState,
+        optionalUpdater: (basicState: BasicScreenState) -> BasicScreenState = { it }
+    ) {
+        if (readVMState().loadingState == ScreenLoadingState.READY) {
+            // 初期化中相当の時は無視する
             return
         }
 
-        val vmState = readVMState()
-            .copy(
-                uiLoadingState = readVMState().uiLoadingState.toStartReloadStateBy(nextScreenState),
+        val loadingState = ScreenLoadingState.READY
+        updateVMState(
+            vmState.copy(
+                loadingState = loadingState,
+                basicState = optionalUpdater(vmState.basicState.updateInitialize(loadingState)),
             )
-        updateVMState(vmState)
+        )
 
-        viewModelScope.launch {
-            // 再度タスクデータを取得して更新を行う
-            val workResult = getWorkUseCase.call(GetWorkInput(vmState.workId))
-            if (workResult.isFailure) {
-                updateVMState(
-                    readVMState().copy(
-                        // この画面から派生する編集画面などでデータが見つからないエラーになる可能性
-                        // がある状態なのでscreenStateをエラーとして記録しておく
-                        uiLoadingState = readVMState().uiLoadingState.toReloadedWithNotFoundException(),
-                        work = Optional.empty(),
-                    )
-                )
+        // 初期化をそのまま呼び出す
+        initializeVM()
+    }
 
-                return@launch
+    override fun replaceVMBasicScreenState(
+        viewModelState: WorkDetailVMState,
+        basicScreenState: BasicScreenState
+    ): WorkDetailVMState {
+        return viewModelState.copy(basicState = basicScreenState)
+    }
+
+    /**
+     * Eventの監視
+     */
+    fun listenEvent(
+        screenLifecycle: LifecycleOwner,
+    ) {
+        // 詳細で表示しているWorkはすでに作成済みなので作成イベントの監視は不要
+
+        EventBus.onEvent<SucceededUpdateWork>(screenLifecycle) {
+            val vmState = readVMState()
+            if (it.workId != vmState.workId) {
+                return@onEvent
             }
-
-            updateVMState(
-                readVMState().copy(
-                    uiLoadingState = readVMState().uiLoadingState.toReloadedStateBy(nextScreenState),
-                    work = Optional.of(Work.fromDomainModel(workResult.getOrThrow())),
-                )
-            )
+            reloadVM()
         }
+        EventBus.onEvent<FailedUpdateWork>(screenLifecycle) {
+            val vmState = readVMState()
+            if (it.workId != vmState.workId) {
+                return@onEvent
+            }
+            reloadVM()
+        }
+
+        // 削除処理はこの画面上で行うのでvmState.actionDoneResultsで直接管理する
     }
 
     /**
@@ -146,8 +186,8 @@ class WorkDetailVM @Inject constructor(
             return
         }
 
-        if (vmState.uiLoadingState.initializeState != UiInitializeState.INITIALIZED || !vmState.work.isPresent) {
-            // 初期化もしていないなら削除はできない
+        if (!vmState.loadingState.isNoErrorInitialized()) {
+            // 正常に初期化ができていないなら削除はできない
             return
         }
 
@@ -163,8 +203,8 @@ class WorkDetailVM @Inject constructor(
      */
     fun showDeleteConfirmDialog(show: Boolean = true) {
         val vmState = readVMState()
-        if (vmState.uiLoadingState.initializeState != UiInitializeState.INITIALIZED || !vmState.work.isPresent) {
-            // 初期化もしていないなら削除はできない
+        if (!vmState.loadingState.isNoErrorInitialized()) {
+            // 正常に初期化ができていないなら削除はできない
             return
         }
 
@@ -180,19 +220,28 @@ class WorkDetailVM @Inject constructor(
      */
     fun deleteWork() {
         val vmState = readVMState()
-        if (vmState.uiLoadingState.initializeState != UiInitializeState.INITIALIZED || !vmState.work.isPresent) {
-            // 初期化もしていないなら削除はできないので失敗として通知
+        if (!vmState.loadingState.isNoErrorInitialized()) {
+            val actionDoneResult = ActionDoneResult.FAILED_DELETE
+
+            // 正常に初期化ができていないなら削除はできないので失敗として通知
             updateVMState(
                 vmState.copy(
+                    basicState = vmState.basicState
+                        .toDoneAction()
+                        .toAcceptActionDoneResult(actionDoneResult),
                     // 削除確認中ダイアログを非表示にしつつscreenStateを更新する
                     inConfirmDelete = false,
-                    uiLoadingState = vmState.uiLoadingState.toDoneWithError(),
                 )
             )
+
+            viewModelScope.launch {
+                val doneWorkEvent = FailedDeleteWork(workId = vmState.workId)
+                EventBus.post(doneWorkEvent)
+            }
             return
         }
 
-        val newVmState = vmState.copy(uiLoadingState = vmState.uiLoadingState.toDoingAction())
+        val newVmState = vmState.copy(basicState = vmState.basicState.toDoingAction())
         updateVMState(newVmState)
 
         viewModelScope.launch {
@@ -205,23 +254,26 @@ class WorkDetailVM @Inject constructor(
                 )
             }.await()
 
+            val oldVmState = readVMState()
+            val actionDoneResult =
+                if (result.isSuccess) ActionDoneResult.SUCCEEDED_DELETE else ActionDoneResult.FAILED_DELETE
+            var newBasicState = oldVmState.basicState
+                .toDoneAction()
+                .toAcceptActionDoneResult(actionDoneResult)
+            if (result.isSuccess) {
+                newBasicState = newBasicState
+                    // 強制アップデートを要求する
+                    .toRequestForceUpdate()
+            }
             // 実行結果を通知
             updateVMState(
-                readVMState().copy(
-                    // 削除確認中ダイアログを非表示にしつつscreenStateを更新する
-                    inConfirmDelete = false,
-                    uiLoadingState = if (result.isSuccess) readVMState().uiLoadingState.toDoneDelete() else readVMState().uiLoadingState.toDoneWithError(),
-                )
+                oldVmState.copy(basicState = newBasicState)
             )
-        }
-    }
 
-    /**
-     * フォームを操作可能な状態にする
-     */
-    fun updateToEditingFormState() {
-        val vmState = readVMState()
-        val newVmState = vmState.copy(uiLoadingState = vmState.uiLoadingState.forceToUsingForm())
-        updateVMState(newVmState)
+            val doneWorkEvent =
+                if (result.isSuccess) SucceededDeleteWork(workId = oldVmState.workId)
+                else FailedDeleteWork(workId = oldVmState.workId)
+            EventBus.post(doneWorkEvent)
+        }
     }
 }

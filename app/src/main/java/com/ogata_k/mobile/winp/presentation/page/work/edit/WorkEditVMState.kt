@@ -1,12 +1,14 @@
 package com.ogata_k.mobile.winp.presentation.page.work.edit
 
-import com.ogata_k.mobile.winp.presentation.model.common.UiLoadingState
+import com.ogata_k.mobile.winp.presentation.enumerate.ScreenLoadingState
+import com.ogata_k.mobile.winp.presentation.model.common.BasicScreenState
 import com.ogata_k.mobile.winp.presentation.model.work_form.WorkFormData
 import com.ogata_k.mobile.winp.presentation.model.work_form.WorkFormValidateExceptions
-import com.ogata_k.mobile.winp.presentation.page.ToUiState
+import com.ogata_k.mobile.winp.presentation.page.IVMState
 
 data class WorkEditVMState(
-    val uiLoadingState: UiLoadingState,
+    override val loadingState: ScreenLoadingState,
+    override val basicState: BasicScreenState,
     val workId: Int,
     val isInCreating: Boolean,
     val formData: WorkFormData,
@@ -16,10 +18,11 @@ data class WorkEditVMState(
     val isInShowBeganTimePicker: Boolean,
     val isInShowEndedDatePicker: Boolean,
     val isInShowEndedTimePicker: Boolean,
-) : ToUiState<WorkEditUiState> {
+) : IVMState<ScreenLoadingState, ScreenLoadingState, WorkEditUiState> {
     override fun toUiState(): WorkEditUiState {
         return WorkEditUiState(
-            uiLoadingState = uiLoadingState,
+            loadingState = loadingState,
+            basicState = basicState,
             isInCreating = isInCreating,
             formData = formData,
             validateExceptions = validateExceptions,
