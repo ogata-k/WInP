@@ -267,7 +267,11 @@ class WorkDetailVM @Inject constructor(
             }
             // 実行結果を通知
             updateVMState(
-                oldVmState.copy(basicState = newBasicState)
+                oldVmState.copy(
+                    basicState = newBasicState,
+                    // 削除確認中ダイアログを非表示にする
+                    inConfirmDelete = false,
+                )
             )
 
             val doneWorkEvent =
