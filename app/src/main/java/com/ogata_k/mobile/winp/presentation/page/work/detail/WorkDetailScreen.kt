@@ -41,7 +41,7 @@ import com.ogata_k.mobile.winp.presentation.model.work.Work
 import com.ogata_k.mobile.winp.presentation.model.work.WorkTodo
 import com.ogata_k.mobile.winp.presentation.page.work.edit.WorkEditRouting
 import com.ogata_k.mobile.winp.presentation.widgert.common.AppBarBackButton
-import com.ogata_k.mobile.winp.presentation.widgert.common.BodyMediumText
+import com.ogata_k.mobile.winp.presentation.widgert.common.BodyLargeText
 import com.ogata_k.mobile.winp.presentation.widgert.common.BodySmallText
 import com.ogata_k.mobile.winp.presentation.widgert.common.ConfirmAlertDialog
 import com.ogata_k.mobile.winp.presentation.widgert.common.DropdownMenuButton
@@ -188,7 +188,7 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                                 )
                             }
                             item {
-                                BodyMediumText(
+                                BodyLargeText(
                                     work.description,
                                     modifier = Modifier.padding(
                                         top = dimensionResource(id = R.dimen.padding_medium),
