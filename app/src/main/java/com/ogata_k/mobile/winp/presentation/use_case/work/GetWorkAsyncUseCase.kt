@@ -34,7 +34,7 @@ class IGetWorkAsyncUseCase : GetWorkAsyncUseCase {
                 else if (input.workId % 7 == 0) now.plusDays(2)
                 else null,
                 completedAt = if (input.workId % 3 == 0) LocalDateTime.now() else null,
-                workTodos = todoItems,
+                workTodos = if (input.workId % 5 == 0) todoItems else emptyList(),
             )
         )
     }
