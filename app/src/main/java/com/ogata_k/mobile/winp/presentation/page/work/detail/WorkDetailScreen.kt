@@ -47,6 +47,7 @@ import com.ogata_k.mobile.winp.presentation.widgert.common.ConfirmAlertDialog
 import com.ogata_k.mobile.winp.presentation.widgert.common.DropdownMenuButton
 import com.ogata_k.mobile.winp.presentation.widgert.common.HeadlineSmallText
 import com.ogata_k.mobile.winp.presentation.widgert.common.LazyColumnScrollBar
+import com.ogata_k.mobile.winp.presentation.widgert.common.TitleLargeText
 import com.ogata_k.mobile.winp.presentation.widgert.common.TitleMediumText
 import com.ogata_k.mobile.winp.presentation.widgert.common.WithScaffoldSmallTopAppBar
 import com.ogata_k.mobile.winp.presentation.widgert.work.WorkTodoItem
@@ -197,11 +198,10 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                             }
                             if (work.todoItems.isNotEmpty()) {
                                 item {
-                                    TitleMediumText(
+                                    TitleLargeText(
                                         text = stringResource(id = R.string.work_todo),
-                                        fontWeight = FontWeight.Bold,
                                         modifier = Modifier.padding(
-                                            top = dimensionResource(id = R.dimen.padding_large),
+                                            top = dimensionResource(id = R.dimen.padding_extra_large),
                                         ),
                                     )
                                 }
