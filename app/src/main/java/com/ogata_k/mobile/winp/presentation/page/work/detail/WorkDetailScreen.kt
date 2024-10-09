@@ -1,10 +1,14 @@
 package com.ogata_k.mobile.winp.presentation.page.work.detail
 
 import android.widget.Toast
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.EditNote
@@ -16,7 +20,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -29,17 +32,24 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavController
 import com.ogata_k.mobile.winp.R
 import com.ogata_k.mobile.winp.presentation.enumerate.ActionDoneResult
 import com.ogata_k.mobile.winp.presentation.enumerate.ScreenLoadingState
 import com.ogata_k.mobile.winp.presentation.model.work.Work
+import com.ogata_k.mobile.winp.presentation.model.work.WorkTodo
 import com.ogata_k.mobile.winp.presentation.page.work.edit.WorkEditRouting
 import com.ogata_k.mobile.winp.presentation.widgert.common.AppBarBackButton
+import com.ogata_k.mobile.winp.presentation.widgert.common.BodyMediumText
+import com.ogata_k.mobile.winp.presentation.widgert.common.BodySmallText
 import com.ogata_k.mobile.winp.presentation.widgert.common.ConfirmAlertDialog
 import com.ogata_k.mobile.winp.presentation.widgert.common.DropdownMenuButton
+import com.ogata_k.mobile.winp.presentation.widgert.common.HeadlineSmallText
+import com.ogata_k.mobile.winp.presentation.widgert.common.LazyColumnScrollBar
 import com.ogata_k.mobile.winp.presentation.widgert.common.TitleMediumText
 import com.ogata_k.mobile.winp.presentation.widgert.common.WithScaffoldSmallTopAppBar
+import com.ogata_k.mobile.winp.presentation.widgert.work.WorkTodoItem
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -151,7 +161,69 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                 ScreenLoadingState.NO_ERROR_INITIALIZED -> {
                     // 初期化が完了してエラーがない状態のはずなので、エラーを無視してgetして問題なし
                     val work: Work = uiState.work.get()
-                    Text(work.toString(), modifier = Modifier.padding(padding))
+                    val listState = rememberLazyListState()
+
+                    Box(modifier = Modifier.padding(padding)) {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(
+                                    vertical = dimensionResource(id = R.dimen.padding_large),
+                                    horizontal = dimensionResource(id = R.dimen.padding_medium_large),
+                                ),
+                            state = listState,
+                        ) {
+                            item {
+                                val formattedPeriod =
+                                    work.formatPeriod(
+                                        rangeString = stringResource(id = R.string.period_range),
+                                        noPeriodString = stringResource(id = R.string.no_period),
+                                    )
+                                BodySmallText(formattedPeriod)
+                            }
+                            item {
+                                HeadlineSmallText(
+                                    work.title,
+                                    fontWeight = FontWeight.Bold,
+                                )
+                            }
+                            item {
+                                BodyMediumText(
+                                    work.description,
+                                    modifier = Modifier.padding(
+                                        top = dimensionResource(id = R.dimen.padding_medium),
+                                    ),
+                                )
+                            }
+                            if (work.todoItems.isNotEmpty()) {
+                                item {
+                                    TitleMediumText(
+                                        text = stringResource(id = R.string.work_todo),
+                                        fontWeight = FontWeight.Bold,
+                                        modifier = Modifier.padding(
+                                            top = dimensionResource(id = R.dimen.padding_large),
+                                        ),
+                                    )
+                                }
+
+                                items(
+                                    count = work.todoItems.count(),
+                                    key = { work.todoItems[it].id },
+                                ) {
+                                    val todoItem: WorkTodo = work.todoItems[it]
+                                    WorkTodoItem(
+                                        todoItem,
+                                        modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_medium)),
+                                    )
+                                }
+                            }
+                        }
+
+                        LazyColumnScrollBar(
+                            listState = listState,
+                            isAlwaysShowScrollBar = false,
+                        )
+                    }
 
                     val actionDoneResult: ActionDoneResult? = uiState.peekActionDoneResult()
                     if (actionDoneResult != null) {

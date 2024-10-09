@@ -27,6 +27,8 @@ data class WorkTodo(
         }
     }
 
+    val isCompleted: Boolean = completedAt != null
+    
     override fun toDomainModel(): DomainWorkTodo {
         return DomainWorkTodo(
             id = id,
