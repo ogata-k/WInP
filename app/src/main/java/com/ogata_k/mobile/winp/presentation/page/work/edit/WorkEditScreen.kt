@@ -321,7 +321,7 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                                         Box(
                                             modifier = Modifier
                                                 .fillMaxSize()
-                                                .background(colorResource(id = R.color.dismiss_background_color)),
+                                                .background(colorResource(id = R.color.work_todo_dismiss_background)),
                                             contentAlignment = Alignment.CenterStart,
                                         ) {
                                             Icon(

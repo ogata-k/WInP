@@ -90,4 +90,7 @@
 
 
     <!-- その他 -->
+    <string name="completed_label">完了</string>
+    <string name="expired_label">期限切れ</string>
+    <string name="not_completed_label">未完了</string>
 </resources>

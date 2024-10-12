@@ -3,6 +3,7 @@ package com.ogata_k.mobile.winp.presentation.page.work.detail
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -30,11 +31,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavController
 import com.ogata_k.mobile.winp.R
+import com.ogata_k.mobile.winp.common.formatter.formatFullDateTimeOrEmpty
 import com.ogata_k.mobile.winp.presentation.enumerate.ActionDoneResult
 import com.ogata_k.mobile.winp.presentation.enumerate.ScreenLoadingState
 import com.ogata_k.mobile.winp.presentation.model.work.Work
@@ -46,6 +49,7 @@ import com.ogata_k.mobile.winp.presentation.widgert.common.BodySmallText
 import com.ogata_k.mobile.winp.presentation.widgert.common.ConfirmAlertDialog
 import com.ogata_k.mobile.winp.presentation.widgert.common.DropdownMenuButton
 import com.ogata_k.mobile.winp.presentation.widgert.common.HeadlineSmallText
+import com.ogata_k.mobile.winp.presentation.widgert.common.Label
 import com.ogata_k.mobile.winp.presentation.widgert.common.LazyColumnScrollBar
 import com.ogata_k.mobile.winp.presentation.widgert.common.TitleLargeText
 import com.ogata_k.mobile.winp.presentation.widgert.common.TitleMediumText
@@ -175,11 +179,10 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                             state = listState,
                         ) {
                             item {
-                                val formattedPeriod =
-                                    work.formatPeriod(
-                                        rangeString = stringResource(id = R.string.period_range),
-                                        noPeriodString = stringResource(id = R.string.no_period),
-                                    )
+                                val formattedPeriod = work.formatPeriod(
+                                    rangeString = stringResource(id = R.string.period_range),
+                                    noPeriodString = stringResource(id = R.string.no_period),
+                                )
                                 BodySmallText(formattedPeriod)
                             }
                             item {
@@ -187,6 +190,32 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                                     work.title,
                                     fontWeight = FontWeight.Bold,
                                 )
+                            }
+                            item {
+                                Row(
+                                    modifier = Modifier.padding(
+                                        top = dimensionResource(id = R.dimen.padding_small),
+                                    ),
+                                ) {
+                                    Label(
+                                        labelStatus = if (work.isCompleted) stringResource(id = R.string.completed_label)
+                                        else if (work.isExpired) stringResource(id = R.string.expired_label)
+                                        else stringResource(id = R.string.not_completed_label),
+                                        bgColor = if (work.isCompleted) colorResource(id = R.color.completed_work_item_label)
+                                        else if (work.isExpired) colorResource(id = R.color.expired_work_item_label)
+                                        else colorResource(id = R.color.doing_work_item_label),
+                                        textColor = colorResource(id = R.color.label_text),
+                                    )
+
+                                    BodySmallText(
+                                        formatFullDateTimeOrEmpty(work.completedAt),
+                                        modifier = Modifier.padding(
+                                            horizontal = dimensionResource(
+                                                id = R.dimen.padding_medium
+                                            )
+                                        ),
+                                    )
+                                }
                             }
                             item {
                                 BodyLargeText(
@@ -211,6 +240,7 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                                     key = { work.todoItems[it].id },
                                 ) {
                                     val todoItem: WorkTodo = work.todoItems[it]
+                                    // @todo 必要なら簡単にタスク対応状況を更新できるようにする
                                     WorkTodoItem(
                                         todoItem,
                                         modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_medium)),
@@ -230,14 +260,11 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                         val text = actionDoneResult.toMessage()
                         if (actionDoneResult.isSucceededAction()) {
                             Toast.makeText(
-                                LocalContext.current,
-                                text,
-                                Toast.LENGTH_LONG
+                                LocalContext.current, text, Toast.LENGTH_LONG
                             ).show()
                             // 重複実行させないようにLaunchedEffectを使う
                             LaunchedEffect(
-                                actionDoneResult,
-                                basicScreenState.actionDoneResults.count()
+                                actionDoneResult, basicScreenState.actionDoneResults.count()
                             ) {
                                 if (actionDoneResult.isDeleteAction()) {
                                     navController.popBackStack()
@@ -251,14 +278,12 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                             }
                         } else {
                             LaunchedEffect(
-                                actionDoneResult,
-                                basicScreenState.actionDoneResults.count()
+                                actionDoneResult, basicScreenState.actionDoneResults.count()
                             ) {
                                 screenScope.launch {
                                     // 画面を跨がない通知はスナックバーで表示する
                                     snackbarHostState.showSnackbar(
-                                        text,
-                                        withDismissAction = true
+                                        text, withDismissAction = true
                                     )
 
                                     // スナックバーの表示が消えてから少し待って有効化

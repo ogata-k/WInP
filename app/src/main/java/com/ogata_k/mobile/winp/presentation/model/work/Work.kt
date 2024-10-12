@@ -39,16 +39,8 @@ data class Work(
         }
     }
 
-    val hasPeriod: Boolean = beganAt !== null || endedAt !== null
     val isExpired: Boolean = endedAt?.isBefore(LocalDateTime.now()) ?: false
     val isCompleted: Boolean = completedAt != null
-
-    fun splitToFormattedPeriod(formatter: DateTimeFormatter): Pair<String, String> {
-        val formatBeganAt: String = beganAt?.format(formatter) ?: ""
-        val formatEndedAt: String = endedAt?.format(formatter) ?: ""
-
-        return Pair(formatBeganAt, formatEndedAt)
-    }
 
     /**
      * 期間を適切な条件でフォーマット
