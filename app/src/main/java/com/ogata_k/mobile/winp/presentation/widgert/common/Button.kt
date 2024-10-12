@@ -15,7 +15,11 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.stringResource
@@ -27,12 +31,15 @@ import com.ogata_k.mobile.winp.R
  */
 @Composable
 fun AppBarBackButton(navController: NavController) {
-    val callback: () -> Unit = {
-        navController.popBackStack()
-    }
+    var isPopped by remember { mutableStateOf(false) }
 
-    BackHandlerSetter { callback() }
-    IconButton(onClick = { callback() }) {
+    LaunchedEffect(isPopped) {
+        if (isPopped) {
+            navController.popBackStack()
+        }
+    }
+    BackHandlerSetter(!isPopped) { isPopped = true }
+    IconButton(enabled = !isPopped, onClick = { isPopped = true }) {
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
             contentDescription = stringResource(R.string.back),
