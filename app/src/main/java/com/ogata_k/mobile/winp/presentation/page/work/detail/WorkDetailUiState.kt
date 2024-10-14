@@ -13,4 +13,6 @@ data class WorkDetailUiState(
     val work: Optional<Work>,
     val inShowMoreAction: Boolean,
     val inConfirmDelete: Boolean,
+    // Not nullで表示中
+    val inConfirmWorkTodoState: Int?,
 ) : IUiState<ScreenLoadingState>

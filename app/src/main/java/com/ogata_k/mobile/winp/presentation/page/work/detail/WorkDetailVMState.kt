@@ -13,6 +13,8 @@ data class WorkDetailVMState(
     val work: Optional<Work>,
     val inShowMoreAction: Boolean,
     val inConfirmDelete: Boolean,
+    // Not nullで表示中
+    val inConfirmWorkTodoState: Int?,
 ) : IVMState<ScreenLoadingState, ScreenLoadingState, WorkDetailUiState> {
     override fun toUiState(): WorkDetailUiState {
         return WorkDetailUiState(
@@ -22,6 +24,7 @@ data class WorkDetailVMState(
             work = work,
             inShowMoreAction = inShowMoreAction,
             inConfirmDelete = inConfirmDelete,
+            inConfirmWorkTodoState = inConfirmWorkTodoState,
         )
     }
 }

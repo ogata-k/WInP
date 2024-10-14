@@ -29,6 +29,7 @@
     <string name="delete_work">タスクを削除</string>
     <string name="create_work_todo">タスクTODOを作成</string>
     <string name="delete_work_todo">タスクTODOを削除</string>
+    <string name="update_work_todo_complete_state">タスクTODOの状態を更新</string>
 
     <!-- タイトル -->
     <string name="title_create_work">タスク作成</string>
@@ -36,9 +37,11 @@
     <string name="title_delete_work">タスク削除</string>
     <string name="title_create_work_todo">タスクTODO作成</string>
     <string name="title_edit_work_todo">タスクTODO編集</string>
+    <string name="title_update_work_todo_complete_state">タスクTODO状態更新</string>
 
     <!-- ダイアログコンテンツ -->
     <string name="dialog_content_confirm_delete_work">タスクを削除します。よろしいですか。</string>
+    <string name="dialog_content_confirm_update_work_todo_complete_state">選択されたタスクTODOの状態を更新します。よろしいですか。</string>
 
     <!-- フォーム共通 -->
     <string name="counter_format">%d／%d</string>

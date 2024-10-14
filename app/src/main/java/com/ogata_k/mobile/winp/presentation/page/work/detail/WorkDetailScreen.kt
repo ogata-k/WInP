@@ -1,6 +1,8 @@
 package com.ogata_k.mobile.winp.presentation.page.work.detail
 
 import android.widget.Toast
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -58,7 +60,7 @@ import com.ogata_k.mobile.winp.presentation.widgert.work.WorkTodoItem
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
     val uiState: WorkDetailUiState by viewModel.uiStateFlow.collectAsState()
@@ -240,11 +242,23 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                                     key = { work.todoItems[it].id },
                                 ) {
                                     val todoItem: WorkTodo = work.todoItems[it]
-                                    // @todo 必要なら簡単にタスク対応状況を更新できるようにする
                                     WorkTodoItem(
                                         todoItem,
-                                        modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_medium)),
+                                        modifier = Modifier
+                                            // @todo 余白の取り方の問題でチケット状に成形した形に選択状態が反映されない。ほかの画面との兼ね合いもあるのでとりあえずこのままにしておく。
+                                            .padding(dimensionResource(id = R.dimen.padding_medium))
+                                            .combinedClickable(
+                                                onLongClickLabel = stringResource(id = R.string.update_work_todo_complete_state),
+                                                onLongClick = {
+                                                    viewModel.showWorkTodoStateConfirmDialog(
+                                                        todoItem.id
+                                                    )
+                                                }
+                                            ) {
+                                                // none onClick action
+                                            },
                                     )
+
                                 }
                             }
                         }
@@ -252,6 +266,26 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                         LazyColumnScrollBar(
                             listState = listState,
                             isAlwaysShowScrollBar = false,
+                        )
+                    }
+
+                    if (uiState.inConfirmWorkTodoState != null) {
+                        ConfirmAlertDialog(
+                            dialogTitle = stringResource(R.string.title_update_work_todo_complete_state),
+                            dialogText = stringResource(R.string.dialog_content_confirm_update_work_todo_complete_state),
+                            onDismissRequest = {
+                                viewModel.showWorkTodoStateConfirmDialog(null)
+                            },
+                            confirmButtonAction = Pair(
+                                stringResource(R.string.update)
+                            ) {
+                                viewModel.updateWorkTodoState()
+                            },
+                            // キャンセルしても問題ないので実行中でなければいくらでも戻ることができるようにする
+                            dismissOnBackPress = basicScreenState.actionState.canLaunch(),
+                            dismissOnClickOutside = basicScreenState.actionState.canLaunch(),
+                            confirmActionIsDanger = false,
+                            enabledButtons = basicScreenState.actionState.canLaunch(),
                         )
                     }
 
