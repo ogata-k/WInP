@@ -1,6 +1,8 @@
 package com.ogata_k.mobile.winp.common.formatter
 
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 fun buildFullDateTimePatternFormatter(): DateTimeFormatter {
@@ -23,5 +25,27 @@ fun formatFullDateTimeOrEmpty(dateTime: LocalDateTime?): String {
         "----/--/-- --:--"
     } else {
         DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm").format(dateTime)
+    }
+}
+
+/**
+ * 年月日のフォーマットに変換する。nullが値として渡されているならダミーを出力
+ */
+fun formatFullDateOrEmpty(dateTime: LocalDate?): String {
+    return if (dateTime == null) {
+        "----/--/--"
+    } else {
+        DateTimeFormatter.ofPattern("yyyy/MM/dd").format(dateTime)
+    }
+}
+
+/**
+ * 時間のフォーマットに変換する。nullが値として渡されているならダミーを出力
+ */
+fun formatFullTimeOrEmpty(dateTime: LocalTime?): String {
+    return if (dateTime == null) {
+        "--:--"
+    } else {
+        DateTimeFormatter.ofPattern("HH:mm").format(dateTime)
     }
 }
