@@ -133,6 +133,7 @@ private fun NotCompletedWorkTodoFormColumnItemPreview() {
         id = 1,
         description = "未完了のタスクTODOアイテム\n少なくともこれはやっておかなければいけないので忘れずに行うこと。",
         completedAt = null,
+        createdAt = LocalDateTime.now(),
     )
 
     WorkTodoItem(todoItem)
@@ -145,6 +146,7 @@ private fun CompletedWorkTodoFormColumnItemPreview() {
         id = 2,
         description = "完了済みのタスクTODOアイテム\n少なくともこれはやっておかなければいけないので忘れずに行うこと。",
         completedAt = LocalDateTime.now(),
+        createdAt = LocalDateTime.now(),
     )
 
     WorkTodoItem(todoItem)
@@ -157,6 +159,7 @@ private fun LargeTextCompletedWorkTodoFormColumnItemPreview() {
         id = 3,
         description = "完了済みのタスクTODOアイテム",
         completedAt = LocalDateTime.now(),
+        createdAt = LocalDateTime.now(),
     )
 
     WorkTodoItem(todoItem)
@@ -169,6 +172,7 @@ private fun SmallTextCompletedWorkTodoFormColumnItemPreview() {
         id = 4,
         description = "完了済みのタスクTODOアイテム",
         completedAt = LocalDateTime.now(),
+        createdAt = LocalDateTime.now(),
     )
 
     WorkTodoItem(todoItem)

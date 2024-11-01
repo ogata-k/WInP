@@ -2,6 +2,7 @@ package com.ogata_k.mobile.winp.presentation.page.work.detail
 
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewModelScope
+import com.ogata_k.mobile.winp.common.type_converter.LocalDateTimeConverter
 import com.ogata_k.mobile.winp.domain.use_case.work.DeleteWorkAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.DeleteWorkInput
 import com.ogata_k.mobile.winp.domain.use_case.work.GetWorkAsyncUseCase
@@ -29,6 +30,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 import java.util.Optional
 import javax.inject.Inject
 import kotlin.jvm.optionals.getOrNull
@@ -58,7 +60,7 @@ class WorkDetailVM @Inject constructor(
     /**
      * workIdを初期化
      */
-    fun setWorkId(workId: Int) {
+    fun setWorkId(workId: Long) {
         val vmState = readVMState()
         updateVMState(vmState.copy(workId = workId))
     }
@@ -86,7 +88,7 @@ class WorkDetailVM @Inject constructor(
             // DBデータでFormの初期化をしたときに初期化を完了とする
             viewModelScope.launch {
                 val workResult = getWorkUseCase.call(GetWorkInput(workId))
-                if (workResult.isFailure) {
+                if (!workResult.isPresent) {
                     val loadingState = ScreenLoadingState.NOT_FOUND_EXCEPTION
                     updateVMState(
                         readVMState().copy(
@@ -104,7 +106,7 @@ class WorkDetailVM @Inject constructor(
                     readVMState().copy(
                         loadingState = loadingState,
                         basicState = vmState.basicState.updateInitialize(loadingState),
-                        work = Optional.of(Work.fromDomainModel(workResult.getOrThrow())),
+                        work = Optional.of(Work.fromDomainModel(workResult.get())),
                     )
                 )
             }
@@ -292,7 +294,7 @@ class WorkDetailVM @Inject constructor(
     /**
      * 指定したタスクのTODOの状態を更新するかどうかの確認ダイアログを表示する
      */
-    fun showWorkTodoStateConfirmDialog(show: Int? = null) {
+    fun showWorkTodoStateConfirmDialog(show: Long? = null) {
         val vmState = readVMState()
         if (!vmState.loadingState.isNoErrorInitialized()) {
             // 正常に初期化ができていないなら削除はできない
@@ -344,8 +346,11 @@ class WorkDetailVM @Inject constructor(
             val result: Result<Work> = async(Dispatchers.IO + SupervisorJob()) {
                 return@async updateWorkTodoStateUseCase.call(
                     UpdateWorkTodoStateInput(
-                        vmState.work.get().toDomainModel(),
+                        vmState.workId,
                         todoItem.id,
+                        if (todoItem.completedAt == null) LocalDateTimeConverter.toOffsetDateTime(
+                            LocalDateTime.now()
+                        ) else null
                     )
                 ).map { Work.fromDomainModel(it) }
             }.await()

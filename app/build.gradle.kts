@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.google.ksp)
     alias(libs.plugins.google.dagger.hilt.android)
+    alias(libs.plugins.androidx.room)
 }
 
 android {
@@ -44,6 +45,9 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
     }
+    room {
+        schemaDirectory("$projectDir/schemas")
+    }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -67,6 +71,11 @@ dependencies {
     implementation(libs.androidx.paging.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.runtime.compose.android)
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    annotationProcessor(libs.androidx.room.compiler)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.paging)
     implementation(libs.lifecycle.viewmodel.ktx)
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
@@ -74,8 +83,9 @@ dependencies {
 
     // For Local tests
     testImplementation(libs.junit)
-    testImplementation(libs.hilt.android.testing)
     testImplementation(libs.androidx.paging.common)
+    testImplementation(libs.androidx.room.testing)
+    testImplementation(libs.hilt.android.testing)
     kspTest(libs.hilt.compiler)
 
     // For instrumentation tests

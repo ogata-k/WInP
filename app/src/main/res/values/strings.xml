@@ -90,6 +90,7 @@
     <string name="failed_open_form_by_not_found_edit_target_task">編集対象のタスクが見つかりませんでした</string>
     <string name="failed_initialize_by_not_found_task_exception">タスクが見つかりませんでした</string>
     <string name="failed_initialize_by_error">予期せぬエラーにより初期化に失敗しました</string>
+    <string name="no_exist_data">データが見つかりませんでした</string>
 
 
     <!-- その他 -->

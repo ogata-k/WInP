@@ -9,12 +9,12 @@ import java.util.Optional
 data class WorkDetailVMState(
     override val loadingState: ScreenLoadingState,
     override val basicState: BasicScreenState,
-    val workId: Int,
+    val workId: Long,
     val work: Optional<Work>,
     val inShowMoreAction: Boolean,
     val inConfirmDelete: Boolean,
     // Not nullで表示中
-    val inConfirmWorkTodoState: Int?,
+    val inConfirmWorkTodoState: Long?,
 ) : IVMState<ScreenLoadingState, ScreenLoadingState, WorkDetailUiState> {
     override fun toUiState(): WorkDetailUiState {
         return WorkDetailUiState(

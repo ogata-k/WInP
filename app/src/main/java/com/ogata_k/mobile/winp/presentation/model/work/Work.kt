@@ -3,6 +3,7 @@ package com.ogata_k.mobile.winp.presentation.model.work
 import com.ogata_k.mobile.winp.common.formatter.buildFullDatePatternFormatter
 import com.ogata_k.mobile.winp.common.formatter.buildFullDateTimePatternFormatter
 import com.ogata_k.mobile.winp.common.formatter.buildFullTimePatternFormatter
+import com.ogata_k.mobile.winp.common.type_converter.LocalDateTimeConverter
 import com.ogata_k.mobile.winp.presentation.model.FromDomain
 import com.ogata_k.mobile.winp.presentation.model.ToDomain
 import java.time.LocalDateTime
@@ -13,27 +14,25 @@ import com.ogata_k.mobile.winp.domain.model.work.Work as DomainWork
  * タスク
  */
 data class Work(
-    val id: Int,
+    val id: Long,
     val title: String,
     val description: String,
     val beganAt: LocalDateTime?,
     val endedAt: LocalDateTime?,
     val completedAt: LocalDateTime?,
+    val createdAt: LocalDateTime,
     val todoItems: List<WorkTodo>,
 ) : ToDomain<DomainWork> {
     companion object : FromDomain<DomainWork, Work> {
         override fun fromDomainModel(domain: DomainWork): Work {
-            if (domain.id == null) {
-                throw IllegalArgumentException()
-            }
-
             return Work(
                 id = domain.id,
                 title = domain.title,
                 description = domain.description,
-                beganAt = domain.beganAt,
-                endedAt = domain.endedAt,
-                completedAt = domain.completedAt,
+                beganAt = domain.beganAt?.let { LocalDateTimeConverter.fromOffsetDateTime(it) },
+                endedAt = domain.endedAt?.let { LocalDateTimeConverter.fromOffsetDateTime(it) },
+                completedAt = domain.completedAt?.let { LocalDateTimeConverter.fromOffsetDateTime(it) },
+                createdAt = LocalDateTimeConverter.fromOffsetDateTime(domain.createdAt),
                 todoItems = domain.workTodos.map { WorkTodo.fromDomainModel(it) },
             )
         }
@@ -89,10 +88,11 @@ data class Work(
             id = id,
             title = title,
             description = description,
-            beganAt = beganAt,
-            endedAt = endedAt,
-            completedAt = completedAt,
+            beganAt = beganAt?.let { LocalDateTimeConverter.toOffsetDateTime(it) },
+            endedAt = endedAt?.let { LocalDateTimeConverter.toOffsetDateTime(it) },
+            completedAt = completedAt?.let { LocalDateTimeConverter.toOffsetDateTime(it) },
             workTodos = todoItems.map { it.toDomainModel() },
+            createdAt = LocalDateTimeConverter.toOffsetDateTime(createdAt),
         )
     }
 }

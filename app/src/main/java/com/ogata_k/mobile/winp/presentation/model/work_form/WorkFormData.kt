@@ -1,6 +1,7 @@
 package com.ogata_k.mobile.winp.presentation.model.work_form
 
-import com.ogata_k.mobile.winp.presentation.constant.AsCreate
+import com.ogata_k.mobile.winp.common.constant.AsCreate
+import com.ogata_k.mobile.winp.common.type_converter.LocalDateTimeConverter
 import com.ogata_k.mobile.winp.presentation.enumerate.ValidationException
 import com.ogata_k.mobile.winp.presentation.enumerate.hasError
 import com.ogata_k.mobile.winp.presentation.model.FromDomain
@@ -15,7 +16,7 @@ import com.ogata_k.mobile.winp.domain.model.work.Work as DomainWork
  * Workのフォーム用データ
  */
 data class WorkFormData(
-    val id: Int,
+    val id: Long,
     val title: String,
     val description: String,
     val beganDate: LocalDate?,
@@ -24,6 +25,7 @@ data class WorkFormData(
     val endedTime: LocalTime?,
     val completedAt: LocalDateTime?,
     val editingTodoItem: WorkTodoFormData,
+    val createdAt: LocalDateTime,
     val todoItems: List<WorkTodoFormData>,
 ) : ToDomain<DomainWork> {
     companion object : FromDomain<DomainWork, WorkFormData> {
@@ -38,6 +40,7 @@ data class WorkFormData(
                 endedTime = null,
                 completedAt = null,
                 editingTodoItem = WorkTodoFormData.empty(UUID.randomUUID()),
+                createdAt = LocalDateTime.now(),
                 todoItems = emptyList(),
             )
         }
@@ -56,15 +59,16 @@ data class WorkFormData(
             }
 
             return WorkFormData(
-                id = domain.id ?: AsCreate.CREATING_ID,
+                id = domain.id,
                 title = domain.title,
                 description = domain.description,
                 beganDate = domain.beganAt?.toLocalDate(),
                 beganTime = domain.beganAt?.toLocalTime(),
                 endedDate = domain.endedAt?.toLocalDate(),
                 endedTime = domain.endedAt?.toLocalTime(),
-                completedAt = domain.completedAt,
+                completedAt = domain.completedAt?.let { LocalDateTimeConverter.fromOffsetDateTime(it) },
                 editingTodoItem = WorkTodoFormData.empty(initialUuid),
+                createdAt = LocalDateTimeConverter.fromOffsetDateTime(domain.createdAt),
                 todoItems = todoFormItems.toList(),
             )
         }
@@ -77,10 +81,13 @@ data class WorkFormData(
             id = id,
             title = title,
             description = description,
-            beganAt = beganDate?.atTime(beganTime ?: LocalTime.MIN),
-            endedAt = endedDate?.atTime(endedTime ?: LocalTime.MAX),
-            completedAt = completedAt,
+            beganAt = beganDate?.atTime(beganTime ?: LocalTime.MIN)
+                ?.let { LocalDateTimeConverter.toOffsetDateTime(it) },
+            endedAt = endedDate?.atTime(endedTime ?: LocalTime.MAX)
+                ?.let { LocalDateTimeConverter.toOffsetDateTime(it) },
+            completedAt = completedAt?.let { LocalDateTimeConverter.toOffsetDateTime(it) },
             workTodos = todoItems.map { it.toDomainModel() },
+            createdAt = LocalDateTimeConverter.toOffsetDateTime(createdAt),
         )
     }
 }

@@ -2,9 +2,10 @@ package com.ogata_k.mobile.winp.domain.use_case.work
 
 import com.ogata_k.mobile.winp.domain.model.work.Work
 import com.ogata_k.mobile.winp.domain.use_case.AsyncUseCase
+import java.util.Optional
 
-data class GetWorkInput(val workId: Int)
+data class GetWorkInput(val workId: Long)
 
-typealias GetWorkOutput = Result<Work>
+typealias GetWorkOutput = Optional<Work>
 
 interface GetWorkAsyncUseCase : AsyncUseCase<GetWorkInput, GetWorkOutput>

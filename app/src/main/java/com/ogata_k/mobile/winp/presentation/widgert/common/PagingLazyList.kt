@@ -94,8 +94,8 @@ fun <Item : Any> PagingLoadColumn(
  * エラーアイテムのデフォルトビルダー
  */
 @Composable
-fun DefaultErrorColumnItemBuilder(state: LoadState.Error) {
-    TitleMediumText(text = state.error.message ?: "UNKNOWN ERROR")
+fun DefaultErrorColumnItemBuilder(state: LoadState.Error, modifier: Modifier = Modifier) {
+    TitleMediumText(text = state.error.message ?: "UNKNOWN ERROR", modifier = modifier)
 }
 
 /**
@@ -108,9 +108,7 @@ private fun <Item : Any> LazyListScope.buildPagingListItems(
     emptyBuilder: @Composable () -> Unit = {},
     loaderBuilder: @Composable () -> Unit = { DefaultCircularProgressIndicatorItem() },
     placeHolderBuilder: (@Composable () -> Unit)? = null,
-    errorItemBuilder: @Composable (errorState: LoadState.Error) -> Unit = {
-        DefaultErrorColumnItemBuilder(state = it)
-    },
+    errorItemBuilder: @Composable (errorState: LoadState.Error) -> Unit,
     headerBuilder: LazyListScope.(refreshLoadState: LoadState, isLoadedItemEmpty: Boolean) -> Unit = { _, _ -> },
     footerBuilder: LazyListScope.(refreshLoadState: LoadState, isLoadedItemEmpty: Boolean) -> Unit = { _, _ -> },
     itemBuilder: @Composable (item: Item) -> Unit,

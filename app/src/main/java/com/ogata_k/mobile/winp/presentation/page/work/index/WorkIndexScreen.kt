@@ -39,8 +39,8 @@ import androidx.navigation.NavController
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.ogata_k.mobile.winp.R
+import com.ogata_k.mobile.winp.common.constant.AsCreate
 import com.ogata_k.mobile.winp.common.formatter.buildFullDatePatternFormatter
-import com.ogata_k.mobile.winp.presentation.constant.AsCreate
 import com.ogata_k.mobile.winp.presentation.model.work.Work
 import com.ogata_k.mobile.winp.presentation.page.work.detail.WorkDetailRouting
 import com.ogata_k.mobile.winp.presentation.page.work.edit.WorkEditRouting
@@ -111,6 +111,15 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
                     )
                     PagingLoadColumn(
                         pagingItems = workPagingItems,
+                        emptyBuilder = {
+                            TitleMediumText(
+                                text = stringResource(R.string.no_exist_data),
+                                modifier = Modifier.padding(
+                                    vertical = dimensionResource(id = R.dimen.padding_medium),
+                                    horizontal = dimensionResource(id = R.dimen.padding_medium_large),
+                                ),
+                            )
+                        },
                         errorItemBuilder = { state ->
                             val errorMessage = state.error.message ?: "UNKNOWN ERROR"
                             LaunchedEffect(errorMessage, snackbarHostState) {
@@ -119,14 +128,21 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
                                     withDismissAction = true,
                                 )
                             }
-                            DefaultErrorColumnItemBuilder(state = state)
+                            DefaultErrorColumnItemBuilder(
+                                state = state,
+                                modifier = Modifier.padding(
+                                    vertical = dimensionResource(id = R.dimen.padding_medium),
+                                    horizontal = dimensionResource(id = R.dimen.padding_medium_large),
+                                ),
+                            )
                         },
                     ) { work ->
                         WorkItem(
-                            work, modifier = Modifier.padding(
+                            work,
+                            modifier = Modifier.padding(
                                 vertical = dimensionResource(id = R.dimen.padding_medium),
                                 horizontal = dimensionResource(id = R.dimen.padding_medium_large),
-                            )
+                            ),
                         ) {
                             // 編集画面への遷移
                             navController.navigate(WorkDetailRouting(work.id).toPath())

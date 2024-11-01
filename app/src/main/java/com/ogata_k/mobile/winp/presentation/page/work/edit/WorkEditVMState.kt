@@ -9,7 +9,7 @@ import com.ogata_k.mobile.winp.presentation.page.IVMState
 data class WorkEditVMState(
     override val loadingState: ScreenLoadingState,
     override val basicState: BasicScreenState,
-    val workId: Int,
+    val workId: Long,
     val isInCreating: Boolean,
     val formData: WorkFormData,
     val validateExceptions: WorkFormValidateExceptions,

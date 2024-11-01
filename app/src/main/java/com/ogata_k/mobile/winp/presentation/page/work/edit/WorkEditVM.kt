@@ -1,13 +1,13 @@
 package com.ogata_k.mobile.winp.presentation.page.work.edit
 
 import androidx.lifecycle.viewModelScope
+import com.ogata_k.mobile.winp.common.constant.AsCreate
 import com.ogata_k.mobile.winp.domain.use_case.work.CreateWorkAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.CreateWorkInput
 import com.ogata_k.mobile.winp.domain.use_case.work.GetWorkAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.GetWorkInput
 import com.ogata_k.mobile.winp.domain.use_case.work.UpdateWorkAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.UpdateWorkInput
-import com.ogata_k.mobile.winp.presentation.constant.AsCreate
 import com.ogata_k.mobile.winp.presentation.enumerate.ActionDoneResult
 import com.ogata_k.mobile.winp.presentation.enumerate.ScreenLoadingState
 import com.ogata_k.mobile.winp.presentation.enumerate.ValidationException
@@ -55,7 +55,7 @@ class WorkEditVM @Inject constructor(
             // 初期状態は未初期化状態とする
             loadingState = ScreenLoadingState.READY,
             basicState = BasicScreenState.initialState(),
-            isInCreating = isInCreating(AsCreate.CREATING_ID),
+            isInCreating = true,
             workId = AsCreate.CREATING_ID,
             formData = WorkFormData.empty(),
             validateExceptions = WorkFormValidateExceptions.empty(),
@@ -73,7 +73,7 @@ class WorkEditVM @Inject constructor(
     /**
      * workIdを初期化
      */
-    fun setWorkId(workId: Int) {
+    fun setWorkId(workId: Long) {
         val vmState = readVMState()
         updateVMState(vmState.copy(workId = workId))
     }
@@ -103,6 +103,7 @@ class WorkEditVM @Inject constructor(
                 endedTime = null,
                 completedAt = null,
                 editingTodoItem = WorkTodoFormData.empty(UUID.randomUUID()),
+                createdAt = LocalDateTime.now(),
                 todoItems = emptyList(),
             )
             val loadingState = ScreenLoadingState.NO_ERROR_INITIALIZED
@@ -132,7 +133,7 @@ class WorkEditVM @Inject constructor(
         viewModelScope.launch {
             // 編集用のフォームデータ
             val workResult = getWorkUseCase.call(GetWorkInput(workId))
-            if (workResult.isFailure) {
+            if (!workResult.isPresent) {
                 val loadingState = ScreenLoadingState.NOT_FOUND_EXCEPTION
                 updateVMState(
                     readVMState().copy(
@@ -144,7 +145,7 @@ class WorkEditVM @Inject constructor(
                 return@launch
             }
 
-            val formData = WorkFormData.fromDomainModel(workResult.getOrThrow())
+            val formData = WorkFormData.fromDomainModel(workResult.get())
             val loadingState = ScreenLoadingState.NO_ERROR_INITIALIZED
             updateVMState(
                 readVMState().copy(
@@ -204,7 +205,7 @@ class WorkEditVM @Inject constructor(
     /**
      * タスク作成中かどうかを判定
      */
-    private fun isInCreating(workId: Int): Boolean = workId == AsCreate.CREATING_ID
+    private fun isInCreating(workId: Long): Boolean = workId == AsCreate.CREATING_ID
 
     /**
      * FormDataの完了状態を更新

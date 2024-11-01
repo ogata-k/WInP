@@ -132,9 +132,10 @@ fun WorkTodoFormColumnItem(
 private fun NotCompletedWorkTodoFormColumnItemPreview() {
     val todoFormData = WorkTodoFormData(
         uuid = UUID.randomUUID(),
-        id = null,
+        id = 1,
         description = "未完了のタスクTODOアイテム\n少なくともこれはやっておかなければいけないので忘れずに行うこと。",
         completedAt = null,
+        createdAt = LocalDateTime.now(),
     )
 
     WorkTodoFormColumnItem(todoFormData)
@@ -145,9 +146,10 @@ private fun NotCompletedWorkTodoFormColumnItemPreview() {
 private fun CompletedWorkTodoFormColumnItemPreview() {
     val todoFormData = WorkTodoFormData(
         uuid = UUID.randomUUID(),
-        id = null,
+        id = 1,
         description = "完了済みのタスクTODOアイテム\n少なくともこれはやっておかなければいけないので忘れずに行うこと。",
         completedAt = LocalDateTime.now(),
+        createdAt = LocalDateTime.now(),
     )
 
     WorkTodoFormColumnItem(todoFormData)
@@ -158,9 +160,10 @@ private fun CompletedWorkTodoFormColumnItemPreview() {
 private fun LargeTextCompletedWorkTodoFormColumnItemPreview() {
     val todoFormData = WorkTodoFormData(
         uuid = UUID.randomUUID(),
-        id = null,
+        id = 1,
         description = "完了済みのタスクTODOアイテム",
         completedAt = LocalDateTime.now(),
+        createdAt = LocalDateTime.now(),
     )
 
     WorkTodoFormColumnItem(todoFormData)
@@ -171,9 +174,10 @@ private fun LargeTextCompletedWorkTodoFormColumnItemPreview() {
 private fun SmallTextCompletedWorkTodoFormColumnItemPreview() {
     val todoFormData = WorkTodoFormData(
         uuid = UUID.randomUUID(),
-        id = null,
+        id = 1,
         description = "完了済みのタスクTODOアイテム",
         completedAt = LocalDateTime.now(),
+        createdAt = LocalDateTime.now(),
     )
 
     WorkTodoFormColumnItem(todoFormData)

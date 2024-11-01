@@ -6,7 +6,7 @@ import androidx.navigation.navArgument
 import com.ogata_k.mobile.winp.presentation.page.IRouting
 import com.ogata_k.mobile.winp.presentation.page.ISetupRouting
 
-class WorkEditRouting(private val workId: Int) : IRouting {
+class WorkEditRouting(private val workId: Long) : IRouting {
     companion object : ISetupRouting {
         const val WORK_ID_KEY = "work_id"
 
@@ -18,7 +18,7 @@ class WorkEditRouting(private val workId: Int) : IRouting {
                 navArgument(
                     name = WORK_ID_KEY,
                 ) {
-                    type = NavType.IntType
+                    type = NavType.LongType
                 },
             )
     }

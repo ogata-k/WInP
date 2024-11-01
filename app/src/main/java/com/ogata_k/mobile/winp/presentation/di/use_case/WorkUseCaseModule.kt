@@ -1,5 +1,6 @@
 package com.ogata_k.mobile.winp.presentation.di.use_case
 
+import com.ogata_k.mobile.winp.domain.infra.database.dao.WorkDao
 import com.ogata_k.mobile.winp.domain.use_case.work.CreateWorkAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.DeleteWorkAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.FetchPageWorksAsyncUseCase
@@ -21,33 +22,44 @@ import dagger.hilt.android.components.ViewModelComponent
 @InstallIn(ViewModelComponent::class)
 object WorkUseCaseModule {
     @Provides
-    fun fetchPageWorksAsyncUseCase(): FetchPageWorksAsyncUseCase {
-        return IFetchPageWorksAsyncUseCase()
+    fun provideFetchPageWorksAsyncUseCase(
+        workDao: WorkDao,
+    ): FetchPageWorksAsyncUseCase {
+        return IFetchPageWorksAsyncUseCase(workDao)
     }
 
     @Provides
-    fun getWorkAsyncUseCase(): GetWorkAsyncUseCase {
-        return IGetWorkAsyncUseCase()
+    fun provideGetWorkAsyncUseCase(
+        workDao: WorkDao,
+    ): GetWorkAsyncUseCase {
+        return IGetWorkAsyncUseCase(workDao)
     }
 
     @Provides
-    fun createWorkAsyncUseCase(): CreateWorkAsyncUseCase {
-        return ICreateWorkAsyncUseCase()
+    fun provideCreateWorkAsyncUseCase(
+        workDao: WorkDao,
+    ): CreateWorkAsyncUseCase {
+        return ICreateWorkAsyncUseCase(workDao)
     }
 
     @Provides
-    fun updateWorkAsyncUseCase(): UpdateWorkAsyncUseCase {
-        return IUpdateWorkAsyncUseCase()
+    fun provideUpdateWorkAsyncUseCase(
+        workDao: WorkDao,
+    ): UpdateWorkAsyncUseCase {
+        return IUpdateWorkAsyncUseCase(workDao)
     }
 
     @Provides
-    fun deleteWorkAsyncUseCase(): DeleteWorkAsyncUseCase {
-        return IDeleteWorkAsyncUseCase()
+    fun provideDeleteWorkAsyncUseCase(
+        workDao: WorkDao,
+    ): DeleteWorkAsyncUseCase {
+        return IDeleteWorkAsyncUseCase(workDao)
     }
 
     @Provides
-    fun updateWorkTodoStateAsyncUseCase(): UpdateWorkTodoStateAsyncUseCase {
-        return IUpdateWorkTodoStateAsyncUseCase()
+    fun provideUpdateWorkTodoStateAsyncUseCase(
+        workDao: WorkDao,
+    ): UpdateWorkTodoStateAsyncUseCase {
+        return IUpdateWorkTodoStateAsyncUseCase(workDao)
     }
-
 }
