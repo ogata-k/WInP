@@ -37,7 +37,7 @@ class IWorkDao(private val db: AppDatabase, private val dao: WorkWithWorkTodoDao
         db.withTransaction {
             val formattedData = splitWorkData(work)
             val createdWorkId = dao.insertWork(formattedData.work)
-            // 作成時はタスクTODOのworkIdが不整な値になっているので保存して取得できた正しい値に置き換え
+            // 作成時は対応項目のworkIdが不整な値になっているので保存して取得できた正しい値に置き換え
             dao.insertWorkTodos(formattedData.createWorkTodos.map { it.copy(workId = createdWorkId) })
             // タスク作成時は更新はない
             if (formattedData.updateWorkTodos.isNotEmpty()) {

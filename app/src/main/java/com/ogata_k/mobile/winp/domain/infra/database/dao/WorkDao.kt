@@ -34,7 +34,7 @@ interface WorkDao {
     suspend fun updateWork(work: Work)
 
     /**
-     * タスクTODOのIDを指定して更新
+     * 対応項目のIDを指定して更新
      */
     suspend fun updateTaskState(workTodoId: Long, completedAt: OffsetDateTime?)
 

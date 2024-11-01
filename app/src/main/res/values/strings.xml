@@ -27,21 +27,21 @@
     <string name="create_work">タスクを作成</string>
     <string name="edit_work">タスクを編集</string>
     <string name="delete_work">タスクを削除</string>
-    <string name="create_work_todo">タスクTODOを作成</string>
-    <string name="delete_work_todo">タスクTODOを削除</string>
-    <string name="update_work_todo_complete_state">タスクTODOの状態を更新</string>
+    <string name="create_work_todo">対応項目を作成</string>
+    <string name="delete_work_todo">対応項目を削除</string>
+    <string name="update_work_todo_complete_state">対応項目の状態を更新</string>
 
     <!-- タイトル -->
     <string name="title_create_work">タスク作成</string>
     <string name="title_edit_work">タスク編集</string>
     <string name="title_delete_work">タスク削除</string>
-    <string name="title_create_work_todo">タスクTODO作成</string>
-    <string name="title_edit_work_todo">タスクTODO編集</string>
-    <string name="title_update_work_todo_complete_state">タスクTODO状態更新</string>
+    <string name="title_create_work_todo">対応項目作成</string>
+    <string name="title_edit_work_todo">対応項目編集</string>
+    <string name="title_update_work_todo_complete_state">対応項目状態更新</string>
 
     <!-- ダイアログコンテンツ -->
     <string name="dialog_content_confirm_delete_work">タスクを削除します。よろしいですか。</string>
-    <string name="dialog_content_confirm_update_work_todo_complete_state">選択されたタスクTODOの状態を更新します。よろしいですか。</string>
+    <string name="dialog_content_confirm_update_work_todo_complete_state">選択された対応項目の状態を更新します。よろしいですか。</string>
 
     <!-- フォーム共通 -->
     <string name="counter_format">%d／%d</string>
@@ -52,12 +52,12 @@
     <!-- フォーム -->
     <string name="work_title">タイトル</string>
     <string name="work_description">説明</string>
-    <string name="work_todo">タスクTODO</string>
+    <string name="work_todo">対応項目</string>
     <string name="complete_state">状態</string>
     <string name="completed">完了済み</string>
     <string name="not_completed">未完了</string>
-    <string name="completed_work_todo">完了済みタスクTODO</string>
-    <string name="not_completed_work_todo">未完了タスクTODO</string>
+    <string name="completed_work_todo">完了済み対応項目</string>
+    <string name="not_completed_work_todo">未完了対応項目</string>
     <string name="work_todo_description">説明</string>
     <string name="work_began_at">開始日時</string>
     <string name="work_ended_at">終了日時</string>

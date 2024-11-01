@@ -261,14 +261,14 @@ class WorkEditVM @Inject constructor(
     }
 
     /**
-     * 指定されたUUIDのタスクTODOが存在するならtrue
+     * 指定されたUUIDの対応項目が存在するならtrue
      */
     private fun existWorkTodoForm(uuid: UUID): Boolean {
         return searchWorkTodoFormByUuid(uuid) !== null
     }
 
     /**
-     * 新規タスクTODO作成用にUUIDを生成
+     * 新規対応項目作成用にUUIDを生成
      */
     private fun generateNotUsingWorkTodoUuid(): UUID {
         while (true) {
@@ -282,7 +282,7 @@ class WorkEditVM @Inject constructor(
     }
 
     /**
-     * 作成として、タスクTODOのフォームの表示させる。
+     * 作成として、対応項目のフォームの表示させる。
      * UUIDを指定していないならフォームを非表示にする。
      */
     fun showWorkTodoCreateForm() {
@@ -290,7 +290,7 @@ class WorkEditVM @Inject constructor(
     }
 
     /**
-     * 指定したUUIDのタスクがあればそれを編集なければ作成として、タスクTODOのフォームの表示させる。
+     * 指定したUUIDのタスクがあればそれを編集なければ作成として、対応項目のフォームの表示させる。
      * UUIDを指定していないならフォームを非表示にする。
      */
     fun showWorkTodoForm(uuid: UUID?) {
@@ -354,7 +354,7 @@ class WorkEditVM @Inject constructor(
     }
 
     /**
-     * 作成/編集中の対象となっているタスクTODOの完了状態を更新する
+     * 作成/編集中の対象となっている対応項目の完了状態を更新する
      */
     fun updateWorkTodoFormCompleted(isCompleted: Boolean) {
         val vmState = readVMState()
@@ -374,7 +374,7 @@ class WorkEditVM @Inject constructor(
     }
 
     /**
-     * 作成/編集中の対象となっているタスクTODOの説明内容を更新する
+     * 作成/編集中の対象となっている対応項目の説明内容を更新する
      */
     fun updateWorkTodoFormDescription(value: String) {
         val vmState = readVMState()
@@ -392,7 +392,7 @@ class WorkEditVM @Inject constructor(
     }
 
     /**
-     * 作成/編集中の対象となっているタスクTODOをリストに適用する
+     * 作成/編集中の対象となっている対応項目をリストに適用する
      */
     fun applyEditingToWorkTodoItems() {
         val vmState = readVMState()

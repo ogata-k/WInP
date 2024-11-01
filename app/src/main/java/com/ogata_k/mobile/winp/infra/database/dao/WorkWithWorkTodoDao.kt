@@ -73,7 +73,7 @@ interface WorkWithWorkTodoDao {
     suspend fun insertWork(work: Work): Long
 
     /**
-     * タスクのタスクTODOを新規登録する
+     * タスクの対応項目を新規登録する
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertWorkTodos(workTodos: List<WorkTodo>): List<Long>
@@ -85,13 +85,13 @@ interface WorkWithWorkTodoDao {
     suspend fun updateWork(work: Work)
 
     /**
-     * タスクのタスクTODOを更新する
+     * タスクの対応項目を更新する
      */
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun updateWorkTodos(workTodos: List<WorkTodo>)
 
     /**
-     * タスクTODOのIDを指定して更新
+     * 対応項目のIDを指定して更新
      */
     @Query("UPDATE work_todos SET completed_at = :completedAt WHERE work_todo_id = :workTodoId")
     suspend fun updateTaskState(workTodoId: Long, completedAt: OffsetDateTime?)

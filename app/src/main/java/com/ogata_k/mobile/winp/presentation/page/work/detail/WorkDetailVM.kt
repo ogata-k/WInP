@@ -309,7 +309,7 @@ class WorkDetailVM @Inject constructor(
     }
 
     /**
-     * 表示しているタスクTODOの状態を更新（完了しているなら完了していない状態にし、完了していないなら完了している状態にする）
+     * 表示している対応項目の状態を更新（完了しているなら完了していない状態にし、完了していないなら完了している状態にする）
      */
     fun updateWorkTodoState() {
         val vmState = readVMState()
