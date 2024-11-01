@@ -22,11 +22,14 @@ interface WorkWithWorkTodoDao {
     @Query(
         """
         SELECT works.* FROM works
-        WHERE (began_at IS NULL AND ended_at IS NULL) 
+        WHERE (datetime(ended_at) <= datetime(:from) AND completed_at IS NULL)
+            OR (began_at IS NULL AND ended_at IS NULL)
             OR (datetime(began_at) <= datetime(:to) AND ended_at IS NULL)
             OR (began_at IS NULL AND datetime(ended_at) >= datetime(:from))
             OR (datetime(began_at) <= datetime(:to) AND datetime(ended_at) >= datetime(:from))
-        ORDER BY completed_at IS NULL DESC, datetime(completed_at) DESC, work_id DESC
+        ORDER BY (ended_at IS NOT NULL AND datetime(ended_at) <= datetime(:from) AND completed_at IS NULL) DESC,
+        began_at IS NULL ASC, datetime(began_at) ASC, ended_at IS NULL ASC, datetime(ended_at) ASC,
+        work_id DESC
         LIMIT :pageSize OFFSET :offset
         """
     )
