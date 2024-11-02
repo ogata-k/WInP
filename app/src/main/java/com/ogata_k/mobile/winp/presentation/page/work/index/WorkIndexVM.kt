@@ -9,13 +9,13 @@ import androidx.paging.compose.LazyPagingItems
 import com.ogata_k.mobile.winp.domain.use_case.work.FetchPageWorksAsyncUseCase
 import com.ogata_k.mobile.winp.presentation.enumerate.ScreenLoadingState
 import com.ogata_k.mobile.winp.presentation.event.EventBus
-import com.ogata_k.mobile.winp.presentation.event.work.FailedCreateWork
-import com.ogata_k.mobile.winp.presentation.event.work.FailedDeleteWork
-import com.ogata_k.mobile.winp.presentation.event.work.FailedUpdateWork
-import com.ogata_k.mobile.winp.presentation.event.work.NotFoundWork
-import com.ogata_k.mobile.winp.presentation.event.work.SucceededCreateWork
-import com.ogata_k.mobile.winp.presentation.event.work.SucceededDeleteWork
-import com.ogata_k.mobile.winp.presentation.event.work.SucceededUpdateWork
+import com.ogata_k.mobile.winp.presentation.event.snackbar.work.FailedCreateWork
+import com.ogata_k.mobile.winp.presentation.event.snackbar.work.FailedDeleteWork
+import com.ogata_k.mobile.winp.presentation.event.snackbar.work.FailedUpdateWork
+import com.ogata_k.mobile.winp.presentation.event.toast.work.NotFoundWork
+import com.ogata_k.mobile.winp.presentation.event.toast.work.SucceededCreateWork
+import com.ogata_k.mobile.winp.presentation.event.toast.work.SucceededDeleteWork
+import com.ogata_k.mobile.winp.presentation.event.toast.work.SucceededUpdateWork
 import com.ogata_k.mobile.winp.presentation.model.common.BasicScreenState
 import com.ogata_k.mobile.winp.presentation.model.work.Work
 import com.ogata_k.mobile.winp.presentation.page.AbstractViewModel
@@ -80,9 +80,9 @@ class WorkIndexVM @Inject constructor(
         // PagerのリロードはPagerに任せるので、画面のリロードは関係ない
     }
 
-    override fun reloadVMWithConsumeActionDoneResult() {
+    override fun reloadVMWithConsumeEvent() {
         // PagerのリロードはPagerに任せるので、画面のリロードは関係ない
-        consumeActionDoneResult()
+        consumeEvent()
     }
 
     override fun replaceVMBasicScreenState(

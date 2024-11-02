@@ -10,7 +10,7 @@ import com.ogata_k.mobile.winp.domain.model.work.WorkTodo as DomainWorkTodo
  * タスクの対応予定の項目
  */
 data class WorkTodo(
-    val id: Long,
+    val workTodoId: Long,
     val description: String,
     val completedAt: LocalDateTime?,
     val createdAt: LocalDateTime,
@@ -18,7 +18,7 @@ data class WorkTodo(
     companion object : FromDomain<DomainWorkTodo, WorkTodo> {
         override fun fromDomainModel(domain: DomainWorkTodo): WorkTodo {
             return WorkTodo(
-                id = domain.id,
+                workTodoId = domain.workTodoId,
                 description = domain.description,
                 completedAt = domain.completedAt?.let { LocalDateTimeConverter.fromOffsetDateTime(it) },
                 createdAt = LocalDateTimeConverter.fromOffsetDateTime(domain.createdAt),
@@ -30,7 +30,7 @@ data class WorkTodo(
     
     override fun toDomainModel(): DomainWorkTodo {
         return DomainWorkTodo(
-            id = id,
+            workTodoId = workTodoId,
             description = description,
             completedAt = completedAt?.let { LocalDateTimeConverter.toOffsetDateTime(it) },
             createdAt = LocalDateTimeConverter.toOffsetDateTime(createdAt),

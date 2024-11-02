@@ -26,7 +26,7 @@ data class Work(
     companion object : FromDomain<DomainWork, Work> {
         override fun fromDomainModel(domain: DomainWork): Work {
             return Work(
-                id = domain.id,
+                id = domain.workId,
                 title = domain.title,
                 description = domain.description,
                 beganAt = domain.beganAt?.let { LocalDateTimeConverter.fromOffsetDateTime(it) },
@@ -85,7 +85,7 @@ data class Work(
 
     override fun toDomainModel(): DomainWork {
         return DomainWork(
-            id = id,
+            workId = id,
             title = title,
             description = description,
             beganAt = beganAt?.let { LocalDateTimeConverter.toOffsetDateTime(it) },

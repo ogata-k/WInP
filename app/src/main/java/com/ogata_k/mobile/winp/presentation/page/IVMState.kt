@@ -1,7 +1,7 @@
 package com.ogata_k.mobile.winp.presentation.page
 
-import com.ogata_k.mobile.winp.presentation.enumerate.ActionDoneResult
 import com.ogata_k.mobile.winp.presentation.enumerate.ScreenLoadingState
+import com.ogata_k.mobile.winp.presentation.event.snackbar.SnackbarEvent
 import com.ogata_k.mobile.winp.presentation.model.common.BasicScreenState
 
 /**
@@ -82,8 +82,8 @@ interface IVMState<VMLoadingState : IScreenLoadingState, UiLoadingState : IScree
     /**
      * アクションの実行結果を消費せずに先頭を覗き見る
      */
-    fun peekActionDoneResult(): ActionDoneResult? {
-        return basicState.actionDoneResults.firstOrNull()
+    fun peekSnackbarEvent(): SnackbarEvent? {
+        return basicState.snackbarEvents.firstOrNull()
     }
 }
 
@@ -104,7 +104,7 @@ interface IVMStateHandler {
     /**
      * アクションの実行結果を消費しつつ画面のリロードを行う
      */
-    fun reloadVMWithConsumeActionDoneResult()
+    fun reloadVMWithConsumeEvent()
 
     /**
      * 画面のリロードを要求するために[BasicScreenState.toRequestForceUpdate]を実行して状態を更新する
@@ -114,10 +114,10 @@ interface IVMStateHandler {
     /**
      * アクションの実行結果を受信する
      */
-    fun acceptActionDoneResult(actionDoneResult: ActionDoneResult)
+    fun acceptSnackbarEvent(snackbarEvent: SnackbarEvent)
 
     /**
      * アクションの実行結果を使ったので先頭から取り除く
      */
-    fun consumeActionDoneResult()
+    fun consumeEvent()
 }

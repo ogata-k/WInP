@@ -8,15 +8,17 @@ import com.ogata_k.mobile.winp.domain.use_case.work.GetWorkAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.GetWorkInput
 import com.ogata_k.mobile.winp.domain.use_case.work.UpdateWorkAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.UpdateWorkInput
-import com.ogata_k.mobile.winp.presentation.enumerate.ActionDoneResult
 import com.ogata_k.mobile.winp.presentation.enumerate.ScreenLoadingState
 import com.ogata_k.mobile.winp.presentation.enumerate.ValidationException
 import com.ogata_k.mobile.winp.presentation.enumerate.ValidationExceptionType
+import com.ogata_k.mobile.winp.presentation.event.EventAction
 import com.ogata_k.mobile.winp.presentation.event.EventBus
-import com.ogata_k.mobile.winp.presentation.event.work.FailedCreateWork
-import com.ogata_k.mobile.winp.presentation.event.work.FailedUpdateWork
-import com.ogata_k.mobile.winp.presentation.event.work.SucceededCreateWork
-import com.ogata_k.mobile.winp.presentation.event.work.SucceededUpdateWork
+import com.ogata_k.mobile.winp.presentation.event.snackbar.work.DoneWork
+import com.ogata_k.mobile.winp.presentation.event.snackbar.work.FailedCreateWork
+import com.ogata_k.mobile.winp.presentation.event.snackbar.work.FailedUpdateWork
+import com.ogata_k.mobile.winp.presentation.event.toast.work.NotFoundWork
+import com.ogata_k.mobile.winp.presentation.event.toast.work.SucceededCreateWork
+import com.ogata_k.mobile.winp.presentation.event.toast.work.SucceededUpdateWork
 import com.ogata_k.mobile.winp.presentation.model.common.BasicScreenState
 import com.ogata_k.mobile.winp.presentation.model.work_form.WorkFormData
 import com.ogata_k.mobile.winp.presentation.model.work_form.WorkFormValidateExceptions
@@ -94,7 +96,7 @@ class WorkEditVM @Inject constructor(
 
             // 作成用のフォームデータ
             val formData = WorkFormData(
-                id = workId,
+                workId = workId,
                 title = "",
                 description = "",
                 beganDate = null,
@@ -141,6 +143,7 @@ class WorkEditVM @Inject constructor(
                         basicState = vmState.basicState.updateInitialize(loadingState),
                     )
                 )
+                EventBus.post(NotFoundWork(vmState.workId))
 
                 return@launch
             }
@@ -167,8 +170,8 @@ class WorkEditVM @Inject constructor(
     /**
      * アクションの実行結果を消費しつつVMをリロードする
      */
-    override fun reloadVMWithConsumeActionDoneResult() {
-        reloadVMWithOptional(readVMState()) { it.toConsumeActionDoneResult() }
+    override fun reloadVMWithConsumeEvent() {
+        reloadVMWithOptional(readVMState()) { it.toConsumeSnackbarEvent() }
     }
 
     /**
@@ -647,12 +650,18 @@ class WorkEditVM @Inject constructor(
             }.await()
 
             val oldVmState = readVMState()
-            val actionDoneResult =
-                if (result.isSuccess) (if (oldVmState.isInCreating) ActionDoneResult.SUCCEEDED_CREATE else ActionDoneResult.SUCCEEDED_UPDATE)
-                else (if (oldVmState.isInCreating) ActionDoneResult.FAILED_CREATE else ActionDoneResult.FAILED_UPDATE)
+            // 成功時がDoneなのはComposerに通知するため
+            val snackbarEvent =
+                if (result.isSuccess) DoneWork(
+                    oldVmState.workId,
+                    if (oldVmState.isInCreating) EventAction.CREATE else EventAction.UPDATE
+                )
+                else (if (oldVmState.isInCreating) FailedCreateWork(oldVmState.workId) else FailedUpdateWork(
+                    oldVmState.workId
+                ))
             var newBasicState = oldVmState.basicState
                 .toDoneAction()
-                .toAcceptActionDoneResult(actionDoneResult)
+                .toAcceptSnackbarEvent(snackbarEvent)
             if (result.isSuccess) {
                 newBasicState = newBasicState
                     // 強制アップデートを要求する
@@ -663,14 +672,15 @@ class WorkEditVM @Inject constructor(
                 oldVmState.copy(basicState = newBasicState)
             )
 
-            val doneWorkEvent =
-                if (result.isSuccess) (if (oldVmState.isInCreating) SucceededCreateWork(workId = oldVmState.workId) else SucceededUpdateWork(
-                    workId = oldVmState.workId
-                ))
-                else (if (oldVmState.isInCreating) FailedCreateWork(workId = oldVmState.workId) else FailedUpdateWork(
-                    workId = oldVmState.workId
-                ))
-            EventBus.post(doneWorkEvent)
+            if (result.isSuccess) {
+                val toastEvent =
+                    if (oldVmState.isInCreating) SucceededCreateWork(
+                        oldVmState.workId
+                    ) else SucceededUpdateWork(
+                        oldVmState.workId
+                    )
+                EventBus.post(toastEvent)
+            }
         }
     }
 

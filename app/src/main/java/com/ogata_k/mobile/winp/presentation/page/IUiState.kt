@@ -1,6 +1,6 @@
 package com.ogata_k.mobile.winp.presentation.page
 
-import com.ogata_k.mobile.winp.presentation.enumerate.ActionDoneResult
+import com.ogata_k.mobile.winp.presentation.event.snackbar.SnackbarEvent
 import com.ogata_k.mobile.winp.presentation.model.common.BasicScreenState
 
 /**
@@ -13,7 +13,7 @@ interface IUiState<UiScreenLoadingState : IScreenLoadingState> {
     /**
      * アクションの実行結果を消費せずに先頭を覗き見る
      */
-    fun peekActionDoneResult(): ActionDoneResult? {
-        return basicState.actionDoneResults.firstOrNull()
+    fun peekSnackbarEvent(): SnackbarEvent? {
+        return basicState.snackbarEvents.firstOrNull()
     }
 }

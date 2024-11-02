@@ -1,7 +1,7 @@
 package com.ogata_k.mobile.winp.presentation.page
 
 import androidx.lifecycle.ViewModel
-import com.ogata_k.mobile.winp.presentation.enumerate.ActionDoneResult
+import com.ogata_k.mobile.winp.presentation.event.snackbar.SnackbarEvent
 import com.ogata_k.mobile.winp.presentation.model.common.BasicScreenState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -75,12 +75,12 @@ abstract class AbstractViewModel<VMLoadingState : IScreenLoadingState, ViewModel
     /**
      * アクションの実行結果を受信する
      */
-    override fun acceptActionDoneResult(actionDoneResult: ActionDoneResult) {
+    override fun acceptSnackbarEvent(snackbarEvent: SnackbarEvent) {
         val vmState = readVMState()
         updateVMState(
             replaceVMBasicScreenState(
                 vmState,
-                vmState.basicState.toAcceptActionDoneResult(actionDoneResult)
+                vmState.basicState.toAcceptSnackbarEvent(snackbarEvent)
             )
         )
     }
@@ -88,12 +88,12 @@ abstract class AbstractViewModel<VMLoadingState : IScreenLoadingState, ViewModel
     /**
      * アクションの実行結果を使ったので先頭から取り除く
      */
-    override fun consumeActionDoneResult() {
+    override fun consumeEvent() {
         val vmState = readVMState()
         updateVMState(
             replaceVMBasicScreenState(
                 vmState,
-                vmState.basicState.toConsumeActionDoneResult()
+                vmState.basicState.toConsumeSnackbarEvent()
             )
         )
     }

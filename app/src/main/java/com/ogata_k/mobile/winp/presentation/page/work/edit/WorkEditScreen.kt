@@ -1,7 +1,6 @@
 package com.ogata_k.mobile.winp.presentation.page.work.edit
 
 import android.annotation.SuppressLint
-import android.widget.Toast
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -54,11 +53,14 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import com.ogata_k.mobile.winp.R
-import com.ogata_k.mobile.winp.presentation.enumerate.ActionDoneResult
 import com.ogata_k.mobile.winp.presentation.enumerate.ScreenLoadingState
 import com.ogata_k.mobile.winp.presentation.enumerate.ValidationExceptionType
 import com.ogata_k.mobile.winp.presentation.enumerate.hasError
 import com.ogata_k.mobile.winp.presentation.enumerate.toErrorMessage
+import com.ogata_k.mobile.winp.presentation.event.EventAction
+import com.ogata_k.mobile.winp.presentation.event.snackbar.SnackbarEvent
+import com.ogata_k.mobile.winp.presentation.event.snackbar.work.DoneWork
+import com.ogata_k.mobile.winp.presentation.page.showSimpleSnackbar
 import com.ogata_k.mobile.winp.presentation.widgert.common.AppBarBackButton
 import com.ogata_k.mobile.winp.presentation.widgert.common.BodyMediumText
 import com.ogata_k.mobile.winp.presentation.widgert.common.ButtonLargeText
@@ -475,48 +477,34 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                         TaskTodoBottomSheetForm(viewModel, uiState)
                     }
 
-                    val actionDoneResult: ActionDoneResult? = uiState.peekActionDoneResult()
-                    if (actionDoneResult != null) {
-                        val text = actionDoneResult.toMessage()
-                        if (actionDoneResult.isSucceededAction()) {
-                            Toast.makeText(
-                                LocalContext.current,
-                                text,
-                                Toast.LENGTH_LONG
-                            ).show()
-                            // 重複実行させないようにLaunchedEffectを使う
-                            LaunchedEffect(
-                                actionDoneResult,
-                                basicScreenState.actionDoneResults.count()
-                            ) {
+                    val event: SnackbarEvent? = uiState.peekSnackbarEvent()
+                    if (event != null) {
+                        val text = event.toMessage()
+                        LaunchedEffect(
+                            event,
+                            basicScreenState.snackbarEvents.count()
+                        ) {
+                            if (event.getKind().isSucceeded()) {
                                 // この画面のメインの処理である作成更新が行われていると確認できたなら画面除去
-                                if (actionDoneResult.isCreateAction() || actionDoneResult.isUpdateAction()) {
+                                if (event is DoneWork && event.workId == uiState.formData.workId && (event.getAction() == EventAction.CREATE || event.getAction() == EventAction.UPDATE)) {
                                     navController.popBackStack()
                                 } else {
                                     if (basicScreenState.needForceUpdate) {
-                                        viewModel.reloadVMWithConsumeActionDoneResult()
+                                        viewModel.reloadVMWithConsumeEvent()
                                     } else {
-                                        viewModel.consumeActionDoneResult()
+                                        viewModel.consumeEvent()
                                     }
                                 }
-                            }
-                        } else {
-                            LaunchedEffect(
-                                actionDoneResult,
-                                basicScreenState.actionDoneResults.count()
-                            ) {
+                            } else {
                                 screenScope.launch {
                                     // 画面を跨がない通知はスナックバーで表示する
-                                    snackbarHostState.showSnackbar(
-                                        text,
-                                        withDismissAction = true
-                                    )
+                                    showSimpleSnackbar(snackbarHostState, text)
 
                                     // スナックバーの表示が消えてから少し待って有効化
                                     delay(300)
                                     viewModel.updateToEditingFormState()
                                 }
-                                viewModel.consumeActionDoneResult()
+                                viewModel.consumeEvent()
                             }
                         }
                     }
@@ -524,21 +512,11 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
 
                 // アイテムが見つからず終了
                 ScreenLoadingState.NOT_FOUND_EXCEPTION -> {
-                    Toast.makeText(
-                        LocalContext.current,
-                        stringResource(R.string.failed_open_form_by_not_found_edit_target_task),
-                        Toast.LENGTH_LONG
-                    ).show()
                     navController.popBackStack()
                 }
 
                 // 予期せぬエラーがあった場合
                 ScreenLoadingState.ERROR -> {
-                    Toast.makeText(
-                        LocalContext.current,
-                        stringResource(R.string.failed_initialize_by_error),
-                        Toast.LENGTH_LONG
-                    ).show()
                     navController.popBackStack()
                 }
             }

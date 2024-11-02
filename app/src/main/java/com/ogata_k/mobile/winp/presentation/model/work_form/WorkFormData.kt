@@ -16,7 +16,7 @@ import com.ogata_k.mobile.winp.domain.model.work.Work as DomainWork
  * Workのフォーム用データ
  */
 data class WorkFormData(
-    val id: Long,
+    val workId: Long,
     val title: String,
     val description: String,
     val beganDate: LocalDate?,
@@ -31,7 +31,7 @@ data class WorkFormData(
     companion object : FromDomain<DomainWork, WorkFormData> {
         fun empty(): WorkFormData {
             return WorkFormData(
-                id = AsCreate.CREATING_ID,
+                workId = AsCreate.CREATING_ID,
                 title = "",
                 description = "",
                 beganDate = null,
@@ -59,7 +59,7 @@ data class WorkFormData(
             }
 
             return WorkFormData(
-                id = domain.id,
+                workId = domain.workId,
                 title = domain.title,
                 description = domain.description,
                 beganDate = domain.beganAt?.toLocalDate(),
@@ -78,7 +78,7 @@ data class WorkFormData(
 
     override fun toDomainModel(): DomainWork {
         return DomainWork(
-            id = id,
+            workId = workId,
             title = title,
             description = description,
             beganAt = beganDate?.atTime(beganTime ?: LocalTime.MIN)

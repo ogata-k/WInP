@@ -65,14 +65,14 @@ class IWorkDao(private val db: AppDatabase, private val dao: WorkWithWorkTodoDao
 
     override suspend fun deleteWork(work: DomainWork) {
         db.withTransaction {
-            dao.deleteWork(work.id)
+            dao.deleteWork(work.workId)
         }
     }
 }
 
 private fun fromWork(work: WorkWithWorkTodo): DomainWork {
     return DomainWork(
-        id = work.work.workId,
+        workId = work.work.workId,
         title = work.work.title,
         description = work.work.description,
         beganAt = work.work.beganAt,
@@ -81,7 +81,7 @@ private fun fromWork(work: WorkWithWorkTodo): DomainWork {
         createdAt = work.work.createdAt,
         workTodos = work.workTodos.map {
             DomainWorkTodo(
-                id = it.workTodoId,
+                workTodoId = it.workTodoId,
                 description = it.description,
                 completedAt = it.completedAt,
                 createdAt = it.createdAt,
@@ -101,8 +101,9 @@ private data class FormattedWorkDataForSave(
 
 private fun splitWorkData(work: DomainWork): FormattedWorkDataForSave {
     val now = LocalDateTimeConverter.toOffsetDateTime(LocalDateTime.now())
-    val workCreatedAt: OffsetDateTime = if (work.id == AsCreate.CREATING_ID) now else work.createdAt
-    val workId = work.id
+    val workCreatedAt: OffsetDateTime =
+        if (work.workId == AsCreate.CREATING_ID) now else work.createdAt
+    val workId = work.workId
     val workForSave = Work(
         workId = workId,
         title = work.title,
@@ -116,9 +117,9 @@ private fun splitWorkData(work: DomainWork): FormattedWorkDataForSave {
     val createWorkTodos: MutableList<WorkTodo> = mutableListOf()
     val updateWorkTodos: MutableList<WorkTodo> = mutableListOf()
     work.workTodos.forEachIndexed { index, item ->
-        val workTodoCreatedAt = if (work.id == AsCreate.CREATING_ID) now else item.createdAt
+        val workTodoCreatedAt = if (work.workId == AsCreate.CREATING_ID) now else item.createdAt
         val workTodoForSave = WorkTodo(
-            workTodoId = item.id,
+            workTodoId = item.workTodoId,
             workId = workId,
             description = item.description,
             completedAt = item.completedAt,
@@ -126,7 +127,7 @@ private fun splitWorkData(work: DomainWork): FormattedWorkDataForSave {
             createdAt = workTodoCreatedAt,
         )
 
-        if (item.id == AsCreate.CREATING_ID) {
+        if (item.workTodoId == AsCreate.CREATING_ID) {
             createWorkTodos.add(workTodoForSave)
         } else {
             updateWorkTodos.add(workTodoForSave)

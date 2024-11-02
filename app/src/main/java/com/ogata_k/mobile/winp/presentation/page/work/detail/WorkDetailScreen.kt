@@ -1,6 +1,5 @@
 package com.ogata_k.mobile.winp.presentation.page.work.detail
 
-import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
@@ -31,7 +30,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
@@ -40,10 +38,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavController
 import com.ogata_k.mobile.winp.R
 import com.ogata_k.mobile.winp.common.formatter.formatFullDateTimeOrEmpty
-import com.ogata_k.mobile.winp.presentation.enumerate.ActionDoneResult
 import com.ogata_k.mobile.winp.presentation.enumerate.ScreenLoadingState
+import com.ogata_k.mobile.winp.presentation.event.EventAction
+import com.ogata_k.mobile.winp.presentation.event.snackbar.SnackbarEvent
+import com.ogata_k.mobile.winp.presentation.event.snackbar.work.DoneWork
+import com.ogata_k.mobile.winp.presentation.event.snackbar.work_todo.SucceededUpdateWorkTodo
 import com.ogata_k.mobile.winp.presentation.model.work.Work
 import com.ogata_k.mobile.winp.presentation.model.work.WorkTodo
+import com.ogata_k.mobile.winp.presentation.page.showSimpleSnackbar
 import com.ogata_k.mobile.winp.presentation.page.work.edit.WorkEditRouting
 import com.ogata_k.mobile.winp.presentation.widgert.common.AppBarBackButton
 import com.ogata_k.mobile.winp.presentation.widgert.common.BodyLargeText
@@ -57,8 +59,6 @@ import com.ogata_k.mobile.winp.presentation.widgert.common.TitleLargeText
 import com.ogata_k.mobile.winp.presentation.widgert.common.TitleMediumText
 import com.ogata_k.mobile.winp.presentation.widgert.common.WithScaffoldSmallTopAppBar
 import com.ogata_k.mobile.winp.presentation.widgert.work.WorkTodoItem
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -239,7 +239,7 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
 
                                 items(
                                     count = work.todoItems.count(),
-                                    key = { work.todoItems[it].id },
+                                    key = { work.todoItems[it].workTodoId },
                                 ) {
                                     val todoItem: WorkTodo = work.todoItems[it]
                                     WorkTodoItem(
@@ -251,7 +251,7 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                                                 onLongClickLabel = stringResource(id = R.string.update_work_todo_complete_state),
                                                 onLongClick = {
                                                     viewModel.showWorkTodoStateConfirmDialog(
-                                                        todoItem.id
+                                                        todoItem.workTodoId
                                                     )
                                                 }
                                             ) {
@@ -289,41 +289,32 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                         )
                     }
 
-                    val actionDoneResult: ActionDoneResult? = uiState.peekActionDoneResult()
-                    if (actionDoneResult != null) {
-                        val text = actionDoneResult.toMessage()
-                        if (actionDoneResult.isSucceededAction()) {
-                            Toast.makeText(
-                                LocalContext.current, text, Toast.LENGTH_LONG
-                            ).show()
-                            // 重複実行させないようにLaunchedEffectを使う
-                            LaunchedEffect(
-                                actionDoneResult, basicScreenState.actionDoneResults.count()
-                            ) {
-                                if (actionDoneResult.isDeleteAction()) {
+                    val event: SnackbarEvent? = uiState.peekSnackbarEvent()
+                    if (event != null) {
+                        val text = event.toMessage()
+                        LaunchedEffect(
+                            event, basicScreenState.snackbarEvents.count()
+                        ) {
+                            if (event.getKind().isSucceeded()) {
+                                if (event is DoneWork && event.workId == uiState.workId && event.getAction() == EventAction.DELETE) {
+                                    // タスク削除
                                     navController.popBackStack()
+                                } else if (event is SucceededUpdateWorkTodo && event.workId == uiState.workId) {
+                                    // 対応項目更新
+                                    showSimpleSnackbar(snackbarHostState, text)
+
+                                    viewModel.consumeEvent()
                                 } else {
                                     if (basicScreenState.needForceUpdate) {
-                                        viewModel.reloadVMWithConsumeActionDoneResult()
+                                        viewModel.reloadVMWithConsumeEvent()
                                     } else {
-                                        viewModel.consumeActionDoneResult()
+                                        viewModel.consumeEvent()
                                     }
                                 }
-                            }
-                        } else {
-                            LaunchedEffect(
-                                actionDoneResult, basicScreenState.actionDoneResults.count()
-                            ) {
-                                screenScope.launch {
-                                    // 画面を跨がない通知はスナックバーで表示する
-                                    snackbarHostState.showSnackbar(
-                                        text, withDismissAction = true
-                                    )
+                            } else {
+                                showSimpleSnackbar(snackbarHostState, text)
 
-                                    // スナックバーの表示が消えてから少し待って有効化
-                                    delay(300)
-                                }
-                                viewModel.consumeActionDoneResult()
+                                viewModel.consumeEvent()
                             }
                         }
                     }
@@ -331,30 +322,14 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
 
                 // アイテムが見つからず終了
                 ScreenLoadingState.NOT_FOUND_EXCEPTION -> {
-                    Toast.makeText(
-                        LocalContext.current,
-                        stringResource(R.string.failed_initialize_by_not_found_task_exception),
-                        Toast.LENGTH_LONG
-                    ).show()
-                    // 画面POPの処理をLaunchedEffectで行わないと戻った先で値をハンドリングできない
-                    LaunchedEffect(true) {
-                        // 続いての処理はできないので前の画面に戻る
-                        navController.popBackStack()
-                    }
+                    // 続いての処理はできないので前の画面に戻る
+                    navController.popBackStack()
                 }
 
                 // 予期せぬエラーがあった場合
                 ScreenLoadingState.ERROR -> {
-                    Toast.makeText(
-                        LocalContext.current,
-                        stringResource(R.string.failed_initialize_by_error),
-                        Toast.LENGTH_LONG
-                    ).show()
-                    // 画面POPの処理をLaunchedEffectで行わないと戻った先で値をハンドリングできない
-                    LaunchedEffect(true) {
-                        // 続いての処理はできないので前の画面に戻る
-                        navController.popBackStack()
-                    }
+                    // 続いての処理はできないので前の画面に戻る
+                    navController.popBackStack()
                 }
             }
         }

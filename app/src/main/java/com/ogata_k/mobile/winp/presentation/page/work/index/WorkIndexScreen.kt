@@ -42,6 +42,7 @@ import com.ogata_k.mobile.winp.R
 import com.ogata_k.mobile.winp.common.constant.AsCreate
 import com.ogata_k.mobile.winp.common.formatter.buildFullDatePatternFormatter
 import com.ogata_k.mobile.winp.presentation.model.work.Work
+import com.ogata_k.mobile.winp.presentation.page.showSimpleSnackbar
 import com.ogata_k.mobile.winp.presentation.page.work.detail.WorkDetailRouting
 import com.ogata_k.mobile.winp.presentation.page.work.edit.WorkEditRouting
 import com.ogata_k.mobile.winp.presentation.widgert.common.ButtonLargeText
@@ -123,10 +124,7 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
                         errorItemBuilder = { state ->
                             val errorMessage = state.error.message ?: "UNKNOWN ERROR"
                             LaunchedEffect(errorMessage, snackbarHostState) {
-                                snackbarHostState.showSnackbar(
-                                    message = errorMessage,
-                                    withDismissAction = true,
-                                )
+                                showSimpleSnackbar(snackbarHostState, errorMessage)
                             }
                             DefaultErrorColumnItemBuilder(
                                 state = state,

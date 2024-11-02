@@ -6,7 +6,7 @@ import java.time.OffsetDateTime
  * タスク
  */
 data class Work(
-    val id: Long,
+    val workId: Long,
     val title: String,
     val description: String,
     val beganAt: OffsetDateTime?,

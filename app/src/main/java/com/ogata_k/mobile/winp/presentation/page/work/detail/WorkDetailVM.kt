@@ -10,15 +10,17 @@ import com.ogata_k.mobile.winp.domain.use_case.work.GetWorkInput
 import com.ogata_k.mobile.winp.domain.use_case.work.UpdateWorkTodoStateAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.UpdateWorkTodoStateInput
 import com.ogata_k.mobile.winp.presentation.constant.DummyID
-import com.ogata_k.mobile.winp.presentation.enumerate.ActionDoneResult
 import com.ogata_k.mobile.winp.presentation.enumerate.ScreenLoadingState
+import com.ogata_k.mobile.winp.presentation.event.EventAction
 import com.ogata_k.mobile.winp.presentation.event.EventBus
-import com.ogata_k.mobile.winp.presentation.event.work.FailedDeleteWork
-import com.ogata_k.mobile.winp.presentation.event.work.FailedUpdateWork
-import com.ogata_k.mobile.winp.presentation.event.work.FailedUpdateWorkTodo
-import com.ogata_k.mobile.winp.presentation.event.work.SucceededDeleteWork
-import com.ogata_k.mobile.winp.presentation.event.work.SucceededUpdateWork
-import com.ogata_k.mobile.winp.presentation.event.work.SucceededUpdateWorkTodo
+import com.ogata_k.mobile.winp.presentation.event.snackbar.work.DoneWork
+import com.ogata_k.mobile.winp.presentation.event.snackbar.work.FailedDeleteWork
+import com.ogata_k.mobile.winp.presentation.event.snackbar.work_todo.FailedUpdateWorkTodo
+import com.ogata_k.mobile.winp.presentation.event.snackbar.work_todo.SucceededUpdateWorkTodo
+import com.ogata_k.mobile.winp.presentation.event.toast.common.ErrorOccurred
+import com.ogata_k.mobile.winp.presentation.event.toast.work.NotFoundWork
+import com.ogata_k.mobile.winp.presentation.event.toast.work.SucceededDeleteWork
+import com.ogata_k.mobile.winp.presentation.event.toast.work.SucceededUpdateWork
 import com.ogata_k.mobile.winp.presentation.model.common.BasicScreenState
 import com.ogata_k.mobile.winp.presentation.model.work.Work
 import com.ogata_k.mobile.winp.presentation.model.work.WorkTodo
@@ -84,6 +86,10 @@ class WorkDetailVM @Inject constructor(
                     work = Optional.empty(),
                 )
             )
+
+            viewModelScope.launch {
+                EventBus.post(ErrorOccurred("Cannot Start Find Work at work_id: $workId"))
+            }
         } else {
             // DBデータでFormの初期化をしたときに初期化を完了とする
             viewModelScope.launch {
@@ -98,6 +104,7 @@ class WorkDetailVM @Inject constructor(
                         )
                     )
 
+                    EventBus.post(NotFoundWork(vmState.workId))
                     return@launch
                 }
 
@@ -120,8 +127,8 @@ class WorkDetailVM @Inject constructor(
     /**
      * アクションの実行結果を消費しつつVMをリロードする
      */
-    override fun reloadVMWithConsumeActionDoneResult() {
-        reloadVMWithOptional(readVMState()) { it.toConsumeActionDoneResult() }
+    override fun reloadVMWithConsumeEvent() {
+        reloadVMWithOptional(readVMState()) { it.toConsumeSnackbarEvent() }
     }
 
     /**
@@ -170,15 +177,13 @@ class WorkDetailVM @Inject constructor(
             }
             reloadVM()
         }
-        EventBus.onEvent<FailedUpdateWork>(screenLifecycle) {
+        EventBus.onEvent<SucceededUpdateWorkTodo>(screenLifecycle) {
             val vmState = readVMState()
             if (it.workId != vmState.workId) {
                 return@onEvent
             }
             reloadVM()
         }
-
-        // 削除処理はこの画面上で行うのでvmState.actionDoneResultsで直接管理する
     }
 
     /**
@@ -231,23 +236,18 @@ class WorkDetailVM @Inject constructor(
     fun deleteWork() {
         val vmState = readVMState()
         if (!vmState.loadingState.isNoErrorInitialized()) {
-            val actionDoneResult = ActionDoneResult.FAILED_DELETE
+            val snackbarEvent = FailedDeleteWork(vmState.workId)
 
             // 正常に初期化ができていないなら削除はできないので失敗として通知
             updateVMState(
                 vmState.copy(
                     basicState = vmState.basicState
                         .toDoneAction()
-                        .toAcceptActionDoneResult(actionDoneResult),
+                        .toAcceptSnackbarEvent(snackbarEvent),
                     // 削除確認中ダイアログを非表示にしつつscreenStateを更新する
                     inConfirmDelete = false,
                 )
             )
-
-            viewModelScope.launch {
-                val doneWorkEvent = FailedDeleteWork(workId = vmState.workId)
-                EventBus.post(doneWorkEvent)
-            }
             return
         }
 
@@ -265,11 +265,15 @@ class WorkDetailVM @Inject constructor(
             }.await()
 
             val oldVmState = readVMState()
-            val actionDoneResult =
-                if (result.isSuccess) ActionDoneResult.SUCCEEDED_DELETE else ActionDoneResult.FAILED_DELETE
+            // 成功時がDoneなのはComposerに通知するため
+            val snackbarEvent =
+                if (result.isSuccess) DoneWork(
+                    vmState.workId,
+                    EventAction.DELETE
+                ) else FailedDeleteWork(vmState.workId)
             var newBasicState = oldVmState.basicState
                 .toDoneAction()
-                .toAcceptActionDoneResult(actionDoneResult)
+                .toAcceptSnackbarEvent(snackbarEvent)
             if (result.isSuccess) {
                 newBasicState = newBasicState
                     // 強制アップデートを要求する
@@ -284,10 +288,11 @@ class WorkDetailVM @Inject constructor(
                 )
             )
 
-            val doneWorkEvent =
-                if (result.isSuccess) SucceededDeleteWork(workId = oldVmState.workId)
-                else FailedDeleteWork(workId = oldVmState.workId)
-            EventBus.post(doneWorkEvent)
+            if (result.isSuccess) {
+                // 削除に成功したときは詳細画面をPOPするので、トーストで通知
+                val toastEvent = SucceededDeleteWork(workId = oldVmState.workId)
+                EventBus.post(toastEvent)
+            }
         }
     }
 
@@ -314,27 +319,21 @@ class WorkDetailVM @Inject constructor(
     fun updateWorkTodoState() {
         val vmState = readVMState()
         val todoItem: WorkTodo? = vmState.inConfirmWorkTodoState?.let {
-            vmState.work.getOrNull()?.todoItems?.firstOrNull { it.id == vmState.inConfirmWorkTodoState }
+            vmState.work.getOrNull()?.todoItems?.firstOrNull { it.workTodoId == vmState.inConfirmWorkTodoState }
         }
 
         if (!vmState.loadingState.isNoErrorInitialized() || todoItem == null) {
-            val actionDoneResult = ActionDoneResult.FAILED_UPDATE
+            val snackbarEvent = FailedUpdateWorkTodo(vmState.workId, todoItem?.workTodoId)
 
             // 正常に初期化ができていなかったり対象が見つからないのはフローとしておかしいのでエラーとして通知
             updateVMState(
                 vmState.copy(
                     basicState = vmState.basicState
                         .toDoneAction()
-                        .toAcceptActionDoneResult(actionDoneResult),
+                        .toAcceptSnackbarEvent(snackbarEvent),
                     inConfirmWorkTodoState = null,
                 )
             )
-
-            viewModelScope.launch {
-                val doneWorkEvent =
-                    FailedUpdateWorkTodo(workId = vmState.workId, workTodoId = todoItem?.id)
-                EventBus.post(doneWorkEvent)
-            }
             return
         }
 
@@ -347,7 +346,7 @@ class WorkDetailVM @Inject constructor(
                 return@async updateWorkTodoStateUseCase.call(
                     UpdateWorkTodoStateInput(
                         vmState.workId,
-                        todoItem.id,
+                        todoItem.workTodoId,
                         if (todoItem.completedAt == null) LocalDateTimeConverter.toOffsetDateTime(
                             LocalDateTime.now()
                         ) else null
@@ -356,11 +355,17 @@ class WorkDetailVM @Inject constructor(
             }.await()
 
             val oldVmState = readVMState()
-            val actionDoneResult =
-                if (result.isSuccess) ActionDoneResult.SUCCEEDED_UPDATE else ActionDoneResult.FAILED_UPDATE
+            val snackbarEvent =
+                if (result.isSuccess) SucceededUpdateWorkTodo(
+                    vmState.workId,
+                    todoItem.workTodoId
+                ) else FailedUpdateWorkTodo(
+                    vmState.workId,
+                    todoItem.workTodoId
+                )
             val newBasicState = oldVmState.basicState
                 .toDoneAction()
-                .toAcceptActionDoneResult(actionDoneResult)
+                .toAcceptSnackbarEvent(snackbarEvent)
             // 実行結果を通知
             updateVMState(
                 oldVmState.copy(
@@ -372,13 +377,7 @@ class WorkDetailVM @Inject constructor(
                 )
             )
 
-            val doneWorkEvent =
-                if (result.isSuccess) SucceededUpdateWorkTodo(
-                    workId = oldVmState.workId,
-                    workTodoId = todoItem.id
-                )
-                else FailedUpdateWorkTodo(workId = oldVmState.workId, workTodoId = todoItem.id)
-            EventBus.post(doneWorkEvent)
+            // 詳細画面上での出来事を想定しているので通知はスナックバーだけで充分
         }
     }
 }

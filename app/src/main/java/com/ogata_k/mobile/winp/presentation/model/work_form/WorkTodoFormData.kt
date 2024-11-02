@@ -15,7 +15,7 @@ import com.ogata_k.mobile.winp.domain.model.work.WorkTodo as DomainWorkTodo
  */
 data class WorkTodoFormData(
     val uuid: UUID,
-    val id: Long,
+    val workTodoId: Long,
     val description: String,
     val completedAt: LocalDateTime?,
     val createdAt: LocalDateTime,
@@ -27,7 +27,7 @@ data class WorkTodoFormData(
         fun empty(uuid: UUID): WorkTodoFormData {
             return WorkTodoFormData(
                 uuid = uuid,
-                id = AsCreate.CREATING_ID,
+                workTodoId = AsCreate.CREATING_ID,
                 description = "",
                 completedAt = null,
                 createdAt = LocalDateTime.now(),
@@ -37,7 +37,7 @@ data class WorkTodoFormData(
         override fun fromDomainModel(domain: DomainWorkTodo, uuid: UUID): WorkTodoFormData {
             return WorkTodoFormData(
                 uuid = uuid,
-                id = domain.id,
+                workTodoId = domain.workTodoId,
                 description = domain.description,
                 completedAt = domain.completedAt?.let { LocalDateTimeConverter.fromOffsetDateTime(it) },
                 createdAt = LocalDateTimeConverter.fromOffsetDateTime(domain.createdAt),
@@ -49,7 +49,7 @@ data class WorkTodoFormData(
 
     override fun toDomainModel(): DomainWorkTodo {
         return DomainWorkTodo(
-            id = id,
+            workTodoId = workTodoId,
             description = description,
             completedAt = completedAt?.let { LocalDateTimeConverter.toOffsetDateTime(it) },
             createdAt = LocalDateTimeConverter.toOffsetDateTime(createdAt),

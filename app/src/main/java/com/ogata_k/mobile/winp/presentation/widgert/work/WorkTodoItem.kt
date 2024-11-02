@@ -130,7 +130,7 @@ fun WorkTodoItem(
 @Composable
 private fun NotCompletedWorkTodoFormColumnItemPreview() {
     val todoItem = WorkTodo(
-        id = 1,
+        workTodoId = 1,
         description = "未完了の対応項目アイテム\n少なくともこれはやっておかなければいけないので忘れずに行うこと。",
         completedAt = null,
         createdAt = LocalDateTime.now(),
@@ -143,7 +143,7 @@ private fun NotCompletedWorkTodoFormColumnItemPreview() {
 @Composable
 private fun CompletedWorkTodoFormColumnItemPreview() {
     val todoItem = WorkTodo(
-        id = 2,
+        workTodoId = 2,
         description = "完了済みの対応項目アイテム\n少なくともこれはやっておかなければいけないので忘れずに行うこと。",
         completedAt = LocalDateTime.now(),
         createdAt = LocalDateTime.now(),
@@ -156,7 +156,7 @@ private fun CompletedWorkTodoFormColumnItemPreview() {
 @Composable
 private fun LargeTextCompletedWorkTodoFormColumnItemPreview() {
     val todoItem = WorkTodo(
-        id = 3,
+        workTodoId = 3,
         description = "完了済みの対応項目アイテム",
         completedAt = LocalDateTime.now(),
         createdAt = LocalDateTime.now(),
@@ -169,7 +169,7 @@ private fun LargeTextCompletedWorkTodoFormColumnItemPreview() {
 @Composable
 private fun SmallTextCompletedWorkTodoFormColumnItemPreview() {
     val todoItem = WorkTodo(
-        id = 4,
+        workTodoId = 4,
         description = "完了済みの対応項目アイテム",
         completedAt = LocalDateTime.now(),
         createdAt = LocalDateTime.now(),
