@@ -143,7 +143,7 @@ class WorkEditVM @Inject constructor(
                         basicState = vmState.basicState.updateInitialize(loadingState),
                     )
                 )
-                EventBus.post(NotFoundWork(vmState.workId))
+                EventBus.postToastEvent(NotFoundWork(vmState.workId))
 
                 return@launch
             }
@@ -679,7 +679,7 @@ class WorkEditVM @Inject constructor(
                     ) else SucceededUpdateWork(
                         oldVmState.workId
                     )
-                EventBus.post(toastEvent)
+                EventBus.postToastEvent(toastEvent)
             }
         }
     }

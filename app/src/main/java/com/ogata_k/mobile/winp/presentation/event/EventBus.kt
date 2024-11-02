@@ -2,6 +2,7 @@ package com.ogata_k.mobile.winp.presentation.event
 
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import com.ogata_k.mobile.winp.presentation.event.toast.ToastEvent
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -16,8 +17,12 @@ object EventBus {
     private val _eventPublisher = MutableSharedFlow<Any>()
     val eventSubscriber = _eventPublisher.asSharedFlow()
 
-    suspend fun post(event: Event) {
+    private suspend fun postEvent(event: Event) {
         _eventPublisher.emit(event)
+    }
+
+    suspend fun postToastEvent(event: ToastEvent) {
+        postEvent(event)
     }
 
     inline fun <reified T : Event> onEvent(
@@ -30,18 +35,6 @@ object EventBus {
                     coroutineContext.ensureActive()
                     onEvent(event)
                 }
-        }
-    }
-
-    inline fun onAnyEvent(
-        lifecycleOwner: LifecycleOwner,
-        crossinline onEvent: (Any) -> Unit
-    ) {
-        lifecycleOwner.lifecycleScope.launch {
-            eventSubscriber.collectLatest { event: Any ->
-                coroutineContext.ensureActive()
-                onEvent(event)
-            }
         }
     }
 }

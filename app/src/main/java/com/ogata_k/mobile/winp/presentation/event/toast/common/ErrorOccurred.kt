@@ -5,7 +5,7 @@ import com.ogata_k.mobile.winp.presentation.event.EventKind
 import com.ogata_k.mobile.winp.presentation.event.EventTarget
 import com.ogata_k.mobile.winp.presentation.event.toast.ToastEvent
 
-data class ErrorOccurred(val loggingMessage: String) : ToastEvent {
+class ErrorOccurred : ToastEvent {
     override fun getTarget(): EventTarget {
         return EventTarget.ERROR
     }

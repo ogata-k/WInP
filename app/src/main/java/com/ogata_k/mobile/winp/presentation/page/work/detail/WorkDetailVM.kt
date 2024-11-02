@@ -1,5 +1,6 @@
 package com.ogata_k.mobile.winp.presentation.page.work.detail
 
+import android.util.Log
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewModelScope
 import com.ogata_k.mobile.winp.common.type_converter.LocalDateTimeConverter
@@ -88,7 +89,11 @@ class WorkDetailVM @Inject constructor(
             )
 
             viewModelScope.launch {
-                EventBus.post(ErrorOccurred("Cannot Start Find Work at work_id: $workId"))
+                Log.e(
+                    this.javaClass.kotlin.toString(),
+                    "Cannot Start Find Work at work_id: $workId"
+                )
+                EventBus.postToastEvent(ErrorOccurred())
             }
         } else {
             // DBデータでFormの初期化をしたときに初期化を完了とする
@@ -104,7 +109,7 @@ class WorkDetailVM @Inject constructor(
                         )
                     )
 
-                    EventBus.post(NotFoundWork(vmState.workId))
+                    EventBus.postToastEvent(NotFoundWork(vmState.workId))
                     return@launch
                 }
 
@@ -291,7 +296,7 @@ class WorkDetailVM @Inject constructor(
             if (result.isSuccess) {
                 // 削除に成功したときは詳細画面をPOPするので、トーストで通知
                 val toastEvent = SucceededDeleteWork(workId = oldVmState.workId)
-                EventBus.post(toastEvent)
+                EventBus.postToastEvent(toastEvent)
             }
         }
     }
