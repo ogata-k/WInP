@@ -123,7 +123,7 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
                         },
                         errorItemBuilder = { state ->
                             val errorMessage = state.error.message ?: "UNKNOWN ERROR"
-                            LaunchedEffect(errorMessage, snackbarHostState) {
+                            LaunchedEffect(state.error, snackbarHostState) {
                                 showSimpleSnackbar(snackbarHostState, errorMessage)
                             }
                             DefaultErrorColumnItemBuilder(
