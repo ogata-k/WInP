@@ -44,6 +44,10 @@ class WorkDetailVM @Inject constructor(
     private val deleteWorkUseCase: DeleteWorkAsyncUseCase,
     private val updateWorkTodoStateUseCase: UpdateWorkTodoStateAsyncUseCase,
 ) : AbstractViewModel<ScreenLoadingState, WorkDetailVMState, ScreenLoadingState, WorkDetailUiState>() {
+    companion object {
+        private const val TAG = "WorkDetailVM"
+    }
+
     override val viewModelStateFlow: MutableStateFlow<WorkDetailVMState> = MutableStateFlow(
         WorkDetailVMState(
             // 初期状態は未初期化状態とする
@@ -90,7 +94,7 @@ class WorkDetailVM @Inject constructor(
 
             viewModelScope.launch {
                 Log.e(
-                    this.javaClass.kotlin.toString(),
+                    TAG,
                     "Cannot Start Find Work at work_id: $workId"
                 )
                 EventBus.postToastEvent(ErrorOccurred())
