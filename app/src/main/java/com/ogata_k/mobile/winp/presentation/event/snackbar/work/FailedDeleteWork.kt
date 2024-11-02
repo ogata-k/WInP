@@ -4,8 +4,12 @@ import com.ogata_k.mobile.winp.presentation.event.EventAction
 import com.ogata_k.mobile.winp.presentation.event.EventKind
 import com.ogata_k.mobile.winp.presentation.event.EventTarget
 import com.ogata_k.mobile.winp.presentation.event.snackbar.SnackbarEvent
+import java.time.LocalDateTime
 
-data class FailedDeleteWork(val workId: Long) : SnackbarEvent {
+data class FailedDeleteWork(
+    val workId: Long,
+    private val timestamp: LocalDateTime = LocalDateTime.now()
+) : SnackbarEvent {
     override fun getTarget(): EventTarget {
         return EventTarget.WORK
     }
