@@ -480,10 +480,7 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                     val event: SnackbarEvent? = uiState.peekSnackbarEvent()
                     if (event != null) {
                         val text = event.toMessage()
-                        LaunchedEffect(
-                            event,
-                            basicScreenState.snackbarEvents.count()
-                        ) {
+                        LaunchedEffect(event) {
                             if (event.getKind().isSucceeded()) {
                                 // この画面のメインの処理である作成更新が行われていると確認できたなら画面除去
                                 if (event is DoneWork && event.workId == uiState.formData.workId && (event.getAction() == EventAction.CREATE || event.getAction() == EventAction.UPDATE)) {

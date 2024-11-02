@@ -81,8 +81,11 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
         val pullToRefreshState = rememberPullToRefreshState()
 
         // Eventを監視
-        viewModel.listenEvent(LocalLifecycleOwner.current) {
-            workPagingItems.refresh()
+        val eventLifecycle = LocalLifecycleOwner.current
+        LaunchedEffect(Unit) {
+            viewModel.listenEvent(eventLifecycle) {
+                workPagingItems.refresh()
+            }
         }
 
         Scaffold(
@@ -123,7 +126,7 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
                         },
                         errorItemBuilder = { state ->
                             val errorMessage = state.error.message ?: "UNKNOWN ERROR"
-                            LaunchedEffect(state.error, snackbarHostState) {
+                            LaunchedEffect(state.error) {
                                 showSimpleSnackbar(snackbarHostState, errorMessage)
                             }
                             DefaultErrorColumnItemBuilder(

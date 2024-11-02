@@ -8,11 +8,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -34,7 +31,6 @@ import com.ogata_k.mobile.winp.presentation.page.work.index.WorkIndexScreen
 import com.ogata_k.mobile.winp.presentation.page.work.index.WorkIndexVM
 import com.ogata_k.mobile.winp.presentation.theme.WInPTheme
 import dagger.hilt.android.AndroidEntryPoint
-import java.time.LocalDateTime
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -93,20 +89,20 @@ fun SetupRouting(navController: NavHostController) {
 @Composable
 fun SetupToastNotifier() {
     val toastContext = LocalContext.current
-    var receivedDateTime by remember { mutableStateOf(LocalDateTime.now()) }
+    val eventLifecycle = LocalLifecycleOwner.current
     val events = remember { mutableStateListOf<ToastEvent>() }
-    EventBus.onEvent<ToastEvent>(LocalLifecycleOwner.current) {
-        events.add(it)
-        receivedDateTime = LocalDateTime.now()
+    LaunchedEffect(Unit) {
+        EventBus.onEvent<ToastEvent>(eventLifecycle) {
+            events.add(it)
+        }
     }
 
-    val message = events.firstOrNull()?.toMessage()
-    LaunchedEffect(receivedDateTime, message) {
+    val event = events.firstOrNull()
+    val message = event?.toMessage()
+    LaunchedEffect(event) {
         if (message != null) {
             Toast.makeText(
-                toastContext,
-                message,
-                LENGTH_LONG
+                toastContext, message, LENGTH_LONG
             ).show()
 
             events.removeAt(0)

@@ -94,6 +94,7 @@ class WorkIndexVM @Inject constructor(
 
     /**
      * Eventの監視
+     * LaunchedEffect内で呼び出さないと何度も同じOwnerで監視してしまうので注意
      */
     fun listenEvent(
         screenLifecycle: LifecycleOwner,

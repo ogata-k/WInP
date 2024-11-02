@@ -144,7 +144,10 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
         ) { padding ->
 
             // Eventを監視
-            viewModel.listenEvent(LocalLifecycleOwner.current)
+            val eventLifecycle = LocalLifecycleOwner.current
+            LaunchedEffect(Unit) {
+                viewModel.listenEvent(eventLifecycle)
+            }
 
             when (screenLoadingState) {
                 // 初期化中
@@ -292,9 +295,7 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                     val event: SnackbarEvent? = uiState.peekSnackbarEvent()
                     if (event != null) {
                         val text = event.toMessage()
-                        LaunchedEffect(
-                            event, basicScreenState.snackbarEvents.count()
-                        ) {
+                        LaunchedEffect(event) {
                             if (event.getKind().isSucceeded()) {
                                 if (event is DoneWork && event.workId == uiState.workId && event.getAction() == EventAction.DELETE) {
                                     // タスク削除
