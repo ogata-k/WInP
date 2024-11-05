@@ -40,7 +40,7 @@
     <string name="title_delete_work">タスク削除</string>
     <string name="title_create_work_todo">対応項目作成</string>
     <string name="title_edit_work_todo">対応項目編集</string>
-    <string name="title_update_work_todo_complete_state">対応項目状態更新</string>
+    <string name="title_update_work_todo_complete_state">対応項目の状態を更新</string>
 
     <!-- ダイアログコンテンツ -->
     <string name="dialog_content_confirm_delete_work">タスクを削除します。よろしいですか。</string>
