@@ -45,7 +45,10 @@ fun WorkItem(work: Work, modifier: Modifier = Modifier, onClick: () -> Unit) {
             containerColor = colorResource(id = R.color.expired_work_item),
             contentColor = contentColorFor(colorResource(id = R.color.expired_work_item)),
         )
-        else CardDefaults.cardColors(),
+        else CardDefaults.cardColors().copy(
+            containerColor = colorResource(id = R.color.default_work_item),
+            contentColor = contentColorFor(colorResource(id = R.color.default_work_item)),
+        ),
     ) {
         Row(
             modifier = Modifier

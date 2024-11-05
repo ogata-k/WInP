@@ -10,12 +10,12 @@
     <color name="white">#FFFFFFFF</color>
 
     <!-- Work / WorkTodo -->
-    <color name="default_work_item">#E7E0EC</color>
-    <color name="completed_work_item">#CEF4B7</color>
-    <color name="expired_work_item">#FFA1BD</color>
-    <color name="completed_check">#399F3D</color>
-    <color name="completed_work_todo">#CEF4B7</color>
-    <color name="not_completed_work_todo">#C6DDF6</color>
+    <color name="default_work_item">#49454F</color>
+    <color name="completed_work_item">#66BB6A</color>
+    <color name="expired_work_item">#E57373</color>
+    <color name="completed_check">#1B5E20</color>
+    <color name="completed_work_todo">#66BB6A</color>
+    <color name="not_completed_work_todo">#5C6BC0</color>
     <color name="work_todo_dismiss_background">#E53935</color>
 
     <!-- label -->
