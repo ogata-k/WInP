@@ -14,6 +14,7 @@ data class WorkIndexVMState(
     // uiStateは常に初期化済みのうえ、アクション実行中もないので指定しない
     val isInSearchDate: Boolean,
     val searchDate: LocalDate,
+    val isInRefreshing: Boolean,
     val workPagingData: Flow<PagingData<Work>>,
 ) : IVMState<ScreenLoadingState, ScreenLoadingState, WorkIndexUiState> {
     override fun toUiState(): WorkIndexUiState {
@@ -22,6 +23,7 @@ data class WorkIndexVMState(
             basicState,
             isInSearchDate,
             searchDate,
+            isInRefreshing,
             workPagingData
         )
     }

@@ -2,7 +2,6 @@ package com.ogata_k.mobile.winp.presentation.page.work.edit
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -88,7 +87,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 @SuppressLint("SuspiciousIndentation")
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
     val uiState: WorkEditUiState by viewModel.uiStateFlow.collectAsState()
@@ -303,11 +302,12 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                                     positionalThreshold = { it * .6f },
                                 )
 
+                                modifier
+                                    .animateContentSize()
                                 SwipeToDismissBox(
                                     state = dismissState,
-                                    modifier = modifier
-                                        .animateContentSize()
-                                        .animateItemPlacement()
+                                    modifier = Modifier
+                                        .animateItem()
                                         .padding(
                                             horizontal = dimensionResource(id = R.dimen.padding_small),
                                         )

@@ -49,6 +49,7 @@ class WorkIndexVM @Inject constructor(
                 .updateInitialize(ScreenLoadingState.NO_ERROR_INITIALIZED),
             isInSearchDate = false,
             searchDate = LocalDate.now(),
+            isInRefreshing = false,
             workPagingData = Pager(
                 config = PagingConfig(
                     initialLoadSize = INITIAL_PAGE_SIZE,
@@ -151,5 +152,13 @@ class WorkIndexVM @Inject constructor(
         updateVMState(newVmState)
 
         workPagingItems.refresh()
+    }
+
+    /**
+     * リストのリフレッシュ処理のステータスを更新
+     */
+    fun updateListRefreshState(isInRefreshing: Boolean) {
+        val vmState = readVMState()
+        updateVMState(vmState.copy(isInRefreshing = isInRefreshing))
     }
 }

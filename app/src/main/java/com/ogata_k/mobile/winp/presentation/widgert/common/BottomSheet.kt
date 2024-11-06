@@ -5,6 +5,7 @@ import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalBottomSheetDefaults
+import androidx.compose.material3.ModalBottomSheetDefaults.properties
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.contentColorFor
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -30,8 +31,8 @@ fun DraggableBottomSheet(
         tonalElevation = BottomSheetDefaults.Elevation,
         scrimColor = BottomSheetDefaults.ScrimColor,
         dragHandle = { BottomSheetDefaults.DragHandle() },
-        windowInsets = BottomSheetDefaults.windowInsets,
-        properties = ModalBottomSheetDefaults.properties(),
+        contentWindowInsets = { BottomSheetDefaults.windowInsets },
+        properties = properties,
         content = content,
     )
 }

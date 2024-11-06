@@ -13,5 +13,6 @@ data class WorkIndexUiState(
     override val basicState: BasicScreenState,
     val isInSearchDate: Boolean,
     val searchDate: LocalDate,
+    val isInRefreshing: Boolean,
     val workPagingData: Flow<PagingData<Work>>,
 ) : IUiState<ScreenLoadingState>

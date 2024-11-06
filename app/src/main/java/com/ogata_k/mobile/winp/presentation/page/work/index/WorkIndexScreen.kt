@@ -2,7 +2,6 @@ package com.ogata_k.mobile.winp.presentation.page.work.index
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -21,7 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
@@ -31,11 +30,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
+import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.ogata_k.mobile.winp.R
@@ -87,6 +86,11 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
                 workPagingItems.refresh()
             }
         }
+        LaunchedEffect(uiState.isInRefreshing, workPagingItems.loadState.refresh) {
+            if (uiState.isInRefreshing && workPagingItems.loadState.refresh is LoadState.NotLoading) {
+                viewModel.updateListRefreshState(false)
+            }
+        }
 
         Scaffold(
             modifier = modifier,
@@ -95,10 +99,14 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
                 SnackbarHost(hostState = snackbarHostState)
             },
         ) { padding ->
-            Box(
-                modifier = Modifier
-                    .nestedScroll(pullToRefreshState.nestedScrollConnection)
-                    .padding(padding),
+            PullToRefreshBox(
+                modifier = Modifier.padding(padding),
+                state = pullToRefreshState,
+                isRefreshing = uiState.isInRefreshing,
+                onRefresh = {
+                    viewModel.updateListRefreshState(true)
+                    workPagingItems.refresh()
+                },
             ) {
                 Column {
                     WorkIndexHeader(
@@ -149,18 +157,6 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
                             navController.navigate(WorkDetailRouting(work.id).toPath())
                         }
                     }
-                }
-
-                PullToRefreshContainer(
-                    state = pullToRefreshState,
-                    modifier = Modifier.align(Alignment.TopCenter),
-                )
-            }
-
-            if (pullToRefreshState.isRefreshing) {
-                LaunchedEffect(Unit) {
-                    workPagingItems.refresh()
-                    pullToRefreshState.endRefresh()
                 }
             }
         }
