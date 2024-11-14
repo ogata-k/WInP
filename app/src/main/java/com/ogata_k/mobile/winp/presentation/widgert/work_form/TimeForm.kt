@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -24,7 +23,7 @@ import androidx.compose.ui.res.stringResource
 import com.ogata_k.mobile.winp.R
 import com.ogata_k.mobile.winp.common.formatter.formatFullTimeOrEmpty
 import com.ogata_k.mobile.winp.presentation.widgert.common.BodyLargeText
-import com.ogata_k.mobile.winp.presentation.widgert.common.ButtonLargeText
+import com.ogata_k.mobile.winp.presentation.widgert.common.ButtonMediumText
 import com.ogata_k.mobile.winp.presentation.widgert.common.DialogOfTimePicker
 import java.time.LocalTime
 
@@ -92,24 +91,24 @@ fun TimeFormColumnItem(
             state = timePickerState,
             onDismissRequest = { /* ignore background dismiss */ },
             dismissButton = {
-                Button(
+                TextButton(
                     onClick = {
                         switchShowTimePicker(false)
                     },
                     enabled = canEdit,
                 ) {
-                    ButtonLargeText(text = stringResource(R.string.cancel))
+                    ButtonMediumText(text = stringResource(R.string.cancel))
                 }
             },
             confirmButton = {
-                Button(
+                TextButton(
                     onClick = {
                         updateTime(LocalTime.of(timePickerState.hour, timePickerState.minute))
                         switchShowTimePicker(false)
                     },
                     enabled = canEdit,
                 ) {
-                    ButtonLargeText(text = stringResource(R.string.ok))
+                    ButtonMediumText(text = stringResource(R.string.ok))
                 }
             },
         )

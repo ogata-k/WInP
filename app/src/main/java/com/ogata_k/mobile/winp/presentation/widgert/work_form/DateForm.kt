@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -25,7 +24,7 @@ import androidx.compose.ui.res.stringResource
 import com.ogata_k.mobile.winp.R
 import com.ogata_k.mobile.winp.common.formatter.formatFullDateOrEmpty
 import com.ogata_k.mobile.winp.presentation.widgert.common.BodyLargeText
-import com.ogata_k.mobile.winp.presentation.widgert.common.ButtonLargeText
+import com.ogata_k.mobile.winp.presentation.widgert.common.ButtonMediumText
 import com.ogata_k.mobile.winp.presentation.widgert.common.DialogOfDatePicker
 import com.ogata_k.mobile.winp.presentation.widgert.common.fromDateToMills
 import com.ogata_k.mobile.winp.presentation.widgert.common.fromMillsToDate
@@ -94,17 +93,17 @@ fun DateFormColumnItem(
             state = datePickerState,
             onDismissRequest = { /* ignore background dismiss */ },
             dismissButton = {
-                Button(
+                TextButton(
                     onClick = {
                         switchShowDatePicker(false)
                     },
                     enabled = canEdit,
                 ) {
-                    ButtonLargeText(text = stringResource(R.string.cancel))
+                    ButtonMediumText(text = stringResource(R.string.cancel))
                 }
             },
             confirmButton = {
-                Button(
+                TextButton(
                     onClick = {
                         val dateTimestamp: Long? =
                             datePickerState.selectedDateMillis
@@ -115,7 +114,7 @@ fun DateFormColumnItem(
                     },
                     enabled = canEdit,
                 ) {
-                    ButtonLargeText(text = stringResource(R.string.ok))
+                    ButtonMediumText(text = stringResource(R.string.ok))
                 }
             },
         )

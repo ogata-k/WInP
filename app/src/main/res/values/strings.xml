@@ -14,6 +14,8 @@
 
     <!-- 操作 -->
     <string name="menu_have_more_action">追加操作</string>
+    <string name="select_from_time_picker">時間を選択</string>
+    <string name="input_from_time_input">時間を入力</string>
     <string name="select_date">日にちを入力</string>
     <string name="select_time">時間を入力</string>
     <string name="ok">OK</string>

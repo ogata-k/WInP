@@ -28,7 +28,7 @@ fun DialogOfDatePicker(
         dismissButton = dismissButton,
         confirmButton = confirmButton,
     ) {
-        DatePicker(state)
+        DatePicker(state, showModeToggle = true)
     }
 }
 

@@ -1,25 +1,25 @@
 package com.ogata_k.mobile.winp.presentation.widgert.common
 
+import android.content.res.Configuration
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.material3.BasicAlertDialog
-import androidx.compose.material3.DatePickerDefaults
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.TimeInput
 import androidx.compose.material3.TimePicker
-import androidx.compose.material3.TimePickerColors
-import androidx.compose.material3.TimePickerDefaults
 import androidx.compose.material3.TimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -28,12 +28,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Placeable
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastForEachIndexed
+import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.ogata_k.mobile.winp.R
 import kotlin.math.max
@@ -46,13 +49,23 @@ fun DialogOfTimePicker(
     confirmButton: @Composable () -> Unit,
     dismissButton: @Composable (() -> Unit)? = null,
 ) {
+    val isVertical = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
     TimePickerDialog(
-        modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large)),
+        title = if (isVertical) {
+            stringResource(R.string.select_from_time_picker)
+        } else {
+            stringResource(R.string.input_from_time_input)
+        },
+        modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_extra_large)),
         onDismissRequest = onDismissRequest,
         dismissButton = dismissButton,
         confirmButton = confirmButton,
     ) {
-        TimePicker(state)
+        if (isVertical) {
+            TimePicker(state)
+        } else {
+            TimeInput(state)
+        }
     }
 }
 
@@ -61,42 +74,47 @@ fun DialogOfTimePicker(
  *
  * @todo ComposeのTimePickerDialogが安定したら置き換える
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimePickerDialog(
+    title: String,
     modifier: Modifier = Modifier,
     onDismissRequest: () -> Unit,
     confirmButton: @Composable () -> Unit,
     dismissButton: @Composable (() -> Unit)? = null,
-    colors: TimePickerColors = TimePickerDefaults.colors(),
-    properties: DialogProperties = DialogProperties(usePlatformDefaultWidth = false),
-    content: @Composable ColumnScope.() -> Unit
+    content: @Composable ColumnScope.() -> Unit,
 ) {
-    BasicAlertDialog(
+    Dialog(
         onDismissRequest = onDismissRequest,
-        modifier = modifier.wrapContentHeight(),
-        properties = properties
+        properties = DialogProperties(usePlatformDefaultWidth = false),
     ) {
         Surface(
-            modifier = Modifier
+            shape = MaterialTheme.shapes.extraLarge,
+            tonalElevation = 6.dp,
+            modifier = modifier
                 .width(IntrinsicSize.Min)
-                .height(IntrinsicSize.Min),
-            color = colors.containerColor,
-            // よさげなものがなかったのでDatePickerのDefault値を指定
-            shape = DatePickerDefaults.shape,
-            tonalElevation = DatePickerDefaults.TonalElevation,
+                .widthIn(min = 360.0.dp)
+                .heightIn(max = 568.0.dp)
+                .background(
+                    shape = MaterialTheme.shapes.extraLarge,
+                    color = MaterialTheme.colorScheme.surface
+                ),
         ) {
             Column(
-                modifier = Modifier
-                    .padding(
-                        start = dimensionResource(id = R.dimen.padding_extra_large),
-                        end = dimensionResource(id = R.dimen.padding_extra_large),
-                        top = dimensionResource(id = R.dimen.padding_medium),
-                        // bottomの指定はボタンが消えてしまう可能性が出てくるので指定しない
-                    ),
-                verticalArrangement = Arrangement.SpaceBetween,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                content()
+                LabelMediumText(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp),
+                    text = title,
+                )
+                Column(
+                    modifier = Modifier.padding(20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    content()
+                }
+
                 // Buttons
                 Box(
                     modifier = Modifier
@@ -122,19 +140,23 @@ fun TimePickerDialog(
 }
 
 //
-// ここから下はDatePickerDialogで使っている実装を借りた
+// ここからはヘルパー
 //
+
+private val DialogButtonsPadding = PaddingValues(bottom = 8.dp, end = 6.dp)
+private val DialogButtonsMainAxisSpacing = 8.dp
+private val DialogButtonsCrossAxisSpacing = 12.dp
 
 /**
  * ProvideContentColorTextStyle
  *
- * A convenience method to provide values to both LocalContentColor and LocalTextStyle in
- * one call. This is less expensive than nesting calls to CompositionLocalProvider.
+ * A convenience method to provide values to both LocalContentColor and LocalTextStyle in one call.
+ * This is less expensive than nesting calls to CompositionLocalProvider.
  *
  * Text styles will be merged with the current value of LocalTextStyle.
  */
 @Composable
-private fun ProvideContentColorTextStyle(
+internal fun ProvideContentColorTextStyle(
     contentColor: Color,
     textStyle: TextStyle,
     content: @Composable () -> Unit
@@ -152,7 +174,7 @@ private fun ProvideContentColorTextStyle(
  * customization.
  */
 @Composable
-private fun AlertDialogFlowRow(
+internal fun AlertDialogFlowRow(
     mainAxisSpacing: Dp,
     crossAxisSpacing: Dp,
     content: @Composable () -> Unit
@@ -171,8 +193,9 @@ private fun AlertDialogFlowRow(
 
         // Return whether the placeable can be added to the current sequence.
         fun canAddToCurrentSequence(placeable: Placeable) =
-            currentSequence.isEmpty() || currentMainAxisSize + mainAxisSpacing.roundToPx() +
-                    placeable.width <= constraints.maxWidth
+            currentSequence.isEmpty() ||
+                    currentMainAxisSize + mainAxisSpacing.roundToPx() + placeable.width <=
+                    constraints.maxWidth
 
         // Store current sequence information and start a new sequence.
         fun startNewSequence() {
@@ -180,8 +203,7 @@ private fun AlertDialogFlowRow(
                 crossAxisSpace += crossAxisSpacing.roundToPx()
             }
             // Ensures that confirming actions appear above dismissive actions.
-            @Suppress("ListIterator")
-            sequences.add(0, currentSequence.toList())
+            @Suppress("ListIterator") sequences.add(0, currentSequence.toList())
             crossAxisSizes += currentCrossAxisSize
             crossAxisPositions += crossAxisSpace
 
@@ -221,29 +243,25 @@ private fun AlertDialogFlowRow(
 
         layout(layoutWidth, layoutHeight) {
             sequences.fastForEachIndexed { i, placeables ->
-                val childrenMainAxisSizes = IntArray(placeables.size) { j ->
-                    placeables[j].width +
-                            if (j < placeables.lastIndex) mainAxisSpacing.roundToPx() else 0
-                }
+                val childrenMainAxisSizes =
+                    IntArray(placeables.size) { j ->
+                        placeables[j].width +
+                                if (j < placeables.lastIndex) mainAxisSpacing.roundToPx() else 0
+                    }
                 val arrangement = Arrangement.End
                 val mainAxisPositions = IntArray(childrenMainAxisSizes.size) { 0 }
                 with(arrangement) {
                     arrange(
-                        mainAxisLayoutSize, childrenMainAxisSizes,
-                        layoutDirection, mainAxisPositions
+                        mainAxisLayoutSize,
+                        childrenMainAxisSizes,
+                        layoutDirection,
+                        mainAxisPositions
                     )
                 }
                 placeables.fastForEachIndexed { j, placeable ->
-                    placeable.place(
-                        x = mainAxisPositions[j],
-                        y = crossAxisPositions[i]
-                    )
+                    placeable.place(x = mainAxisPositions[j], y = crossAxisPositions[i])
                 }
             }
         }
     }
 }
-
-private val DialogButtonsPadding = PaddingValues(bottom = 8.dp, end = 6.dp)
-private val DialogButtonsMainAxisSpacing = 8.dp
-private val DialogButtonsCrossAxisSpacing = 12.dp
