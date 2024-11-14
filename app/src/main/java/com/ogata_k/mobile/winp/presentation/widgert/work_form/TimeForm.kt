@@ -82,9 +82,27 @@ fun TimeFormColumnItem(
         }
     }
     if (isInShowTimePicker) {
+        val (baseTimeHour, baseTimeMinute) = if (time == null) {
+            // 特に深い理由はないが切りのいい時間をデフォルトで選択しておく
+            val baseTime = LocalTime.now()
+            var baseTimeHour = baseTime.hour
+            var baseTimeMinute = baseTime.minute
+            if (55 < baseTimeMinute) {
+                baseTimeHour = (baseTimeHour + 1) % 24
+                baseTimeMinute = 0
+            } else if (baseTimeMinute % 5 != 0) {
+                baseTimeMinute = (baseTimeMinute - (baseTimeMinute % 5) + 5) % 60
+            }
+
+            Pair(baseTimeHour, baseTimeMinute)
+        } else {
+            // すでに入力してある値を利用
+            Pair(time.hour, time.minute)
+        }
+
         val timePickerState = rememberTimePickerState(
-            initialHour = time?.hour ?: LocalTime.now().hour,
-            initialMinute = 0,
+            initialHour = baseTimeHour,
+            initialMinute = baseTimeMinute,
             is24Hour = true,
         )
         DialogOfTimePicker(
