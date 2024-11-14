@@ -49,7 +49,7 @@ class WorkEditVM @Inject constructor(
 
         const val DESCRIPTION_MAX_LENGTH = 2000
 
-        const val WORK_TODO_ITEM_DESCRIPTION_MAX_LENGTH = 50
+        const val WORK_TODO_ITEM_DESCRIPTION_MAX_LENGTH = 100
     }
 
     override val viewModelStateFlow: MutableStateFlow<WorkEditVMState> = MutableStateFlow(

@@ -210,6 +210,7 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                                             viewModel.updateFormTitle(it)
                                         },
                                         maxLength = WorkEditVM.TITLE_MAX_LENGTH,
+                                        singleLine = true,
                                         isError = workValidateExceptions.title.hasError(),
                                     )
                                 }
