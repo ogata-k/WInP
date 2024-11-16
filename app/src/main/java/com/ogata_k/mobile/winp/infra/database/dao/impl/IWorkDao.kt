@@ -23,13 +23,13 @@ class IWorkDao(private val db: AppDatabase, private val dao: WorkWithWorkTodoDao
         pageSize: Int
     ): List<DomainWork> {
         return dao.fetchWorksAtTheRange(from, to, itemOffset, pageSize).map {
-            fromWork(it)
+            toDomainWork(it)
         }
     }
 
     override suspend fun findWork(workId: Long): Optional<DomainWork> {
         return dao.findWork(workId).map {
-            fromWork(it)
+            toDomainWork(it)
         }
     }
 
@@ -70,7 +70,7 @@ class IWorkDao(private val db: AppDatabase, private val dao: WorkWithWorkTodoDao
     }
 }
 
-private fun fromWork(work: WorkWithWorkTodo): DomainWork {
+private fun toDomainWork(work: WorkWithWorkTodo): DomainWork {
     return DomainWork(
         workId = work.work.workId,
         title = work.work.title,

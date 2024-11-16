@@ -2,8 +2,10 @@ package com.ogata_k.mobile.winp.presentation.di.infra
 
 import android.content.Context
 import androidx.room.Room
+import com.ogata_k.mobile.winp.domain.infra.database.dao.WorkCommentDao
 import com.ogata_k.mobile.winp.domain.infra.database.dao.WorkDao
 import com.ogata_k.mobile.winp.infra.database.AppDatabase
+import com.ogata_k.mobile.winp.infra.database.dao.impl.IWorkCommentDao
 import com.ogata_k.mobile.winp.infra.database.dao.impl.IWorkDao
 import dagger.Module
 import dagger.Provides
@@ -29,4 +31,10 @@ object DatabaseModule {
     fun providesWorkWithWorkTodoDao(
         appDb: AppDatabase,
     ): WorkDao = IWorkDao(appDb, appDb.workWithWorkTodoDao())
+
+    @Singleton
+    @Provides
+    fun providesWorkCommentDao(
+        appDb: AppDatabase,
+    ): WorkCommentDao = IWorkCommentDao(appDb, appDb.workCommentDao())
 }

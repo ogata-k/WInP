@@ -102,7 +102,7 @@ interface WorkWithWorkTodoDao {
     /**
      * タスクを削除する
      */
-    @Query("DELETE FROM works where work_id = :workId")
+    @Query("DELETE FROM works WHERE work_id = :workId")
     suspend fun _deleteWork(workId: Long)
 
     /**
@@ -112,17 +112,25 @@ interface WorkWithWorkTodoDao {
     suspend fun deleteWork(workId: Long) {
         _deleteWork(workId)
         deleteAllWorkTodo(workId)
+        _deleteAllComment(workId)
     }
 
     /**
-     * タスクを削除する
+     * タスクの対応項目を削除する
      */
-    @Query("DELETE FROM work_todos where work_id = :workId")
+    @Query("DELETE FROM work_todos WHERE work_id = :workId")
     suspend fun deleteAllWorkTodo(workId: Long)
 
     /**
-     * タスクを削除する
+     * タスクの対応項目を削除する
      */
-    @Query("DELETE FROM work_todos where work_id = :workId AND work_todo_id NOT IN (:validWorkTodoIds)")
+    @Query("DELETE FROM work_todos WHERE work_id = :workId AND work_todo_id NOT IN (:validWorkTodoIds)")
     suspend fun deleteWorkTodos(workId: Long, validWorkTodoIds: List<Long>)
+
+    /**
+     * タスクのコメントを削除する
+     * ※ タスクを削除するときにゴミが残らないようにするための処理。ほかで使う予定はない。
+     */
+    @Query("DELETE FROM work_comments WHERE work_id = :workId")
+    suspend fun _deleteAllComment(workId: Long)
 }

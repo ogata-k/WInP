@@ -1,0 +1,207 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 2,
+    "identityHash": "f5b60b3153832e0f59196e8d0a924909",
+    "entities": [
+      {
+        "tableName": "works",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`work_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `began_at` TEXT, `ended_at` TEXT, `completed_at` TEXT, `created_at` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "workId",
+            "columnName": "work_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "beganAt",
+            "columnName": "began_at",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "endedAt",
+            "columnName": "ended_at",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "completedAt",
+            "columnName": "completed_at",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "work_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_works_began_at_ended_at",
+            "unique": false,
+            "columnNames": [
+              "began_at",
+              "ended_at"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_works_began_at_ended_at` ON `${TABLE_NAME}` (`began_at`, `ended_at`)"
+          },
+          {
+            "name": "index_works_completed_at",
+            "unique": false,
+            "columnNames": [
+              "completed_at"
+            ],
+            "orders": [
+              "DESC"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_works_completed_at` ON `${TABLE_NAME}` (`completed_at` DESC)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "work_todos",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`work_todo_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `work_id` INTEGER NOT NULL, `description` TEXT NOT NULL, `completed_at` TEXT, `position` INTEGER NOT NULL, `created_at` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "workTodoId",
+            "columnName": "work_todo_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "workId",
+            "columnName": "work_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "completedAt",
+            "columnName": "completed_at",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "position",
+            "columnName": "position",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "work_todo_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_work_todos_work_id",
+            "unique": false,
+            "columnNames": [
+              "work_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_work_todos_work_id` ON `${TABLE_NAME}` (`work_id`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "work_comments",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`work_comment_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `work_id` INTEGER NOT NULL, `comment` TEXT NOT NULL, `modified_at` TEXT, `created_at` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "workCommentId",
+            "columnName": "work_comment_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "workId",
+            "columnName": "work_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "comment",
+            "columnName": "comment",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "modifiedAt",
+            "columnName": "modified_at",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "work_comment_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_work_comments_work_id_created_at",
+            "unique": false,
+            "columnNames": [
+              "work_id",
+              "created_at"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_work_comments_work_id_created_at` ON `${TABLE_NAME}` (`work_id`, `created_at`)"
+          }
+        ],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f5b60b3153832e0f59196e8d0a924909')"
+    ]
+  }
+}
