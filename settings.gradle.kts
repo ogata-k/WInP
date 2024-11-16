@@ -21,3 +21,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "WInP"
 include(":app")
+include(":app:common")
+include(":app:domain")
+include(":app:infra")

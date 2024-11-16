@@ -1,7 +1,6 @@
 package com.ogata_k.mobile.winp.presentation.di.infra
 
 import android.content.Context
-import androidx.room.Room
 import com.ogata_k.mobile.winp.domain.infra.database.dao.WorkCommentDao
 import com.ogata_k.mobile.winp.domain.infra.database.dao.WorkDao
 import com.ogata_k.mobile.winp.infra.database.AppDatabase
@@ -21,10 +20,7 @@ object DatabaseModule {
     @Provides
     fun providesRoomDatabase(
         @ApplicationContext context: Context,
-    ): AppDatabase = Room
-        .databaseBuilder(context, AppDatabase::class.java, "winp.db")
-        .fallbackToDestructiveMigration()
-        .build()
+    ): AppDatabase = AppDatabase.createDatabase(context, "winp.db")
 
     @Singleton
     @Provides
