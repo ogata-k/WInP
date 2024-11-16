@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material3.Button
 import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -20,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberDatePickerState
@@ -44,7 +44,7 @@ import com.ogata_k.mobile.winp.presentation.model.work.Work
 import com.ogata_k.mobile.winp.presentation.page.showSimpleSnackbar
 import com.ogata_k.mobile.winp.presentation.page.work.detail.WorkDetailRouting
 import com.ogata_k.mobile.winp.presentation.page.work.edit.WorkEditRouting
-import com.ogata_k.mobile.winp.presentation.widgert.common.ButtonLargeText
+import com.ogata_k.mobile.winp.presentation.widgert.common.ButtonMediumText
 import com.ogata_k.mobile.winp.presentation.widgert.common.DefaultErrorColumnItemBuilder
 import com.ogata_k.mobile.winp.presentation.widgert.common.DialogOfDatePicker
 import com.ogata_k.mobile.winp.presentation.widgert.common.PagingLoadColumn
@@ -199,21 +199,21 @@ private fun WorkIndexHeader(
                 state = datePickerState,
                 onDismissRequest = { /* ignore background dismiss */ },
                 dismissButton = {
-                    Button(onClick = {
+                    TextButton(onClick = {
                         switchShowDatePickerForSearch(false)
                     }) {
-                        ButtonLargeText(text = stringResource(R.string.cancel))
+                        ButtonMediumText(text = stringResource(R.string.cancel))
                     }
                 },
                 confirmButton = {
-                    Button(onClick = {
+                    TextButton(onClick = {
                         val dateTimestamp: Long? =
                             datePickerState.selectedDateMillis
                         if (dateTimestamp != null) {
                             updateAndHideDialogSearchQuery(fromMillsToDate(dateTimestamp))
                         }
                     }) {
-                        ButtonLargeText(text = stringResource(R.string.ok))
+                        ButtonMediumText(text = stringResource(R.string.ok))
                     }
                 },
             )
