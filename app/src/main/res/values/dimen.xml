@@ -10,4 +10,7 @@
     <dimen name="icon_size_extra_large">48dp</dimen>
     <dimen name="icon_size_large">36dp</dimen>
     <dimen name="icon_size_medium">24dp</dimen>
+
+    <!-- テキストの拡大縮小に合わせるためspで指定しているもの -->
+    <dimen name="icon_size_with_text">24sp</dimen>
 </resources>

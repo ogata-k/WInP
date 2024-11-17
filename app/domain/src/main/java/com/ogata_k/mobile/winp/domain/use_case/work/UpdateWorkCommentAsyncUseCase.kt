@@ -1,6 +1,5 @@
 package com.ogata_k.mobile.winp.domain.use_case.work
 
-import com.ogata_k.mobile.winp.domain.model.work.WorkComment
 import com.ogata_k.mobile.winp.domain.use_case.AsyncUseCase
 import java.time.OffsetDateTime
 
@@ -11,7 +10,7 @@ data class UpdateWorkCommentInput(
     val modifiedAt: OffsetDateTime
 )
 
-typealias UpdateWorkCommentOutput = Result<List<WorkComment>>
+typealias UpdateWorkCommentOutput = Result<Unit>
 
 interface UpdateWorkCommentAsyncUseCase :
     AsyncUseCase<UpdateWorkCommentInput, UpdateWorkCommentOutput>

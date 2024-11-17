@@ -9,14 +9,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -65,6 +63,7 @@ import com.ogata_k.mobile.winp.presentation.widgert.common.BodyMediumText
 import com.ogata_k.mobile.winp.presentation.widgert.common.ButtonLargeText
 import com.ogata_k.mobile.winp.presentation.widgert.common.ButtonMediumText
 import com.ogata_k.mobile.winp.presentation.widgert.common.DraggableBottomSheet
+import com.ogata_k.mobile.winp.presentation.widgert.common.FormBlock
 import com.ogata_k.mobile.winp.presentation.widgert.common.FormErrorText
 import com.ogata_k.mobile.winp.presentation.widgert.common.FormLabel
 import com.ogata_k.mobile.winp.presentation.widgert.common.FormTitle
@@ -72,7 +71,7 @@ import com.ogata_k.mobile.winp.presentation.widgert.common.HeadlineSmallText
 import com.ogata_k.mobile.winp.presentation.widgert.common.LazyColumnScrollBar
 import com.ogata_k.mobile.winp.presentation.widgert.common.MaxLengthTextField
 import com.ogata_k.mobile.winp.presentation.widgert.common.RadioButtonWithLabel
-import com.ogata_k.mobile.winp.presentation.widgert.common.TitleMediumText
+import com.ogata_k.mobile.winp.presentation.widgert.common.WithCounterTitle
 import com.ogata_k.mobile.winp.presentation.widgert.common.WithLoadingButton
 import com.ogata_k.mobile.winp.presentation.widgert.common.WithScaffoldSmallTopAppBar
 import com.ogata_k.mobile.winp.presentation.widgert.common.draggableColumnContainer
@@ -519,75 +518,6 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun CounterText(
-    current: Int,
-    max: Int,
-    modifier: Modifier = Modifier,
-) {
-    val countFormat = stringResource(R.string.counter_format)
-    TitleMediumText(
-        text = countFormat.format(current, max),
-        modifier = modifier,
-    )
-}
-
-@Composable
-private fun WithCounterTitle(
-    title: String,
-    current: Int,
-    max: Int,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.Bottom,
-    ) {
-        FormTitle(
-            modifier = Modifier.weight(1f),
-            title = title,
-        )
-        Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_medium)))
-        CounterText(
-            current = current,
-            max = max,
-        )
-        Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_small)))
-    }
-}
-
-@Composable
-private fun FormBlock(
-    title: String,
-    // 自前でハンドリングしたい場合や非表示の場合はnullを指定する
-    isRequired: Boolean? = false,
-    errorMessage: String? = null,
-    formTitleAndError: @Composable (title: String, errorMessage: String?) -> Unit = { t, e ->
-        Row(verticalAlignment = Alignment.Bottom) {
-            FormTitle(title = t, modifier = Modifier.weight(1f))
-        }
-
-        if (e != null) {
-            FormErrorText(text = e)
-        }
-    },
-    content: @Composable (RowScope.(errorMessage: String?) -> Unit),
-) {
-    if (isRequired != null) {
-        FormLabel(isRequired = isRequired)
-    }
-    formTitleAndError(title, errorMessage)
-    Row(
-        modifier = Modifier
-            .padding(
-                vertical = dimensionResource(id = R.dimen.padding_medium),
-                horizontal = dimensionResource(id = R.dimen.padding_small),
-            ),
-    ) {
-        content(errorMessage)
     }
 }
 

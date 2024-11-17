@@ -12,11 +12,7 @@ class IUpdateWorkCommentAsyncUseCase(private val dao: WorkCommentDao) :
         try {
             dao.updateWorkComment(input.workCommentId, input.comment, input.modifiedAt)
 
-            return UpdateWorkCommentOutput.success(
-                dao.fetchAllWorkCommentsOrderByCreatedAtDesc(
-                    input.workId
-                )
-            )
+            return UpdateWorkCommentOutput.success(Unit)
         } catch (e: CancellationException) {
             // suspendなので中断される可能性を考慮。中断時はキャンセル用のエラーが渡ってくるのでそのまま投げる
             throw e

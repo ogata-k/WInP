@@ -16,7 +16,7 @@ interface WorkCommentDao {
         """
         SELECT work_comments.* from work_comments
         WHERE work_id = :workId
-        ORDER BY datetime(created_at) DESC
+        ORDER BY datetime(created_at) DESC, work_comment_id DESC
     """
     )
     suspend fun fetchAllWorkCommentsOrderByCreatedAtDesc(workId: Long): List<WorkComment>

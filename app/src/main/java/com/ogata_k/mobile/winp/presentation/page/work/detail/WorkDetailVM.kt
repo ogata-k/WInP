@@ -3,22 +3,32 @@ package com.ogata_k.mobile.winp.presentation.page.work.detail
 import android.util.Log
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewModelScope
+import com.ogata_k.mobile.winp.common.constant.AsCreate
 import com.ogata_k.mobile.winp.common.exception.InvalidArgumentException
 import com.ogata_k.mobile.winp.common.type_converter.LocalDateTimeConverter
+import com.ogata_k.mobile.winp.domain.use_case.work.CreateWorkCommentAsyncUseCase
+import com.ogata_k.mobile.winp.domain.use_case.work.CreateWorkCommentInput
 import com.ogata_k.mobile.winp.domain.use_case.work.DeleteWorkAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.DeleteWorkInput
 import com.ogata_k.mobile.winp.domain.use_case.work.FetchAllWorkCommentsAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.FetchAllWorkCommentsInput
 import com.ogata_k.mobile.winp.domain.use_case.work.GetWorkAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.GetWorkInput
+import com.ogata_k.mobile.winp.domain.use_case.work.UpdateWorkCommentAsyncUseCase
+import com.ogata_k.mobile.winp.domain.use_case.work.UpdateWorkCommentInput
 import com.ogata_k.mobile.winp.domain.use_case.work.UpdateWorkTodoStateAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.UpdateWorkTodoStateInput
 import com.ogata_k.mobile.winp.presentation.constant.DummyID
 import com.ogata_k.mobile.winp.presentation.enumerate.ScreenLoadingState
+import com.ogata_k.mobile.winp.presentation.enumerate.ValidationException
+import com.ogata_k.mobile.winp.presentation.enumerate.ValidationExceptionType
 import com.ogata_k.mobile.winp.presentation.event.EventAction
 import com.ogata_k.mobile.winp.presentation.event.EventBus
 import com.ogata_k.mobile.winp.presentation.event.snackbar.work.DoneWork
 import com.ogata_k.mobile.winp.presentation.event.snackbar.work.FailedDeleteWork
+import com.ogata_k.mobile.winp.presentation.event.snackbar.work_comment.DoneWorkComment
+import com.ogata_k.mobile.winp.presentation.event.snackbar.work_comment.FailedCreateWorkComment
+import com.ogata_k.mobile.winp.presentation.event.snackbar.work_comment.FailedUpdateWorkComment
 import com.ogata_k.mobile.winp.presentation.event.snackbar.work_todo.FailedUpdateWorkTodo
 import com.ogata_k.mobile.winp.presentation.event.snackbar.work_todo.SucceededUpdateWorkTodo
 import com.ogata_k.mobile.winp.presentation.event.toast.common.ErrorOccurred
@@ -29,6 +39,8 @@ import com.ogata_k.mobile.winp.presentation.model.common.BasicScreenState
 import com.ogata_k.mobile.winp.presentation.model.work.Work
 import com.ogata_k.mobile.winp.presentation.model.work.WorkComment
 import com.ogata_k.mobile.winp.presentation.model.work.WorkTodo
+import com.ogata_k.mobile.winp.presentation.model.work_form.WorkCommentFormData
+import com.ogata_k.mobile.winp.presentation.model.work_form.WorkCommentFormValidateExceptions
 import com.ogata_k.mobile.winp.presentation.page.AbstractViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -48,9 +60,13 @@ class WorkDetailVM @Inject constructor(
     private val deleteWorkUseCase: DeleteWorkAsyncUseCase,
     private val updateWorkTodoStateUseCase: UpdateWorkTodoStateAsyncUseCase,
     private val fetchAllWorkCommentsUseCase: FetchAllWorkCommentsAsyncUseCase,
+    private val createWorkCommentUseCase: CreateWorkCommentAsyncUseCase,
+    private val updateWorkCommentUseCase: UpdateWorkCommentAsyncUseCase,
 ) : AbstractViewModel<ScreenLoadingState, WorkDetailVMState, ScreenLoadingState, WorkDetailUiState>() {
     companion object {
         private const val TAG = "WorkDetailVM"
+
+        const val COMMENT_MAX_LENGTH = 500
     }
 
     override val viewModelStateFlow: MutableStateFlow<WorkDetailVMState> = MutableStateFlow(
@@ -60,8 +76,12 @@ class WorkDetailVM @Inject constructor(
             basicState = BasicScreenState.initialState(),
             workId = DummyID.INVALID_ID,
             work = Optional.empty(),
+            isInShowCommentForm = false,
             workComments = Result.success(listOf()),
+            commentFormData = WorkCommentFormData.empty(),
+            validateCommentExceptions = WorkCommentFormValidateExceptions.empty(),
             inShowMoreAction = false,
+            inShowMoreCommentAction = false,
             inConfirmDelete = false,
             inConfirmWorkTodoState = null,
         )
@@ -326,7 +346,7 @@ class WorkDetailVM @Inject constructor(
     }
 
     /**
-     * 指定したタスクのTODOの状態を更新するかどうかの確認ダイアログを表示する
+     * 指定したタスクの対応予定の項目の状態を更新するかどうかの確認ダイアログを表示する
      */
     fun showWorkTodoStateConfirmDialog(show: Long? = null) {
         val vmState = readVMState()
@@ -407,6 +427,175 @@ class WorkDetailVM @Inject constructor(
             )
 
             // 詳細画面上での出来事を想定しているので通知はスナックバーだけで充分
+        }
+    }
+
+    /**
+     * 進捗のコメントに対するさらなる操作を要求するための操作一覧を表示するかどうかを切り替える
+     */
+    fun showMoreCommentAction(show: Boolean = true) {
+        val vmState = readVMState()
+        if (vmState.inShowMoreCommentAction || !show) {
+            // 表示中なら非表示にする
+            updateVMState(
+                vmState.copy(
+                    inShowMoreCommentAction = show,
+                )
+            )
+            return
+        }
+
+        if (!vmState.loadingState.isNoErrorInitialized()) {
+            // 正常に初期化ができていないなら削除はできない
+            return
+        }
+
+        updateVMState(
+            vmState.copy(
+                inShowMoreCommentAction = true,
+            )
+        )
+    }
+
+    /**
+     * タスクの進捗コメントのフォームの表示状態を切り替える
+     */
+    fun showWorkCommentForm(commentId: Long?) {
+        val vmState = readVMState()
+        if (commentId == null) {
+            val newVmState = vmState.copy(
+                isInShowCommentForm = false,
+            )
+            updateVMState(newVmState)
+            return
+        }
+
+        if (vmState.workComments.isFailure) {
+            // 対象となるデータがうまく取得できていないなら作成編集もさせない
+            return
+        }
+        val comment: WorkComment? = vmState.workComments.getOrNull()
+            ?.let { it.firstOrNull({ comment -> comment.workCommentId == commentId }) }
+        val newFormData = vmState.commentFormData.copy(
+            workCommentId = comment?.workCommentId ?: AsCreate.CREATING_ID,
+            comment = comment?.comment ?: "",
+        )
+        val newVmState = vmState.copy(
+            isInShowCommentForm = true,
+            commentFormData = newFormData,
+            validateCommentExceptions = validateCommentFormData(newFormData),
+        )
+        updateVMState(newVmState)
+    }
+
+    /**
+     * タスクの進捗のコメントのバリデーション
+     */
+    private fun validateCommentFormData(formData: WorkCommentFormData): WorkCommentFormValidateExceptions {
+        val commentValidated = if (formData.comment.isEmpty()) ValidationException.of(
+            ValidationExceptionType.EmptyValue(false)
+        )
+        else if (formData.comment.length > COMMENT_MAX_LENGTH) ValidationException.of(
+            ValidationExceptionType.OverflowValue(
+                COMMENT_MAX_LENGTH, false
+            )
+        )
+        else ValidationException.empty()
+
+        return WorkCommentFormValidateExceptions(
+            comment = commentValidated,
+        )
+    }
+
+    /**
+     * タスクの進捗のコメントの入力値更新
+     */
+    fun updateCommentFormComment(value: String) {
+        val vmState = readVMState()
+        val newWorkCommentFormData = vmState.commentFormData.copy(comment = value)
+
+        val newVmState = vmState.copy(
+            commentFormData = newWorkCommentFormData,
+            validateCommentExceptions = validateCommentFormData(newWorkCommentFormData),
+        )
+
+        updateVMState(newVmState)
+    }
+
+    /**
+     * タスクの進捗のコメントの作成もしくは更新
+     */
+    fun createOrUpdateWorkComment() {
+        val vmState = readVMState()
+        if (!vmState.canLaunchAction() || vmState.validateCommentExceptions.hasError()) {
+            // エラーがある場合は作成や更新の処理を行わずに終了
+            return
+        }
+
+
+        val newTempVmState = vmState.copy(basicState = vmState.basicState.toDoingAction())
+        updateVMState(newTempVmState)
+
+        viewModelScope.launch {
+            val formData = vmState.commentFormData
+            // アプリを強制停止する場合を除いて、実行中に画面をpopしたりしたときなどに最後まで実行されないのは困る
+            val result: Result<Unit> = async(Dispatchers.IO + SupervisorJob()) {
+                if (formData.isInCreating) {
+                    return@async createWorkCommentUseCase.call(
+                        CreateWorkCommentInput(
+                            formData.toDomainModel(
+                                vmState.workId
+                            )
+                        )
+                    )
+                } else {
+                    return@async updateWorkCommentUseCase.call(
+                        UpdateWorkCommentInput(
+                            workId = vmState.workId,
+                            workCommentId = formData.workCommentId,
+                            comment = formData.comment,
+                            modifiedAt = LocalDateTimeConverter.toOffsetDateTime(LocalDateTime.now()),
+                        )
+                    )
+                }
+            }.await()
+
+            val oldVmState = readVMState()
+            // 成功時がDoneなのはComposerに通知するため
+            val snackbarEvent = if (result.isSuccess) DoneWorkComment(
+                workCommentId = formData.workCommentId,
+                if (formData.isInCreating) EventAction.CREATE else EventAction.UPDATE,
+            ) else (if (formData.isInCreating) FailedCreateWorkComment(formData.workCommentId) else FailedUpdateWorkComment(
+                formData.workCommentId
+            ))
+
+            val newBasicState = oldVmState.basicState
+                .toDoneAction()
+                .toAcceptSnackbarEvent(snackbarEvent)
+            var newVmState = oldVmState.copy(
+                basicState = newBasicState,
+            )
+            if (result.isSuccess) {
+                newVmState = newVmState.copy(
+                    // フォームなどの表示を非表示にする
+                    inShowMoreCommentAction = false,
+                    isInShowCommentForm = false,
+                    workComments = fetchAllWorkCommentsUseCase.call(
+                        FetchAllWorkCommentsInput(
+                            vmState.workId
+                        )
+                    ).let {
+                        it.map { list ->
+                            list.map { domainComment ->
+                                WorkComment.fromDomainModel(domainComment)
+                            }
+                        }
+                    },
+                )
+            }
+
+            // 実行結果を通知
+            updateVMState(newVmState)
         }
     }
 }

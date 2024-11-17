@@ -53,6 +53,19 @@ private fun BackHandlerSetter(enabled: Boolean = true, callback: () -> Unit) {
 }
 
 @Composable
+fun WithLoading(
+    button: @Composable (modifier: Modifier) -> Unit,
+    isLoading: Boolean = false,
+    modifier: Modifier = Modifier,
+) {
+    if (isLoading) {
+        CircularProgressIndicator(modifier = modifier)
+    } else {
+        button(modifier)
+    }
+}
+
+@Composable
 fun WithLoadingButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -66,20 +79,22 @@ fun WithLoadingButton(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable RowScope.() -> Unit
 ) {
-    if (isLoading) {
-        CircularProgressIndicator(modifier = modifier)
-    } else {
-        Button(
-            onClick = onClick,
-            modifier = modifier,
-            enabled = enabled,
-            shape = shape,
-            colors = colors,
-            elevation = elevation,
-            border = border,
-            contentPadding = contentPadding,
-            interactionSource = interactionSource,
-            content = content,
-        )
-    }
+    WithLoading(
+        button = { m ->
+            Button(
+                onClick = onClick,
+                modifier = m,
+                enabled = enabled,
+                shape = shape,
+                colors = colors,
+                elevation = elevation,
+                border = border,
+                contentPadding = contentPadding,
+                interactionSource = interactionSource,
+                content = content,
+            )
+        },
+        isLoading = isLoading,
+        modifier = modifier,
+    )
 }

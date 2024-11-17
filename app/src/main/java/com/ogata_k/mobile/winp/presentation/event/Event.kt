@@ -9,7 +9,8 @@ import com.ogata_k.mobile.winp.presentation.event.EventKind.SUCCEEDED
 enum class EventTarget {
     ERROR,
     WORK,
-    WORK_TODO;
+    WORK_TODO,
+    WORK_COMMENT;
 
     @Composable
     fun getName(): String {
@@ -17,6 +18,7 @@ enum class EventTarget {
             ERROR -> stringResource(R.string.error)
             WORK -> stringResource(R.string.work)
             WORK_TODO -> stringResource(R.string.work_todo)
+            WORK_COMMENT -> stringResource(R.string.work_comment)
         }
     }
 }
