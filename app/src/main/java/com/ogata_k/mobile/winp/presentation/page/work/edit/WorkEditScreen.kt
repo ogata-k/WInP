@@ -65,7 +65,7 @@ import com.ogata_k.mobile.winp.presentation.widgert.common.BodyMediumText
 import com.ogata_k.mobile.winp.presentation.widgert.common.ButtonLargeText
 import com.ogata_k.mobile.winp.presentation.widgert.common.ButtonMediumText
 import com.ogata_k.mobile.winp.presentation.widgert.common.DraggableBottomSheet
-import com.ogata_k.mobile.winp.presentation.widgert.common.ErrorText
+import com.ogata_k.mobile.winp.presentation.widgert.common.FormErrorText
 import com.ogata_k.mobile.winp.presentation.widgert.common.FormLabel
 import com.ogata_k.mobile.winp.presentation.widgert.common.FormTitle
 import com.ogata_k.mobile.winp.presentation.widgert.common.HeadlineSmallText
@@ -197,7 +197,7 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                                         )
 
                                         if (e != null) {
-                                            ErrorText(text = e)
+                                            FormErrorText(text = e)
                                         }
                                     },
                                     isRequired = true,
@@ -230,7 +230,7 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                                         )
 
                                         if (e != null) {
-                                            ErrorText(text = e)
+                                            FormErrorText(text = e)
                                         }
                                     },
                                     isRequired = true,
@@ -571,7 +571,7 @@ private fun FormBlock(
         }
 
         if (e != null) {
-            ErrorText(text = e)
+            FormErrorText(text = e)
         }
     },
     content: @Composable (RowScope.(errorMessage: String?) -> Unit),
@@ -708,7 +708,7 @@ private fun TaskTodoBottomSheetForm(
                     )
 
                     if (e != null) {
-                        ErrorText(text = e)
+                        FormErrorText(text = e)
                     }
                 },
                 isRequired = true,

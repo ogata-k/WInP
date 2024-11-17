@@ -14,7 +14,7 @@ import com.ogata_k.mobile.winp.domain.model.work.Work as DomainWork
  * タスク
  */
 data class Work(
-    val id: Long,
+    val workId: Long,
     val title: String,
     val description: String,
     val beganAt: LocalDateTime?,
@@ -26,7 +26,7 @@ data class Work(
     companion object : FromDomain<DomainWork, Work> {
         override fun fromDomainModel(domain: DomainWork): Work {
             return Work(
-                id = domain.workId,
+                workId = domain.workId,
                 title = domain.title,
                 description = domain.description,
                 beganAt = domain.beganAt?.let { LocalDateTimeConverter.fromOffsetDateTime(it) },
@@ -85,7 +85,7 @@ data class Work(
 
     override fun toDomainModel(): DomainWork {
         return DomainWork(
-            workId = id,
+            workId = workId,
             title = title,
             description = description,
             beganAt = beganAt?.let { LocalDateTimeConverter.toOffsetDateTime(it) },

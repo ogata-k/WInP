@@ -19,9 +19,11 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -43,18 +45,20 @@ import com.ogata_k.mobile.winp.presentation.event.snackbar.SnackbarEvent
 import com.ogata_k.mobile.winp.presentation.event.snackbar.work.DoneWork
 import com.ogata_k.mobile.winp.presentation.event.snackbar.work_todo.SucceededUpdateWorkTodo
 import com.ogata_k.mobile.winp.presentation.model.work.Work
+import com.ogata_k.mobile.winp.presentation.model.work.WorkComment
 import com.ogata_k.mobile.winp.presentation.model.work.WorkTodo
 import com.ogata_k.mobile.winp.presentation.page.showSimpleSnackbar
 import com.ogata_k.mobile.winp.presentation.page.work.edit.WorkEditRouting
 import com.ogata_k.mobile.winp.presentation.widgert.common.AppBarBackButton
 import com.ogata_k.mobile.winp.presentation.widgert.common.BodyLargeText
+import com.ogata_k.mobile.winp.presentation.widgert.common.BodyMediumText
 import com.ogata_k.mobile.winp.presentation.widgert.common.BodySmallText
 import com.ogata_k.mobile.winp.presentation.widgert.common.ConfirmAlertDialog
 import com.ogata_k.mobile.winp.presentation.widgert.common.DropdownMenuButton
 import com.ogata_k.mobile.winp.presentation.widgert.common.HeadlineSmallText
 import com.ogata_k.mobile.winp.presentation.widgert.common.Label
 import com.ogata_k.mobile.winp.presentation.widgert.common.LazyColumnScrollBar
-import com.ogata_k.mobile.winp.presentation.widgert.common.TitleLargeText
+import com.ogata_k.mobile.winp.presentation.widgert.common.SolidBorder
 import com.ogata_k.mobile.winp.presentation.widgert.common.TitleMediumText
 import com.ogata_k.mobile.winp.presentation.widgert.common.WithScaffoldSmallTopAppBar
 import com.ogata_k.mobile.winp.presentation.widgert.work.WorkTodoItem
@@ -230,7 +234,7 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                             }
                             if (work.todoItems.isNotEmpty()) {
                                 item {
-                                    TitleLargeText(
+                                    TitleMediumText(
                                         text = stringResource(id = R.string.work_todo),
                                         modifier = Modifier.padding(
                                             top = dimensionResource(id = R.dimen.padding_extra_large),
@@ -240,7 +244,7 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
 
                                 items(
                                     count = work.todoItems.count(),
-                                    key = { work.todoItems[it].workTodoId },
+                                    key = { Pair("work_todo", work.todoItems[it].workTodoId) },
                                 ) {
                                     val todoItem: WorkTodo = work.todoItems[it]
                                     WorkTodoItem(
@@ -259,7 +263,83 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                                                 // none onClick action
                                             },
                                     )
+                                }
+                            }
 
+                            // タスクの進捗コメント
+                            item {
+                                TitleMediumText(
+                                    text = stringResource(id = R.string.work_comment),
+                                    modifier = Modifier.padding(
+                                        top = dimensionResource(id = R.dimen.padding_extra_large),
+                                        bottom = dimensionResource(id = R.dimen.padding_medium),
+                                    ),
+                                )
+                                SolidBorder(
+                                    width = dimensionResource(R.dimen.border_width),
+                                    color = colorResource(R.color.border_gray),
+                                    modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_extra_large)),
+                                )
+                            }
+
+                            val workCommentsResult: Result<List<WorkComment>> = uiState.workComments
+                            if (workCommentsResult.isSuccess) {
+                                val workComments = workCommentsResult.getOrThrow()
+
+                                if (workComments.isEmpty()) {
+                                    item {
+                                        BodyMediumText(
+                                            text = stringResource(R.string.not_found_comment),
+                                            modifier = Modifier.padding(
+                                                vertical = dimensionResource(id = R.dimen.padding_medium),
+                                                horizontal = dimensionResource(id = R.dimen.padding_large),
+                                            ),
+                                        )
+                                    }
+                                } else {
+                                    items(
+                                        count = workComments.count(),
+                                        key = {
+                                            Pair(
+                                                "work_comment",
+                                                workComments[it].workCommentId
+                                            )
+                                        },
+                                    ) {
+                                        val comment: WorkComment = workComments[it]
+
+                                        // 先頭はすでにボーダーを表示しているので表示の必要はない
+                                        if (it != 0) {
+                                            SolidBorder(
+                                                width = dimensionResource(R.dimen.border_width),
+                                                color = colorResource(R.color.border_gray),
+                                                modifier = Modifier.padding(
+                                                    horizontal = dimensionResource(
+                                                        id = R.dimen.padding_extra_large
+                                                    )
+                                                ),
+                                            )
+                                        }
+
+                                        Text(
+                                            text = comment.toString(), modifier =
+                                            Modifier.padding(
+                                                vertical = dimensionResource(id = R.dimen.padding_medium),
+                                                horizontal = dimensionResource(id = R.dimen.padding_large),
+                                            )
+                                        )
+                                    }
+                                }
+                            } else {
+                                item {
+                                    BodyMediumText(
+                                        text = stringResource(R.string.fail_fetch_error),
+                                        modifier = Modifier.padding(
+                                            vertical = dimensionResource(id = R.dimen.padding_medium),
+                                            horizontal = dimensionResource(id = R.dimen.padding_large),
+                                        ),
+                                        color = MaterialTheme.colorScheme.error,
+                                    )
                                 }
                             }
                         }

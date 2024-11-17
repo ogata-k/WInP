@@ -463,37 +463,6 @@ fun LabelSmallText(
 }
 
 /**
- * エラーを表示するときに使うText
- */
-@Composable
-fun ErrorText(
-    text: String,
-    modifier: Modifier = Modifier,
-    fontWeight: FontWeight? = null,
-    textDecoration: TextDecoration? = null,
-    textAlign: TextAlign? = null,
-    overflow: TextOverflow = TextOverflow.Clip,
-    softWrap: Boolean = true,
-    maxLines: Int = Int.MAX_VALUE,
-    minLines: Int = 1,
-    onTextLayout: ((TextLayoutResult) -> Unit)? = null,
-) {
-    TitleSmallText(
-        text = text,
-        modifier = modifier,
-        color = MaterialTheme.colorScheme.error,
-        fontWeight = fontWeight,
-        textDecoration = textDecoration,
-        textAlign = textAlign,
-        overflow = overflow,
-        softWrap = softWrap,
-        maxLines = maxLines,
-        minLines = minLines,
-        onTextLayout = onTextLayout,
-    )
-}
-
-/**
  * Button内で使う想定のText
  */
 @Composable

@@ -1,17 +1,26 @@
 package com.ogata_k.mobile.winp.presentation.di.use_case
 
+import com.ogata_k.mobile.winp.domain.infra.database.dao.WorkCommentDao
 import com.ogata_k.mobile.winp.domain.infra.database.dao.WorkDao
 import com.ogata_k.mobile.winp.domain.use_case.work.CreateWorkAsyncUseCase
+import com.ogata_k.mobile.winp.domain.use_case.work.CreateWorkCommentAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.DeleteWorkAsyncUseCase
+import com.ogata_k.mobile.winp.domain.use_case.work.DeleteWorkCommentAsyncUseCase
+import com.ogata_k.mobile.winp.domain.use_case.work.FetchAllWorkCommentsAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.FetchPageWorksAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.GetWorkAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.UpdateWorkAsyncUseCase
+import com.ogata_k.mobile.winp.domain.use_case.work.UpdateWorkCommentAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.UpdateWorkTodoStateAsyncUseCase
 import com.ogata_k.mobile.winp.presentation.use_case.work.ICreateWorkAsyncUseCase
+import com.ogata_k.mobile.winp.presentation.use_case.work.ICreateWorkCommentAsyncUseCase
 import com.ogata_k.mobile.winp.presentation.use_case.work.IDeleteWorkAsyncUseCase
+import com.ogata_k.mobile.winp.presentation.use_case.work.IDeleteWorkCommentAsyncUseCase
+import com.ogata_k.mobile.winp.presentation.use_case.work.IFetchAllWorkCommentsAsyncUseCase
 import com.ogata_k.mobile.winp.presentation.use_case.work.IFetchPageWorksAsyncUseCase
 import com.ogata_k.mobile.winp.presentation.use_case.work.IGetWorkAsyncUseCase
 import com.ogata_k.mobile.winp.presentation.use_case.work.IUpdateWorkAsyncUseCase
+import com.ogata_k.mobile.winp.presentation.use_case.work.IUpdateWorkCommentAsyncUseCase
 import com.ogata_k.mobile.winp.presentation.use_case.work.IUpdateWorkTodoStateAsyncUseCase
 import dagger.Module
 import dagger.Provides
@@ -61,5 +70,33 @@ object WorkUseCaseModule {
         workDao: WorkDao,
     ): UpdateWorkTodoStateAsyncUseCase {
         return IUpdateWorkTodoStateAsyncUseCase(workDao)
+    }
+
+    @Provides
+    fun provideFetchAllWorkCommentsAsyncUseCaseAsyncUseCase(
+        workCommentDao: WorkCommentDao,
+    ): FetchAllWorkCommentsAsyncUseCase {
+        return IFetchAllWorkCommentsAsyncUseCase(workCommentDao)
+    }
+
+    @Provides
+    fun provideCreateWorkCommentAsyncUseCaseAsyncUseCase(
+        workCommentDao: WorkCommentDao,
+    ): CreateWorkCommentAsyncUseCase {
+        return ICreateWorkCommentAsyncUseCase(workCommentDao)
+    }
+
+    @Provides
+    fun provideUpdateWorkCommentAsyncUseCaseAsyncUseCase(
+        workCommentDao: WorkCommentDao,
+    ): UpdateWorkCommentAsyncUseCase {
+        return IUpdateWorkCommentAsyncUseCase(workCommentDao)
+    }
+
+    @Provides
+    fun provideDeleteWorkCommentAsyncUseCaseAsyncUseCase(
+        workCommentDao: WorkCommentDao,
+    ): DeleteWorkCommentAsyncUseCase {
+        return IDeleteWorkCommentAsyncUseCase(workCommentDao)
     }
 }

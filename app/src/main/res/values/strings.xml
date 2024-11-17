@@ -5,12 +5,16 @@
     <!-- 画面遷移 -->
     <string name="navigate_to_detail">詳細を開く</string>
 
+    <!-- 一般共通のエラー -->
+    <string name="error">&lt;予期せぬエラー&gt;</string>
+    <string name="fail_fetch_error">取得に失敗しました</string>
+
     <!-- 一般共通 -->
     <string name="period_range">～</string>
     <string name="no_period">期限なし</string>
-    <string name="error">&lt;予期せぬエラー&gt;</string>
     <string name="work">タスク</string>
     <string name="work_todo">対応項目</string>
+    <string name="work_comment">コメント</string>
 
     <!-- 操作 -->
     <string name="menu_have_more_action">追加操作</string>
@@ -105,9 +109,11 @@
     <string name="no_exist_data">%sを見つけられませんでした</string>
     <string name="error_occurred">予期せぬエラーが発生しました</string>
 
-
-    <!-- その他 -->
+    <!-- ラベル -->
     <string name="completed_label">完了</string>
     <string name="expired_label">期限切れ</string>
     <string name="not_completed_label">未完了</string>
+
+    <!-- その他 -->
+    <string name="not_found_comment">コメントが見つかりません</string>
 </resources>

@@ -12,6 +12,17 @@ interface ToDomain<Domain> {
     fun toDomainModel(): Domain
 }
 
+
+/**
+ * domainパッケージにあるモデルに変換する機能を備えたインターフェース
+ */
+interface ToDomainWithRelationId<Domain, Id> {
+    /**
+     * domainパッケージにあるモデルに変換する
+     */
+    fun toDomainModel(relationId: Id): Domain
+}
+
 /**
  * domainパッケージにあるモデルから変換する機能を備えたインターフェース
  */

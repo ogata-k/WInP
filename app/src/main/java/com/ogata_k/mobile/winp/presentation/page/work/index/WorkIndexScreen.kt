@@ -154,7 +154,7 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
                             ),
                         ) {
                             // 編集画面への遷移
-                            navController.navigate(WorkDetailRouting(work.id).toPath())
+                            navController.navigate(WorkDetailRouting(work.workId).toPath())
                         }
                     }
                 }

@@ -3,9 +3,12 @@ package com.ogata_k.mobile.winp.presentation.page.work.detail
 import android.util.Log
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewModelScope
+import com.ogata_k.mobile.winp.common.exception.InvalidArgumentException
 import com.ogata_k.mobile.winp.common.type_converter.LocalDateTimeConverter
 import com.ogata_k.mobile.winp.domain.use_case.work.DeleteWorkAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.DeleteWorkInput
+import com.ogata_k.mobile.winp.domain.use_case.work.FetchAllWorkCommentsAsyncUseCase
+import com.ogata_k.mobile.winp.domain.use_case.work.FetchAllWorkCommentsInput
 import com.ogata_k.mobile.winp.domain.use_case.work.GetWorkAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.GetWorkInput
 import com.ogata_k.mobile.winp.domain.use_case.work.UpdateWorkTodoStateAsyncUseCase
@@ -24,6 +27,7 @@ import com.ogata_k.mobile.winp.presentation.event.toast.work.SucceededDeleteWork
 import com.ogata_k.mobile.winp.presentation.event.toast.work.SucceededUpdateWork
 import com.ogata_k.mobile.winp.presentation.model.common.BasicScreenState
 import com.ogata_k.mobile.winp.presentation.model.work.Work
+import com.ogata_k.mobile.winp.presentation.model.work.WorkComment
 import com.ogata_k.mobile.winp.presentation.model.work.WorkTodo
 import com.ogata_k.mobile.winp.presentation.page.AbstractViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -43,6 +47,7 @@ class WorkDetailVM @Inject constructor(
     private val getWorkUseCase: GetWorkAsyncUseCase,
     private val deleteWorkUseCase: DeleteWorkAsyncUseCase,
     private val updateWorkTodoStateUseCase: UpdateWorkTodoStateAsyncUseCase,
+    private val fetchAllWorkCommentsUseCase: FetchAllWorkCommentsAsyncUseCase,
 ) : AbstractViewModel<ScreenLoadingState, WorkDetailVMState, ScreenLoadingState, WorkDetailUiState>() {
     companion object {
         private const val TAG = "WorkDetailVM"
@@ -55,6 +60,7 @@ class WorkDetailVM @Inject constructor(
             basicState = BasicScreenState.initialState(),
             workId = DummyID.INVALID_ID,
             work = Optional.empty(),
+            workComments = Result.success(listOf()),
             inShowMoreAction = false,
             inConfirmDelete = false,
             inConfirmWorkTodoState = null,
@@ -89,6 +95,7 @@ class WorkDetailVM @Inject constructor(
                     loadingState = loadingState,
                     basicState = vmState.basicState.updateInitialize(loadingState),
                     work = Optional.empty(),
+                    workComments = Result.failure(InvalidArgumentException("workComments")),
                 )
             )
 
@@ -110,6 +117,7 @@ class WorkDetailVM @Inject constructor(
                             loadingState = loadingState,
                             basicState = vmState.basicState.updateInitialize(loadingState),
                             work = Optional.empty(),
+                            workComments = Result.failure(InvalidArgumentException("workComments")),
                         )
                     )
 
@@ -123,6 +131,17 @@ class WorkDetailVM @Inject constructor(
                         loadingState = loadingState,
                         basicState = vmState.basicState.updateInitialize(loadingState),
                         work = Optional.of(Work.fromDomainModel(workResult.get())),
+                        workComments = fetchAllWorkCommentsUseCase.call(
+                            FetchAllWorkCommentsInput(
+                                workId
+                            )
+                        ).let {
+                            it.map { list ->
+                                list.map { domainComment ->
+                                    WorkComment.fromDomainModel(domainComment)
+                                }
+                            }
+                        },
                     )
                 )
             }

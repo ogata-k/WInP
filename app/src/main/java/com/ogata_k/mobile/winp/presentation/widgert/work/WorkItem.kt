@@ -104,7 +104,7 @@ fun WorkItem(work: Work, modifier: Modifier = Modifier, onClick: () -> Unit) {
 @Composable
 private fun WorkItemNoDeadlinePreview() {
     val work = Work(
-        id = 1,
+        workId = 1,
         title = "サンプルタスク",
         description = "これはサンプル。完了もしていないし期限もなし。",
         beganAt = LocalDateTime.now(),
@@ -124,7 +124,7 @@ private fun WorkItemNoDeadlinePreview() {
 @Composable
 private fun WorkItemNoPeriodPreview() {
     val work = Work(
-        id = 1,
+        workId = 1,
         title = "サンプルタスク",
         description = "これはサンプル。完了もしていないし期限もなし。",
         beganAt = null,
@@ -144,7 +144,7 @@ private fun WorkItemNoPeriodPreview() {
 @Composable
 private fun NotCompletedNotExpiredWorkItemPreview() {
     val work = Work(
-        id = 1,
+        workId = 1,
         title = "サンプルタスク",
         description = "これはサンプル。期限は設けられているがまだ来ていない。",
         beganAt = LocalDateTime.now(),
@@ -164,7 +164,7 @@ private fun NotCompletedNotExpiredWorkItemPreview() {
 @Composable
 private fun NotCompletedExpiredWorkItemPreview() {
     val work = Work(
-        id = 1,
+        workId = 1,
         title = "サンプルタスク",
         description = "これはサンプル。期限は設けられているがまだ来ていない。",
         beganAt = LocalDateTime.now().minusDays(2),
@@ -184,7 +184,7 @@ private fun NotCompletedExpiredWorkItemPreview() {
 @Composable
 private fun CompletedWorkItemPreview() {
     val work = Work(
-        id = 1,
+        workId = 1,
         title = "サンプルタスク",
         description = "これはサンプル。タスクは完了している。",
         beganAt = LocalDateTime.now().minusDays(1),
