@@ -1,7 +1,6 @@
 package com.ogata_k.mobile.winp.infra.database.dao
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -33,10 +32,4 @@ interface WorkCommentDao {
      */
     @Query("UPDATE work_comments SET comment = :comment, modified_at = :modifiedAt WHERE work_comment_id = :workCommentId")
     suspend fun updateWorkComment(workCommentId: Long, comment: String, modifiedAt: OffsetDateTime?)
-
-    /**
-     * タスクのコメントを削除する
-     */
-    @Delete
-    suspend fun deleteWorkComment(comment: WorkComment)
 }

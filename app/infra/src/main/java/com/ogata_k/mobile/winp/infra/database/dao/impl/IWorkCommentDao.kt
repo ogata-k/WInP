@@ -31,12 +31,6 @@ class IWorkCommentDao(private val db: AppDatabase, private val dao: WorkCommentD
             dao.updateWorkComment(workCommentId, comment, modifiedAt)
         }
     }
-
-    override suspend fun deleteWorkComment(comment: DomainWorkComment) {
-        db.withTransaction {
-            dao.deleteWorkComment(toInfraWorkComment(comment))
-        }
-    }
 }
 
 private fun toDomainWorkComment(workComment: WorkComment): DomainWorkComment {

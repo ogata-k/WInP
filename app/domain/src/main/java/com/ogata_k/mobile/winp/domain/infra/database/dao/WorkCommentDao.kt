@@ -21,9 +21,4 @@ interface WorkCommentDao {
      * コメントを指定して更新
      */
     suspend fun updateWorkComment(workCommentId: Long, comment: String, modifiedAt: OffsetDateTime)
-
-    /**
-     * タスクのコメントを削除する
-     */
-    suspend fun deleteWorkComment(comment: WorkComment)
 }

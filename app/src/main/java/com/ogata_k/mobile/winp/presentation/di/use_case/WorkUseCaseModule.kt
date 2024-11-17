@@ -5,7 +5,6 @@ import com.ogata_k.mobile.winp.domain.infra.database.dao.WorkDao
 import com.ogata_k.mobile.winp.domain.use_case.work.CreateWorkAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.CreateWorkCommentAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.DeleteWorkAsyncUseCase
-import com.ogata_k.mobile.winp.domain.use_case.work.DeleteWorkCommentAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.FetchAllWorkCommentsAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.FetchPageWorksAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.GetWorkAsyncUseCase
@@ -15,7 +14,6 @@ import com.ogata_k.mobile.winp.domain.use_case.work.UpdateWorkTodoStateAsyncUseC
 import com.ogata_k.mobile.winp.presentation.use_case.work.ICreateWorkAsyncUseCase
 import com.ogata_k.mobile.winp.presentation.use_case.work.ICreateWorkCommentAsyncUseCase
 import com.ogata_k.mobile.winp.presentation.use_case.work.IDeleteWorkAsyncUseCase
-import com.ogata_k.mobile.winp.presentation.use_case.work.IDeleteWorkCommentAsyncUseCase
 import com.ogata_k.mobile.winp.presentation.use_case.work.IFetchAllWorkCommentsAsyncUseCase
 import com.ogata_k.mobile.winp.presentation.use_case.work.IFetchPageWorksAsyncUseCase
 import com.ogata_k.mobile.winp.presentation.use_case.work.IGetWorkAsyncUseCase
@@ -91,12 +89,5 @@ object WorkUseCaseModule {
         workCommentDao: WorkCommentDao,
     ): UpdateWorkCommentAsyncUseCase {
         return IUpdateWorkCommentAsyncUseCase(workCommentDao)
-    }
-
-    @Provides
-    fun provideDeleteWorkCommentAsyncUseCaseAsyncUseCase(
-        workCommentDao: WorkCommentDao,
-    ): DeleteWorkCommentAsyncUseCase {
-        return IDeleteWorkCommentAsyncUseCase(workCommentDao)
     }
 }
