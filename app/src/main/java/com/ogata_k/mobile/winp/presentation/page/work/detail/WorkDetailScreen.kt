@@ -17,13 +17,13 @@ import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -58,9 +58,9 @@ import com.ogata_k.mobile.winp.presentation.widgert.common.DropdownMenuButton
 import com.ogata_k.mobile.winp.presentation.widgert.common.HeadlineSmallText
 import com.ogata_k.mobile.winp.presentation.widgert.common.Label
 import com.ogata_k.mobile.winp.presentation.widgert.common.LazyColumnScrollBar
-import com.ogata_k.mobile.winp.presentation.widgert.common.SolidBorder
 import com.ogata_k.mobile.winp.presentation.widgert.common.TitleMediumText
 import com.ogata_k.mobile.winp.presentation.widgert.common.WithScaffoldSmallTopAppBar
+import com.ogata_k.mobile.winp.presentation.widgert.work.WorkCommentItem
 import com.ogata_k.mobile.winp.presentation.widgert.work.WorkTodoItem
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -275,10 +275,15 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                                         bottom = dimensionResource(id = R.dimen.padding_medium),
                                     ),
                                 )
-                                SolidBorder(
-                                    width = dimensionResource(R.dimen.border_width),
+                                HorizontalDivider(
+                                    thickness = dimensionResource(R.dimen.border_width),
                                     color = colorResource(R.color.border_gray),
-                                    modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_extra_large)),
+                                    modifier = Modifier
+                                        .padding(
+                                            horizontal = dimensionResource(
+                                                id = R.dimen.padding_small
+                                            )
+                                        ),
                                 )
                             }
 
@@ -290,10 +295,7 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                                     item {
                                         BodyMediumText(
                                             text = stringResource(R.string.not_found_comment),
-                                            modifier = Modifier.padding(
-                                                vertical = dimensionResource(id = R.dimen.padding_medium),
-                                                horizontal = dimensionResource(id = R.dimen.padding_large),
-                                            ),
+                                            modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_medium)),
                                         )
                                     }
                                 } else {
@@ -308,25 +310,20 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                                     ) {
                                         val comment: WorkComment = workComments[it]
 
-                                        // 先頭はすでにボーダーを表示しているので表示の必要はない
-                                        if (it != 0) {
-                                            SolidBorder(
-                                                width = dimensionResource(R.dimen.border_width),
-                                                color = colorResource(R.color.border_gray),
-                                                modifier = Modifier.padding(
-                                                    horizontal = dimensionResource(
-                                                        id = R.dimen.padding_extra_large
-                                                    )
-                                                ),
-                                            )
-                                        }
+                                        WorkCommentItem(
+                                            comment = comment,
+                                            modifier = Modifier
+                                                .padding(dimensionResource(id = R.dimen.padding_medium)),
+                                        )
 
-                                        Text(
-                                            text = comment.toString(), modifier =
-                                            Modifier.padding(
-                                                vertical = dimensionResource(id = R.dimen.padding_medium),
-                                                horizontal = dimensionResource(id = R.dimen.padding_large),
-                                            )
+                                        HorizontalDivider(
+                                            thickness = dimensionResource(R.dimen.border_width),
+                                            color = colorResource(R.color.border_gray),
+                                            modifier = Modifier.padding(
+                                                horizontal = dimensionResource(
+                                                    id = R.dimen.padding_small
+                                                )
+                                            ),
                                         )
                                     }
                                 }
@@ -334,10 +331,7 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                                 item {
                                     BodyMediumText(
                                         text = stringResource(R.string.fail_fetch_error),
-                                        modifier = Modifier.padding(
-                                            vertical = dimensionResource(id = R.dimen.padding_medium),
-                                            horizontal = dimensionResource(id = R.dimen.padding_large),
-                                        ),
+                                        modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_medium)),
                                         color = MaterialTheme.colorScheme.error,
                                     )
                                 }

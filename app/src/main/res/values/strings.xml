@@ -113,6 +113,11 @@
     <string name="completed_label">完了</string>
     <string name="expired_label">期限切れ</string>
     <string name="not_completed_label">未完了</string>
+    <string name="modified_paren_label">（修正済み）</string>
+
+    <!-- セパレーター -->
+    <!-- extra_small_separatorはほぼ余白を作りたくないときのセパレーター -->
+    <string name="extra_small_separator" />
 
     <!-- その他 -->
     <string name="not_found_comment">コメントが見つかりません</string>

@@ -34,6 +34,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.ogata_k.mobile.winp.R
 import com.ogata_k.mobile.winp.presentation.model.work.WorkTodo
+import com.ogata_k.mobile.winp.presentation.theme.WInPTheme
 import com.ogata_k.mobile.winp.presentation.widgert.common.BodyMediumText
 import java.time.LocalDateTime
 
@@ -136,7 +137,9 @@ private fun NotCompletedWorkTodoFormColumnItemPreview() {
         createdAt = LocalDateTime.now(),
     )
 
-    WorkTodoItem(todoItem)
+    WInPTheme {
+        WorkTodoItem(todoItem)
+    }
 }
 
 @Preview
@@ -149,7 +152,9 @@ private fun CompletedWorkTodoFormColumnItemPreview() {
         createdAt = LocalDateTime.now(),
     )
 
-    WorkTodoItem(todoItem)
+    WInPTheme {
+        WorkTodoItem(todoItem)
+    }
 }
 
 @Preview(fontScale = 2.0f)
@@ -162,7 +167,9 @@ private fun LargeTextCompletedWorkTodoFormColumnItemPreview() {
         createdAt = LocalDateTime.now(),
     )
 
-    WorkTodoItem(todoItem)
+    WInPTheme {
+        WorkTodoItem(todoItem)
+    }
 }
 
 @Preview(fontScale = 0.5f)
@@ -175,5 +182,7 @@ private fun SmallTextCompletedWorkTodoFormColumnItemPreview() {
         createdAt = LocalDateTime.now(),
     )
 
-    WorkTodoItem(todoItem)
+    WInPTheme {
+        WorkTodoItem(todoItem)
+    }
 }

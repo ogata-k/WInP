@@ -36,4 +36,6 @@ data class WorkComment(
             createdAt = LocalDateTimeConverter.toOffsetDateTime(createdAt),
         )
     }
+
+    val isModified: Boolean = modifiedAt != null
 }
