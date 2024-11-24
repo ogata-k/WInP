@@ -6,6 +6,6 @@ import java.util.Optional
 
 data class GetWorkInput(val workId: Long)
 
-typealias GetWorkOutput = Optional<Work>
+typealias GetWorkOutput = Result<Optional<Work>>
 
 interface GetWorkAsyncUseCase : AsyncUseCase<GetWorkInput, GetWorkOutput>

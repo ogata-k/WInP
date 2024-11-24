@@ -135,7 +135,7 @@ class WorkEditVM @Inject constructor(
         viewModelScope.launch {
             // 編集用のフォームデータ
             val workResult = getWorkUseCase.call(GetWorkInput(workId))
-            if (!workResult.isPresent) {
+            if (workResult.isFailure || !workResult.getOrThrow().isPresent) {
                 val loadingState = ScreenLoadingState.NOT_FOUND_EXCEPTION
                 updateVMState(
                     readVMState().copy(
@@ -148,7 +148,7 @@ class WorkEditVM @Inject constructor(
                 return@launch
             }
 
-            val formData = WorkFormData.fromDomainModel(workResult.get())
+            val formData = WorkFormData.fromDomainModel(workResult.getOrThrow().get())
             val loadingState = ScreenLoadingState.NO_ERROR_INITIALIZED
             updateVMState(
                 readVMState().copy(

@@ -130,7 +130,7 @@ class WorkDetailVM @Inject constructor(
             // DBデータでFormの初期化をしたときに初期化を完了とする
             viewModelScope.launch {
                 val workResult = getWorkUseCase.call(GetWorkInput(workId))
-                if (!workResult.isPresent) {
+                if (workResult.isFailure || !workResult.getOrThrow().isPresent) {
                     val loadingState = ScreenLoadingState.NOT_FOUND_EXCEPTION
                     updateVMState(
                         readVMState().copy(
@@ -150,7 +150,7 @@ class WorkDetailVM @Inject constructor(
                     readVMState().copy(
                         loadingState = loadingState,
                         basicState = vmState.basicState.updateInitialize(loadingState),
-                        work = Optional.of(Work.fromDomainModel(workResult.get())),
+                        work = Optional.of(Work.fromDomainModel(workResult.getOrThrow().get())),
                         workComments = fetchAllWorkCommentsUseCase.call(
                             FetchAllWorkCommentsInput(
                                 workId
