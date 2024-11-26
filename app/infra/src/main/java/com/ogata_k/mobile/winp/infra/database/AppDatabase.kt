@@ -6,6 +6,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.ogata_k.mobile.winp.infra.database.dao.SummaryWorkDao
 import com.ogata_k.mobile.winp.infra.database.dao.WorkCommentDao
 import com.ogata_k.mobile.winp.infra.database.dao.WorkWithWorkTodoDao
 import com.ogata_k.mobile.winp.infra.database.entity.Work
@@ -36,6 +37,7 @@ abstract class AppDatabase : RoomDatabase() {
         }
     }
 
+    abstract fun summaryWorkDao(): SummaryWorkDao
     abstract fun workWithWorkTodoDao(): WorkWithWorkTodoDao
     abstract fun workCommentDao(): WorkCommentDao
 }

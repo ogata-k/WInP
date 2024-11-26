@@ -1,5 +1,6 @@
 package com.ogata_k.mobile.winp.presentation.di.use_case
 
+import com.ogata_k.mobile.winp.domain.infra.database.dao.SummaryWorkDao
 import com.ogata_k.mobile.winp.domain.infra.database.dao.WorkCommentDao
 import com.ogata_k.mobile.winp.domain.infra.database.dao.WorkDao
 import com.ogata_k.mobile.winp.domain.use_case.work.CreateWorkAsyncUseCase
@@ -7,6 +8,7 @@ import com.ogata_k.mobile.winp.domain.use_case.work.CreateWorkCommentAsyncUseCas
 import com.ogata_k.mobile.winp.domain.use_case.work.DeleteWorkAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.FetchAllWorkCommentsAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.FetchPageWorksAsyncUseCase
+import com.ogata_k.mobile.winp.domain.use_case.work.GetSummaryAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.GetWorkAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.UpdateWorkAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.UpdateWorkCommentAsyncUseCase
@@ -16,6 +18,7 @@ import com.ogata_k.mobile.winp.presentation.use_case.work.ICreateWorkCommentAsyn
 import com.ogata_k.mobile.winp.presentation.use_case.work.IDeleteWorkAsyncUseCase
 import com.ogata_k.mobile.winp.presentation.use_case.work.IFetchAllWorkCommentsAsyncUseCase
 import com.ogata_k.mobile.winp.presentation.use_case.work.IFetchPageWorksAsyncUseCase
+import com.ogata_k.mobile.winp.presentation.use_case.work.IGetSummaryWorkAsyncUseCase
 import com.ogata_k.mobile.winp.presentation.use_case.work.IGetWorkAsyncUseCase
 import com.ogata_k.mobile.winp.presentation.use_case.work.IUpdateWorkAsyncUseCase
 import com.ogata_k.mobile.winp.presentation.use_case.work.IUpdateWorkCommentAsyncUseCase
@@ -28,6 +31,13 @@ import dagger.hilt.android.components.ViewModelComponent
 @Module
 @InstallIn(ViewModelComponent::class)
 object WorkUseCaseModule {
+    @Provides
+    fun provideGetSummaryAsyncUseCase(
+        summaryWorkDao: SummaryWorkDao,
+    ): GetSummaryAsyncUseCase {
+        return IGetSummaryWorkAsyncUseCase(summaryWorkDao)
+    }
+
     @Provides
     fun provideFetchPageWorksAsyncUseCase(
         workDao: WorkDao,
