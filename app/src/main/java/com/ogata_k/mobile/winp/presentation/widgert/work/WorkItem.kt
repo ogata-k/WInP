@@ -6,9 +6,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -25,6 +22,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ogata_k.mobile.winp.R
+import com.ogata_k.mobile.winp.presentation.constant.AppIcons
 import com.ogata_k.mobile.winp.presentation.model.work.Work
 import com.ogata_k.mobile.winp.presentation.theme.WInPTheme
 import com.ogata_k.mobile.winp.presentation.widgert.common.BodyMediumText
@@ -62,7 +60,7 @@ fun WorkItem(work: Work, modifier: Modifier = Modifier, onClick: () -> Unit) {
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     if (work.isCompleted) Icon(
-                        imageVector = Icons.Filled.Check,
+                        imageVector = AppIcons.checkedIcon,
                         contentDescription = null,
                         tint = colorResource(id = R.color.completed_check),
                         modifier = Modifier
@@ -93,7 +91,7 @@ fun WorkItem(work: Work, modifier: Modifier = Modifier, onClick: () -> Unit) {
                 modifier = Modifier.padding(
                     start = dimensionResource(id = R.dimen.padding_medium),
                 ),
-                imageVector = Icons.Filled.ChevronRight,
+                imageVector = AppIcons.moveToIcon,
                 contentDescription = stringResource(id = R.string.navigate_to_detail)
             )
         }

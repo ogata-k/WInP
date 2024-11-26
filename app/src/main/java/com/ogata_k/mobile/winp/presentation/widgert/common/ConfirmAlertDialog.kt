@@ -1,7 +1,5 @@
 package com.ogata_k.mobile.winp.presentation.widgert.common
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -12,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.DialogProperties
 import com.ogata_k.mobile.winp.R
+import com.ogata_k.mobile.winp.presentation.constant.AppIcons
 
 @Composable
 fun ConfirmAlertDialog(
@@ -33,7 +32,7 @@ fun ConfirmAlertDialog(
         ),
         icon = {
             Icon(
-                imageVector = Icons.Filled.Info,
+                imageVector = AppIcons.confirmIcon,
                 contentDescription = null,
             )
         },

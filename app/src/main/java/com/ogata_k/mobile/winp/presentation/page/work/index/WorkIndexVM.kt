@@ -47,6 +47,7 @@ class WorkIndexVM @Inject constructor(
             loadingState = ScreenLoadingState.NO_ERROR_INITIALIZED,
             basicState = BasicScreenState.initialState()
                 .updateInitialize(ScreenLoadingState.NO_ERROR_INITIALIZED),
+            inShowMoreAction = false,
             isInSearchDate = false,
             searchDate = LocalDate.now(),
             isInRefreshing = false,
@@ -125,6 +126,28 @@ class WorkIndexVM @Inject constructor(
         EventBus.onEvent<NotFoundWork>(screenLifecycle) {
             refreshListRequest()
         }
+    }
+
+    /**
+     * さらなる操作を要求するための操作一覧を表示するかどうかを切り替える
+     */
+    fun showMoreAction(show: Boolean = true) {
+        val vmState = readVMState()
+        if (vmState.inShowMoreAction || !show) {
+            // 表示中なら非表示にする
+            updateVMState(
+                vmState.copy(
+                    inShowMoreAction = show,
+                )
+            )
+            return
+        }
+
+        updateVMState(
+            vmState.copy(
+                inShowMoreAction = true,
+            )
+        )
     }
 
     /**

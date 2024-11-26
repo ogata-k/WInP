@@ -28,6 +28,9 @@ import com.ogata_k.mobile.winp.presentation.page.work.edit.WorkEditVM
 import com.ogata_k.mobile.winp.presentation.page.work.index.WorkIndexRouting
 import com.ogata_k.mobile.winp.presentation.page.work.index.WorkIndexScreen
 import com.ogata_k.mobile.winp.presentation.page.work.index.WorkIndexVM
+import com.ogata_k.mobile.winp.presentation.page.work.summary.WorkSummaryRouting
+import com.ogata_k.mobile.winp.presentation.page.work.summary.WorkSummaryScreen
+import com.ogata_k.mobile.winp.presentation.page.work.summary.WorkSummaryVM
 import com.ogata_k.mobile.winp.presentation.theme.WInPTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -50,6 +53,14 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun SetupRouting(navController: NavHostController) {
     NavHost(navController = navController, startDestination = WorkIndexRouting.routingPath) {
+        // Workのサマリー
+        composableByRouting(WorkSummaryRouting) { _ ->
+            val vm: WorkSummaryVM = hiltViewModel()
+
+            vm.initializeVM()
+            WorkSummaryScreen(navController = navController, viewModel = vm)
+        }
+
         // Workの一覧
         composableByRouting(WorkIndexRouting) { _ ->
             val vm: WorkIndexVM = hiltViewModel()

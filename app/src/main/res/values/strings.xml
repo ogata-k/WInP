@@ -15,6 +15,7 @@
     <string name="work">タスク</string>
     <string name="work_todo">対応項目</string>
     <string name="work_comment">コメント</string>
+    <string name="work_summary">サマリー</string>
 
     <!-- 操作 -->
     <string name="menu_have_more_action">追加操作</string>
@@ -41,6 +42,7 @@
     <string name="update_work_todo_complete_state">対応項目の状態を更新</string>
     <string name="create_work_comment">コメントを追加</string>
     <string name="modify_latest_work_comment">最新のコメントを修正</string>
+    <string name="open_work_summary">サマリー</string>
 
     <!-- タイトル -->
     <string name="title_create_work">タスク作成</string>
@@ -51,6 +53,7 @@
     <string name="title_update_work_todo_complete_state">対応項目の状態を更新</string>
     <string name="title_create_work_comment">コメント作成</string>
     <string name="title_edit_work_comment">コメント編集</string>
+    <string name="title_work_summary">サマリー</string>
 
     <!-- ダイアログコンテンツ -->
     <string name="dialog_content_confirm_delete_work">タスクを削除します。よろしいですか。</string>

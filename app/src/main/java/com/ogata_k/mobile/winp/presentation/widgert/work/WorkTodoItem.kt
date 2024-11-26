@@ -12,8 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.GenericShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -33,6 +31,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.ogata_k.mobile.winp.R
+import com.ogata_k.mobile.winp.presentation.constant.AppIcons
 import com.ogata_k.mobile.winp.presentation.model.work.WorkTodo
 import com.ogata_k.mobile.winp.presentation.theme.WInPTheme
 import com.ogata_k.mobile.winp.presentation.widgert.common.BodyMediumText
@@ -107,7 +106,7 @@ fun WorkTodoItem(
         ) {
             Icon(
                 modifier = Modifier.size(checkIconSize),
-                imageVector = Icons.Filled.Check,
+                imageVector = AppIcons.checkedIcon,
                 // 説明は即時更新
                 contentDescription = if (isCompleted) stringResource(id = R.string.completed_work_todo)
                 else stringResource(id = R.string.not_completed_work_todo),

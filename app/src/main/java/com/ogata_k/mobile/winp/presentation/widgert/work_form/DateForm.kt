@@ -4,9 +4,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -23,6 +20,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.ogata_k.mobile.winp.R
 import com.ogata_k.mobile.winp.common.formatter.formatFullDateOrEmpty
+import com.ogata_k.mobile.winp.presentation.constant.AppIcons
 import com.ogata_k.mobile.winp.presentation.widgert.common.BodyLargeText
 import com.ogata_k.mobile.winp.presentation.widgert.common.ButtonMediumText
 import com.ogata_k.mobile.winp.presentation.widgert.common.DialogOfDatePicker
@@ -52,7 +50,7 @@ fun DateFormColumnItem(
         ) {
             Icon(
                 modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_large)),
-                imageVector = Icons.Filled.DateRange,
+                imageVector = AppIcons.calendarIcon,
                 contentDescription = stringResource(id = R.string.select_date),
                 tint = if (isError) MaterialTheme.colorScheme.error else LocalContentColor.current,
             )
@@ -78,7 +76,7 @@ fun DateFormColumnItem(
             ) {
                 Icon(
                     modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_medium)),
-                    imageVector = Icons.Filled.Close,
+                    imageVector = AppIcons.closeIcon,
                     contentDescription = stringResource(id = R.string.clear_form_value)
                 )
             }

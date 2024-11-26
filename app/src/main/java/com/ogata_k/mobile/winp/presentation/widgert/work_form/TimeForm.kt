@@ -4,9 +4,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccessTime
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -22,6 +19,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.ogata_k.mobile.winp.R
 import com.ogata_k.mobile.winp.common.formatter.formatFullTimeOrEmpty
+import com.ogata_k.mobile.winp.presentation.constant.AppIcons
 import com.ogata_k.mobile.winp.presentation.widgert.common.BodyLargeText
 import com.ogata_k.mobile.winp.presentation.widgert.common.ButtonMediumText
 import com.ogata_k.mobile.winp.presentation.widgert.common.DialogOfTimePicker
@@ -49,7 +47,7 @@ fun TimeFormColumnItem(
         ) {
             Icon(
                 modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_large)),
-                imageVector = Icons.Filled.AccessTime,
+                imageVector = AppIcons.clockIcon,
                 contentDescription = stringResource(id = R.string.select_time),
                 tint = if (isError) MaterialTheme.colorScheme.error else LocalContentColor.current,
             )
@@ -75,7 +73,7 @@ fun TimeFormColumnItem(
             ) {
                 Icon(
                     modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_medium)),
-                    imageVector = Icons.Filled.Close,
+                    imageVector = AppIcons.closeIcon,
                     contentDescription = stringResource(id = R.string.clear_form_value)
                 )
             }

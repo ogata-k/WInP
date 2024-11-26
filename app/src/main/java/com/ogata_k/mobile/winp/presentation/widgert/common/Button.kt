@@ -5,8 +5,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
@@ -25,6 +23,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import com.ogata_k.mobile.winp.R
+import com.ogata_k.mobile.winp.presentation.constant.AppIcons
 
 /**
  * AppBarなどでの戻るボタン
@@ -41,7 +40,7 @@ fun AppBarBackButton(navController: NavController) {
     BackHandlerSetter(!isPopped) { isPopped = true }
     IconButton(enabled = !isPopped, onClick = { isPopped = true }) {
         Icon(
-            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+            imageVector = AppIcons.moveBackIcon,
             contentDescription = stringResource(R.string.back),
         )
     }

@@ -20,9 +20,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
@@ -50,6 +47,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import com.ogata_k.mobile.winp.R
+import com.ogata_k.mobile.winp.presentation.constant.AppIcons
 import com.ogata_k.mobile.winp.presentation.enumerate.ScreenLoadingState
 import com.ogata_k.mobile.winp.presentation.enumerate.ValidationExceptionType
 import com.ogata_k.mobile.winp.presentation.enumerate.hasError
@@ -265,7 +263,7 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                                         enabled = canLaunchAction,
                                     ) {
                                         Icon(
-                                            imageVector = Icons.Filled.Add,
+                                            imageVector = AppIcons.addIcon,
                                             contentDescription = stringResource(
                                                 R.string.create_work_todo
                                             ),
@@ -333,7 +331,7 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
                                                         horizontal = dimensionResource(id = R.dimen.padding_large),
                                                     )
                                                     .size(dimensionResource(id = R.dimen.icon_size_medium)),
-                                                imageVector = Icons.Filled.Delete,
+                                                imageVector = AppIcons.deleteIcon,
                                                 contentDescription = stringResource(id = R.string.delete_work_todo),
                                             )
                                         }

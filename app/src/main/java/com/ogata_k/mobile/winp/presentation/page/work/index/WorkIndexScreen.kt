@@ -8,10 +8,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.DisplayMode
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -40,13 +38,16 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.ogata_k.mobile.winp.R
 import com.ogata_k.mobile.winp.common.constant.AsCreate
 import com.ogata_k.mobile.winp.common.formatter.buildFullDatePatternFormatter
+import com.ogata_k.mobile.winp.presentation.constant.AppIcons
 import com.ogata_k.mobile.winp.presentation.model.work.Work
 import com.ogata_k.mobile.winp.presentation.page.showSimpleSnackbar
 import com.ogata_k.mobile.winp.presentation.page.work.detail.WorkDetailRouting
 import com.ogata_k.mobile.winp.presentation.page.work.edit.WorkEditRouting
+import com.ogata_k.mobile.winp.presentation.page.work.summary.WorkSummaryRouting
 import com.ogata_k.mobile.winp.presentation.widgert.common.ButtonMediumText
 import com.ogata_k.mobile.winp.presentation.widgert.common.DefaultErrorColumnItemBuilder
 import com.ogata_k.mobile.winp.presentation.widgert.common.DialogOfDatePicker
+import com.ogata_k.mobile.winp.presentation.widgert.common.DropdownMenuButton
 import com.ogata_k.mobile.winp.presentation.widgert.common.PagingLoadColumn
 import com.ogata_k.mobile.winp.presentation.widgert.common.TitleMediumText
 import com.ogata_k.mobile.winp.presentation.widgert.common.WithScaffoldSmallTopAppBar
@@ -65,12 +66,34 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
 
     WithScaffoldSmallTopAppBar(
         text = stringResource(id = R.string.app_name),
-        canChangeColor = false,
         actions = {
             IconButton(onClick = { navController.navigate(WorkEditRouting(AsCreate.CREATING_ID).toPath()) }) {
                 Icon(
-                    imageVector = Icons.Filled.Add,
+                    imageVector = AppIcons.addIcon,
                     contentDescription = stringResource(R.string.create_work),
+                )
+            }
+
+            DropdownMenuButton(
+                expanded = uiState.inShowMoreAction,
+                showMoreAction = { viewModel.showMoreAction(it) },
+            ) {
+                DropdownMenuItem(
+                    text = {
+                        TitleMediumText(stringResource(R.string.open_work_summary))
+                    },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = AppIcons.summaryIcon,
+                            contentDescription = stringResource(
+                                R.string.work_summary
+                            ),
+                        )
+                    },
+                    onClick = {
+                        // サマリー画面に遷移
+                        navController.navigate(WorkSummaryRouting().toPath())
+                    },
                 )
             }
         },
@@ -184,7 +207,7 @@ private fun WorkIndexHeader(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
-                imageVector = Icons.Filled.DateRange,
+                imageVector = AppIcons.calendarIcon,
                 contentDescription = stringResource(id = R.string.select_date)
             )
             Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_medium)))

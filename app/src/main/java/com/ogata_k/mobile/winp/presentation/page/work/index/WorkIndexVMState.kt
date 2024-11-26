@@ -11,6 +11,7 @@ import java.time.LocalDate
 data class WorkIndexVMState(
     override val loadingState: ScreenLoadingState,
     override val basicState: BasicScreenState,
+    val inShowMoreAction: Boolean,
     // uiStateは常に初期化済みのうえ、アクション実行中もないので指定しない
     val isInSearchDate: Boolean,
     val searchDate: LocalDate,
@@ -21,6 +22,7 @@ data class WorkIndexVMState(
         return WorkIndexUiState(
             loadingState,
             basicState,
+            inShowMoreAction,
             isInSearchDate,
             searchDate,
             isInRefreshing,

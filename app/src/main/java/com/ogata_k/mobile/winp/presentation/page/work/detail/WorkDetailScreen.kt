@@ -17,11 +17,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -52,6 +47,7 @@ import androidx.navigation.NavController
 import com.ogata_k.mobile.winp.R
 import com.ogata_k.mobile.winp.common.constant.AsCreate
 import com.ogata_k.mobile.winp.common.formatter.formatFullDateTimeOrEmpty
+import com.ogata_k.mobile.winp.presentation.constant.AppIcons
 import com.ogata_k.mobile.winp.presentation.enumerate.ScreenLoadingState
 import com.ogata_k.mobile.winp.presentation.enumerate.hasError
 import com.ogata_k.mobile.winp.presentation.enumerate.toErrorMessage
@@ -106,7 +102,7 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                     },
                 ) {
                     Icon(
-                        imageVector = Icons.Filled.EditNote,
+                        imageVector = AppIcons.editNoteIcon,
                         contentDescription = stringResource(
                             R.string.edit_work
                         ),
@@ -124,7 +120,7 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                         },
                         leadingIcon = {
                             Icon(
-                                imageVector = Icons.Filled.Delete,
+                                imageVector = AppIcons.deleteIcon,
                                 contentDescription = stringResource(
                                     R.string.delete_work
                                 ),
@@ -318,7 +314,7 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                                                 },
                                                 leadingIcon = {
                                                     Icon(
-                                                        imageVector = Icons.Filled.Add,
+                                                        imageVector = AppIcons.addIcon,
                                                         contentDescription = stringResource(
                                                             R.string.create_work_comment
                                                         ),
@@ -344,7 +340,7 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                                                     },
                                                     leadingIcon = {
                                                         Icon(
-                                                            imageVector = Icons.Filled.Edit,
+                                                            imageVector = AppIcons.editIcon,
                                                             contentDescription = stringResource(
                                                                 R.string.modify_latest_work_comment
                                                             ),
