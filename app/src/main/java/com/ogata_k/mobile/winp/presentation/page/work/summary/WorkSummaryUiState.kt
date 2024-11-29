@@ -10,8 +10,15 @@ import java.time.LocalDateTime
 data class WorkSummaryUiState(
     override val loadingState: ScreenLoadingState,
     override val basicState: BasicScreenState,
+    val isInSelectRangeDateType: Boolean,
     val rangeDateType: SelectRangeDateType,
+    val isInShowRangeDatePicker: Boolean,
     val summaryRangeFrom: LocalDateTime,
     val summaryRangeTo: LocalDateTime,
     val summaryData: WorkSummary,
+    val isUncompletedWorkExpanded: Boolean,
+    val isExpiredUncompletedWorkExpanded: Boolean,
+    val isCompletedWorkExpanded: Boolean,
+    val isExpiredCompletedWorkExpanded: Boolean,
+    val isPostedCommentExpanded: Boolean,
 ) : IUiState<ScreenLoadingState>

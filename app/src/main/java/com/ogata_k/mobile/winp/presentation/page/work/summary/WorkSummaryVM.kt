@@ -36,10 +36,17 @@ class WorkSummaryVM @Inject constructor(
                 // 初期状態は未初期化状態とする
                 loadingState = ScreenLoadingState.READY,
                 basicState = BasicScreenState.initialState(),
+                isInSelectRangeDateType = false,
                 rangeDateType = rangeDateType,
+                isInShowRangeDatePicker = false,
                 summaryRangeFrom = fromDateTime,
                 summaryRangeTo = toDateTime,
                 summaryData = WorkSummary.empty(fromDateTime, toDateTime),
+                isUncompletedWorkExpanded = false,
+                isExpiredUncompletedWorkExpanded = false,
+                isCompletedWorkExpanded = false,
+                isExpiredCompletedWorkExpanded = false,
+                isPostedCommentExpanded = false,
             )
         }
     )
@@ -134,17 +141,52 @@ class WorkSummaryVM @Inject constructor(
     }
 
     /**
+     * 日にちの範囲選択タイプ指定のフォーム表示切替
+     */
+    fun showSelectRangeType(show: Boolean) {
+        val vmState = readVMState()
+        if (!vmState.loadingState.isInitialized()) {
+            // 初期化前ならスキップ
+            return
+        }
+
+        updateVMState(
+            vmState.copy(
+                isInSelectRangeDateType = show,
+                // カスタムを選択したときだけ表示させたいので通常の表示切替の時は非表示化させておく
+                isInShowRangeDatePicker = false,
+            )
+        )
+    }
+
+    /**
      * 選択期間の選択タイプを更新する
      */
-    fun updateSelectRangeDateType(rangeDateType: SelectRangeDateType) {
+    fun updateSelectRangeDateType(
+        rangeDateType: SelectRangeDateType,
+        isInSelectRangeDateType: Boolean = true,
+    ) {
         val vmState = readVMState()
-        if (vmState.rangeDateType == rangeDateType) {
-            // 更新されていないので処理をスキップ
+        // カスタムだけ日にちの追加指定が必要なので別途指定させる
+        if (rangeDateType == SelectRangeDateType.Custom) {
+            updateVMState(
+                vmState.copy(
+                    rangeDateType = rangeDateType,
+                    isInSelectRangeDateType = isInSelectRangeDateType,
+                    // カスタムの場合は期間範囲選択ピッカーを表示させる
+                    isInShowRangeDatePicker = true,
+                )
+            )
             return
         }
 
         val rangeDate: Pair<LocalDate, LocalDate> = rangeDateType.getDefaultRange(LocalDate.now())
-        updateRangeDateWithSelectRangeDateType(rangeDateType, rangeDate.first, rangeDate.second)
+        updateRangeDateWithSelectRangeDateType(
+            rangeDateType,
+            rangeDate.first,
+            rangeDate.second,
+            isInSelectRangeDateType = isInSelectRangeDateType
+        )
     }
 
     /**
@@ -153,7 +195,8 @@ class WorkSummaryVM @Inject constructor(
     private fun updateRangeDateWithSelectRangeDateType(
         rangeDateType: SelectRangeDateType,
         fromDate: LocalDate,
-        toDate: LocalDate
+        toDate: LocalDate,
+        isInSelectRangeDateType: Boolean = true,
     ) {
         val vmState = readVMState()
 
@@ -163,8 +206,11 @@ class WorkSummaryVM @Inject constructor(
                 loadingState = loadingState,
                 basicState = vmState.basicState.updateInitialize(loadingState),
                 rangeDateType = rangeDateType,
+                isInSelectRangeDateType = isInSelectRangeDateType,
                 summaryRangeFrom = fromDate.atTime(LocalTime.MIN),
                 summaryRangeTo = toDate.atTime(LocalTime.MAX),
+                // 更新したということはダイアログの表示は不要
+                isInShowRangeDatePicker = false,
             )
         )
 
@@ -173,10 +219,120 @@ class WorkSummaryVM @Inject constructor(
     }
 
     /**
+     * 日にち範囲選択ピッカーの表示切替
+     */
+    fun showRangeDatePicker(show: Boolean) {
+        val vmState = readVMState()
+        if (!vmState.loadingState.isInitialized()) {
+            // 初期化前ならスキップ
+            return
+        }
+
+        updateVMState(
+            vmState.copy(
+                isInShowRangeDatePicker = show,
+            )
+        )
+    }
+
+    /**
      * 選択期間を更新する
      */
-    fun updateRangeDate(fromDate: LocalDate, toDate: LocalDate) {
+    fun updateRangeDate(
+        fromDate: LocalDate, toDate: LocalDate,
+        isInSelectRangeDateType: Boolean = true,
+    ) {
         val vmState = readVMState()
-        updateRangeDateWithSelectRangeDateType(vmState.rangeDateType, fromDate, toDate)
+        updateRangeDateWithSelectRangeDateType(
+            vmState.rangeDateType,
+            fromDate,
+            toDate,
+            isInSelectRangeDateType = isInSelectRangeDateType,
+        )
+    }
+
+    /**
+     * 未完了タスクの拡張表示をするか切り替える
+     */
+    fun expandUncompletedWorkView(expand: Boolean) {
+        val vmState = readVMState()
+        if (!vmState.loadingState.isInitialized()) {
+            // 初期化前ならスキップ
+            return
+        }
+
+        updateVMState(
+            vmState.copy(
+                isUncompletedWorkExpanded = expand,
+            )
+        )
+    }
+
+    /**
+     * 未完了で期限切れとなっているタスクの拡張表示をするか切り替える
+     */
+    fun expandExpiredUncompletedWorkView(expand: Boolean) {
+        val vmState = readVMState()
+        if (!vmState.loadingState.isInitialized()) {
+            // 初期化前ならスキップ
+            return
+        }
+
+        updateVMState(
+            vmState.copy(
+                isExpiredUncompletedWorkExpanded = expand,
+            )
+        )
+    }
+
+    /**
+     * 完了タスクの拡張表示をするか切り替える
+     */
+    fun expandCompletedWorkView(expand: Boolean) {
+        val vmState = readVMState()
+        if (!vmState.loadingState.isInitialized()) {
+            // 初期化前ならスキップ
+            return
+        }
+
+        updateVMState(
+            vmState.copy(
+                isCompletedWorkExpanded = expand,
+            )
+        )
+    }
+
+    /**
+     * 完了しているが期限切れだったタスクの拡張表示をするか切り替える
+     */
+    fun expandExpiredCompletedWorkView(expand: Boolean) {
+        val vmState = readVMState()
+        if (!vmState.loadingState.isInitialized()) {
+            // 初期化前ならスキップ
+            return
+        }
+
+        updateVMState(
+            vmState.copy(
+                isExpiredCompletedWorkExpanded = expand,
+            )
+        )
+    }
+
+    /**
+     * コメント一覧の拡張表示をするか切り替える
+     */
+    fun expandPostedCommentView(expand: Boolean) {
+        val vmState = readVMState()
+        if (!vmState.loadingState.isInitialized()) {
+            // 初期化前ならスキップ
+            return
+        }
+
+        updateVMState(
+            vmState.copy(
+                isPostedCommentExpanded = expand,
+            )
+        )
     }
 }

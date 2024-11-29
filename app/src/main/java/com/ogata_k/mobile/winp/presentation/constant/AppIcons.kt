@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.EditNote
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -56,5 +57,8 @@ class AppIcons {
 
         val summaryIcon: ImageVector
             get() = Icons.AutoMirrored.Filled.LibraryBooks
+
+        val selectFromList: ImageVector
+            get() = Icons.Filled.FilterList
     }
 }

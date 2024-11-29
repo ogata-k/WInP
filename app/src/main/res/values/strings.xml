@@ -129,4 +129,14 @@
 
     <!-- その他 -->
     <string name="not_found_comment">コメントが見つかりません</string>
+    <string name="select_range_date_type">日にちの範囲選択方法を選択</string>
+    <string name="select_range_date_type_ThisWeekMonToSun">今週（月～日）</string>
+    <string name="select_range_date_type_PrevWeekMonToSun">先週（月～日）</string>
+    <string name="select_range_date_type_ThisWeekSunToSat">今週（日～土）</string>
+    <string name="select_range_date_type_PrevWeekSunToSat">先週（日～土）</string>
+    <string name="select_range_date_type_ThisMonthly">今月</string>
+    <string name="select_range_date_type_PrevMonthly">先月</string>
+    <string name="select_range_date_type_ThisYear">今年</string>
+    <string name="select_range_date_type_PrevYear">昨年</string>
+    <string name="select_range_date_type_Custom">カスタム</string>
 </resources>
