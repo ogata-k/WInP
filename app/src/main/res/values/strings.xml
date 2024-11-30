@@ -146,12 +146,14 @@
     <!-- その他 -->
     <string name="no_period">期限なし</string>
     <string name="not_found_work">タスクが見つかりません</string>
-    <string name="not_found_comment">コメントが見つかりません</string>
+    <string name="not_found_work_comment">コメントが見つかりません</string>
     <string name="failed_fetch_work_summary">サマリーの取得に失敗しました</string>
     <string name="select_range_date_type">日にちの範囲選択方法を選択</string>
     <string name="not_exist_work">タスクがありません</string>
+    <string name="not_exist_work_comment">コメントがありません</string>
     <string name="list_of_uncompleted_work">未完了タスク　一覧</string>
     <string name="list_of_expired_uncompleted_work">期限切れ未完了タスク　一覧</string>
     <string name="list_of_completed_work">対応済みタスク　一覧</string>
     <string name="list_of_expired_completed_work">期限切れ対応済みタスク　一覧</string>
+    <string name="list_of_posted_work_comment">コメント　一覧</string>
 </resources>

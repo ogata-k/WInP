@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -38,14 +39,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.navigation.NavController
 import com.ogata_k.mobile.winp.R
 import com.ogata_k.mobile.winp.common.formatter.buildFullDatePatternFormatter
+import com.ogata_k.mobile.winp.common.formatter.formatFullDateTimeOrEmpty
 import com.ogata_k.mobile.winp.presentation.constant.AppIcons
 import com.ogata_k.mobile.winp.presentation.enumerate.ScreenLoadingState
 import com.ogata_k.mobile.winp.presentation.enumerate.SelectRangeDateType
 import com.ogata_k.mobile.winp.presentation.model.work.Work
+import com.ogata_k.mobile.winp.presentation.model.work.WorkComment
 import com.ogata_k.mobile.winp.presentation.widget.common.AppBarBackButton
 import com.ogata_k.mobile.winp.presentation.widget.common.BodyLargeText
 import com.ogata_k.mobile.winp.presentation.widget.common.BodyMediumText
@@ -84,7 +88,7 @@ fun WorkSummaryScreen(navController: NavController, viewModel: WorkSummaryVM) {
             Column(modifier = Modifier.padding(padding)) {
                 // サマリーの選択期間を固定でヘッダーに表示
                 // LazyColumnの一緒にスクロールされないように別で指定する
-                WorkSummaryHeader(
+                SelectableRangeDateHeader(
                     uiState,
                     { toShow -> viewModel.showSelectRangeType(toShow) },
                     { rangeDateType, keepInSelectRangeDateTypeShow ->
@@ -135,7 +139,7 @@ fun WorkSummaryScreen(navController: NavController, viewModel: WorkSummaryVM) {
                                 val summaryData = uiState.summaryData
 
                                 // 未完了タスク一覧
-                                workSummaryExpandableListContent(
+                                expandableWorkListContent(
                                     titleResId = R.string.list_of_uncompleted_work,
                                     keyPrefix = "list_of_uncompleted_work",
                                     expanded = uiState.isUncompletedWorkExpanded,
@@ -147,7 +151,7 @@ fun WorkSummaryScreen(navController: NavController, viewModel: WorkSummaryVM) {
                                 )
 
                                 // 期限切れの未完了タスク一覧
-                                workSummaryExpandableListContent(
+                                expandableWorkListContent(
                                     titleResId = R.string.list_of_expired_uncompleted_work,
                                     keyPrefix = "list_of_expired_uncompleted_work",
                                     expanded = uiState.isExpiredUncompletedWorkExpanded,
@@ -159,7 +163,7 @@ fun WorkSummaryScreen(navController: NavController, viewModel: WorkSummaryVM) {
                                 )
 
                                 // 対応済みタスクの一覧
-                                workSummaryExpandableListContent(
+                                expandableWorkListContent(
                                     titleResId = R.string.list_of_completed_work,
                                     keyPrefix = "list_of_completed_work",
                                     expanded = uiState.isCompletedWorkExpanded,
@@ -171,7 +175,7 @@ fun WorkSummaryScreen(navController: NavController, viewModel: WorkSummaryVM) {
                                 )
 
                                 // 期限切れの対応済みタスクの一覧
-                                workSummaryExpandableListContent(
+                                expandableWorkListContent(
                                     titleResId = R.string.list_of_expired_completed_work,
                                     keyPrefix = "list_of_expired_completed_work",
                                     expanded = uiState.isExpiredCompletedWorkExpanded,
@@ -182,7 +186,17 @@ fun WorkSummaryScreen(navController: NavController, viewModel: WorkSummaryVM) {
                                     targetWorkIds = summaryData.expiredCompletedWorkIds,
                                 )
 
-                                // TODO コメントの一覧
+                                // 期間内に投稿されたコメントの一覧
+                                expandableWorkCommentListContent(
+                                    titleResId = R.string.list_of_posted_work_comment,
+                                    keyPrefix = "list_of_posted_work_comment",
+                                    expanded = uiState.isPostedCommentExpanded,
+                                    switchExpandState = {
+                                        viewModel.expandPostedCommentView(it)
+                                    },
+                                    referenceWorks = summaryData.referenceWorks,
+                                    targetWorkComments = summaryData.postedComments,
+                                )
                             }
 
                             ScreenLoadingState.NOT_FOUND_EXCEPTION, ScreenLoadingState.ERROR -> {
@@ -219,7 +233,7 @@ fun WorkSummaryScreen(navController: NavController, viewModel: WorkSummaryVM) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WorkSummaryHeader(
+private fun SelectableRangeDateHeader(
     uiState: WorkSummaryUiState,
     switchShowSelectRangeDateType: (toShow: Boolean) -> Unit,
     updateAndHideSelectRangeDateType: (rangeDateType: SelectRangeDateType, keepInSelectRangeDateTypeShow: Boolean) -> Unit,
@@ -350,13 +364,17 @@ fun WorkSummaryHeader(
 }
 
 @OptIn(ExperimentalFoundationApi::class)
-fun LazyListScope.workSummaryExpandableListContent(
+private fun <T> LazyListScope.expandableListContent(
     @StringRes titleResId: Int,
+    @StringRes notExistListItemResId: Int,
+    @StringRes notFoundWorkResId: Int,
     keyPrefix: String,
     expanded: Boolean,
     switchExpandState: (toExpand: Boolean) -> Unit,
-    referenceWorks: Map<Long, Work>,
-    targetWorkIds: List<Long>,
+    listItems: List<T>,
+    toListItemId: (listItem: T) -> Long,
+    getWork: (listItem: T) -> Work?,
+    content: @Composable RowScope.(listItem: T, work: Work) -> Unit,
 ) {
     stickyHeader(
         key = "%s_header".format(keyPrefix),
@@ -391,7 +409,7 @@ fun LazyListScope.workSummaryExpandableListContent(
     }
 
     if (expanded) {
-        if (targetWorkIds.isEmpty()) {
+        if (listItems.isEmpty()) {
             item {
                 Row(
                     modifier = Modifier
@@ -403,20 +421,20 @@ fun LazyListScope.workSummaryExpandableListContent(
                         )
                 ) {
                     BodyLargeText(
-                        stringResource(R.string.not_exist_work),
+                        stringResource(notExistListItemResId),
                         modifier = Modifier.weight(1f),
                     )
                 }
             }
         } else {
             items(
-                count = targetWorkIds.count(),
+                count = listItems.count(),
                 key = { index ->
-                    "%s_%d".format(keyPrefix, targetWorkIds[index])
+                    "%s_%d".format(keyPrefix, toListItemId(listItems[index]))
                 },
                 itemContent = { index ->
-                    val workId = targetWorkIds[index]
-                    val work = referenceWorks[workId]
+                    val listItem = listItems[index]
+                    val work = getWork(listItem)
 
                     Surface(
                         color = MaterialTheme.colorScheme.background,
@@ -432,40 +450,12 @@ fun LazyListScope.workSummaryExpandableListContent(
                         ) {
                             if (work == null) {
                                 BodyLargeText(
-                                    stringResource(R.string.not_found_work),
+                                    stringResource(notFoundWorkResId),
                                     modifier = Modifier.weight(1f),
                                     color = MaterialTheme.colorScheme.error,
                                 )
                             } else {
-                                Column(
-                                    modifier = Modifier.weight(1f),
-                                    horizontalAlignment = Alignment.Start,
-                                ) {
-                                    val formattedPeriod =
-                                        work.formatPeriod(
-                                            rangeString = stringResource(id = R.string.period_range),
-                                            noPeriodString = stringResource(id = R.string.no_period),
-                                        )
-                                    BodySmallText(formattedPeriod)
-                                    BodyLargeText(work.title)
-                                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
-                                    val todos = work.todoItems
-                                    val formattedPercent = if (todos.isEmpty()) {
-                                        stringResource(R.string.invalid_passed_percent)
-                                    } else {
-                                        val todosCount = todos.count()
-                                        val completeTodosCount = todos.count { it.isCompleted }
-                                        stringResource(R.string.valid_passed_percent).format((completeTodosCount.toFloat() / todosCount.toFloat()) * 100f)
-                                    }
-                                    BodyMediumText(
-                                        "%s%s%s".format(
-                                            stringResource(R.string.work_todo_passed_rate),
-                                            stringResource(R.string.colon_separator),
-                                            formattedPercent
-                                        ),
-                                        modifier = Modifier.align(Alignment.End),
-                                    )
-                                }
+                                content(listItem, work)
                             }
                         }
                     }
@@ -478,4 +468,106 @@ fun LazyListScope.workSummaryExpandableListContent(
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_large)))
         }
     }
+}
+
+private fun LazyListScope.expandableWorkListContent(
+    @StringRes titleResId: Int,
+    keyPrefix: String,
+    expanded: Boolean,
+    switchExpandState: (toExpand: Boolean) -> Unit,
+    referenceWorks: Map<Long, Work>,
+    targetWorkIds: List<Long>,
+) {
+    expandableListContent(
+        titleResId = titleResId,
+        notExistListItemResId = R.string.not_exist_work,
+        notFoundWorkResId = R.string.not_found_work,
+        keyPrefix = keyPrefix,
+        expanded = expanded,
+        switchExpandState = switchExpandState,
+        listItems = targetWorkIds,
+        toListItemId = { it },
+        getWork = { referenceWorks[it] },
+        content = { _, work ->
+            Column(
+                modifier = Modifier.weight(1f),
+                horizontalAlignment = Alignment.Start,
+            ) {
+                val formattedPeriod =
+                    work.formatPeriod(
+                        rangeString = stringResource(id = R.string.period_range),
+                        noPeriodString = stringResource(id = R.string.no_period),
+                    )
+                BodySmallText(formattedPeriod)
+                BodyLargeText(work.title)
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
+                val todos = work.todoItems
+                val formattedPercent = if (todos.isEmpty()) {
+                    stringResource(R.string.invalid_passed_percent)
+                } else {
+                    val todosCount = todos.count()
+                    val completeTodosCount = todos.count { it.isCompleted }
+                    stringResource(R.string.valid_passed_percent).format((completeTodosCount.toFloat() / todosCount.toFloat()) * 100f)
+                }
+                BodyMediumText(
+                    "%s%s%s".format(
+                        stringResource(R.string.work_todo_passed_rate),
+                        stringResource(R.string.colon_separator),
+                        formattedPercent
+                    ),
+                    modifier = Modifier.align(Alignment.End),
+                )
+            }
+        },
+    )
+}
+
+private fun LazyListScope.expandableWorkCommentListContent(
+    @StringRes titleResId: Int,
+    keyPrefix: String,
+    expanded: Boolean,
+    switchExpandState: (toExpand: Boolean) -> Unit,
+    referenceWorks: Map<Long, Work>,
+    targetWorkComments: List<WorkComment>,
+) {
+    expandableListContent(
+        titleResId = titleResId,
+        notExistListItemResId = R.string.not_exist_work_comment,
+        // コメントの関連情報の表示にタスクが必要だが、タスクの参照に失敗したら表示しないのでコメントの取得失敗としてよい
+        notFoundWorkResId = R.string.not_found_work_comment,
+        keyPrefix = keyPrefix,
+        expanded = expanded,
+        switchExpandState = switchExpandState,
+        listItems = targetWorkComments,
+        toListItemId = { it.workCommentId },
+        getWork = { referenceWorks[it.workId] },
+        content = { comment, work ->
+            Column(
+                modifier = Modifier.weight(1f),
+                horizontalAlignment = Alignment.Start,
+            ) {
+                BodySmallText(work.title)
+                BodyMediumText(
+                    text = comment.comment,
+                )
+                Spacer(Modifier.height(dimensionResource(R.dimen.padding_small)))
+                Row(
+                    modifier = Modifier.align(Alignment.End),
+                    verticalAlignment = Alignment.Bottom,
+                ) {
+                    if (comment.isModified) {
+                        BodySmallText(
+                            text = stringResource(R.string.modified_paren_label)
+                                    + stringResource(R.string.extra_small_separator),
+                        )
+                    }
+
+                    BodySmallText(
+                        text = formatFullDateTimeOrEmpty(comment.createdAt),
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+            }
+        }
+    )
 }

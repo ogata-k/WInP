@@ -57,6 +57,7 @@ fun WorkCommentItem(
 private fun NotModifiedWorkCommentItemPreview() {
     val comment = WorkComment(
         workCommentId = 1,
+        workId = 1,
         comment = "これは編集されていないコメントです",
         modifiedAt = null,
         createdAt = LocalDateTime.now(),
@@ -72,6 +73,7 @@ private fun NotModifiedWorkCommentItemPreview() {
 private fun ModifiedWorkCommentItemPreview() {
     val comment = WorkComment(
         workCommentId = 2,
+        workId = 1,
         comment = "これは編集されているコメントです",
         modifiedAt = LocalDateTime.now().plusMinutes(30),
         createdAt = LocalDateTime.now(),

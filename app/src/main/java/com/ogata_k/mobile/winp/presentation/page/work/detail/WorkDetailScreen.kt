@@ -388,7 +388,7 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                                 if (workComments.isEmpty()) {
                                     item {
                                         BodyMediumText(
-                                            text = stringResource(R.string.not_found_comment),
+                                            text = stringResource(R.string.not_found_work_comment),
                                             modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_medium)),
                                         )
                                     }

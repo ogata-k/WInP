@@ -11,6 +11,7 @@ import com.ogata_k.mobile.winp.domain.model.work.WorkComment as DomainWorkCommen
  */
 data class WorkComment(
     val workCommentId: Long,
+    val workId: Long,
     val comment: String,
     val modifiedAt: LocalDateTime?,
     val createdAt: LocalDateTime,
@@ -19,6 +20,7 @@ data class WorkComment(
         override fun fromDomainModel(domain: DomainWorkComment): WorkComment {
             return WorkComment(
                 workCommentId = domain.workCommentId,
+                workId = domain.workId,
                 comment = domain.comment,
                 modifiedAt = domain.modifiedAt?.let { LocalDateTimeConverter.fromOffsetDateTime(it) },
                 createdAt = LocalDateTimeConverter.fromOffsetDateTime(domain.createdAt),
