@@ -93,6 +93,8 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
                     onClick = {
                         // サマリー画面に遷移
                         navController.navigate(WorkSummaryRouting().toPath())
+                        // 遷移した先でも表示が少し残ってしまうのですぐ消えるように指定しておく
+                        viewModel.showMoreAction(false)
                     },
                 )
             }
