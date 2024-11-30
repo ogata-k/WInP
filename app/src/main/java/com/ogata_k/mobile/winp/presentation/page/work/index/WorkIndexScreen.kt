@@ -44,16 +44,16 @@ import com.ogata_k.mobile.winp.presentation.page.showSimpleSnackbar
 import com.ogata_k.mobile.winp.presentation.page.work.detail.WorkDetailRouting
 import com.ogata_k.mobile.winp.presentation.page.work.edit.WorkEditRouting
 import com.ogata_k.mobile.winp.presentation.page.work.summary.WorkSummaryRouting
-import com.ogata_k.mobile.winp.presentation.widgert.common.ButtonMediumText
-import com.ogata_k.mobile.winp.presentation.widgert.common.DefaultErrorColumnItemBuilder
-import com.ogata_k.mobile.winp.presentation.widgert.common.DialogOfDatePicker
-import com.ogata_k.mobile.winp.presentation.widgert.common.DropdownMenuButton
-import com.ogata_k.mobile.winp.presentation.widgert.common.PagingLoadColumn
-import com.ogata_k.mobile.winp.presentation.widgert.common.TitleMediumText
-import com.ogata_k.mobile.winp.presentation.widgert.common.WithScaffoldSmallTopAppBar
-import com.ogata_k.mobile.winp.presentation.widgert.common.fromDateToMills
-import com.ogata_k.mobile.winp.presentation.widgert.common.fromMillsToDate
-import com.ogata_k.mobile.winp.presentation.widgert.work.WorkItem
+import com.ogata_k.mobile.winp.presentation.widget.common.ButtonMediumText
+import com.ogata_k.mobile.winp.presentation.widget.common.DefaultErrorColumnItemBuilder
+import com.ogata_k.mobile.winp.presentation.widget.common.DialogOfDatePicker
+import com.ogata_k.mobile.winp.presentation.widget.common.DropdownMenuButton
+import com.ogata_k.mobile.winp.presentation.widget.common.PagingLoadColumn
+import com.ogata_k.mobile.winp.presentation.widget.common.TitleMediumText
+import com.ogata_k.mobile.winp.presentation.widget.common.WithScaffoldSmallTopAppBar
+import com.ogata_k.mobile.winp.presentation.widget.common.fromDateToMills
+import com.ogata_k.mobile.winp.presentation.widget.common.fromMillsToDate
+import com.ogata_k.mobile.winp.presentation.widget.work.WorkItem
 import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)

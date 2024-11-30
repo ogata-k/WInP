@@ -1,4 +1,4 @@
-package com.ogata_k.mobile.winp.presentation.widgert.common
+package com.ogata_k.mobile.winp.presentation.widget.common
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier

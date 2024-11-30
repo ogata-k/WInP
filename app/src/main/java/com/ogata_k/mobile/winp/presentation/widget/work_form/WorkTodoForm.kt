@@ -1,4 +1,4 @@
-package com.ogata_k.mobile.winp.presentation.widgert.work
+package com.ogata_k.mobile.winp.presentation.widget.work_form
 
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.tween
@@ -32,18 +32,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.ogata_k.mobile.winp.R
 import com.ogata_k.mobile.winp.presentation.constant.AppIcons
-import com.ogata_k.mobile.winp.presentation.model.work.WorkTodo
-import com.ogata_k.mobile.winp.presentation.theme.WInPTheme
-import com.ogata_k.mobile.winp.presentation.widgert.common.BodyMediumText
+import com.ogata_k.mobile.winp.presentation.model.work_form.WorkTodoFormData
+import com.ogata_k.mobile.winp.presentation.widget.common.BodyMediumText
 import java.time.LocalDateTime
+import java.util.UUID
 
 /**
  * WorkTodoのColumn系のためのFormアイテム
  * 更新することによって完了未完了状態が変更するので、色を変化させて通知できるようにしている。
  */
 @Composable
-fun WorkTodoItem(
-    workTodo: WorkTodo,
+fun WorkTodoFormColumnItem(
+    todoFormData: WorkTodoFormData,
     modifier: Modifier = Modifier,
 ) {
     val checkIconSize = dimensionResource(id = R.dimen.icon_size_medium)
@@ -59,7 +59,7 @@ fun WorkTodoItem(
         lineTo(0f, size.height)
     }
 
-    val isCompleted = workTodo.isCompleted
+    val isCompleted = todoFormData.isCompleted
     val transition = updateTransition(isCompleted, label = "completed state")
     val checkIconColor: Color by transition.animateColor(
         transitionSpec = {
@@ -116,7 +116,7 @@ fun WorkTodoItem(
             VerticalDivider(color = MaterialTheme.colorScheme.onBackground)
             Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_large)))
             BodyMediumText(
-                text = workTodo.description,
+                text = todoFormData.description,
                 modifier = Modifier
                     .align(Alignment.Top)
                     .padding(vertical = dimensionResource(id = R.dimen.padding_medium))
@@ -129,59 +129,55 @@ fun WorkTodoItem(
 @Preview
 @Composable
 private fun NotCompletedWorkTodoFormColumnItemPreview() {
-    val todoItem = WorkTodo(
+    val todoFormData = WorkTodoFormData(
+        uuid = UUID.randomUUID(),
         workTodoId = 1,
         description = "未完了の対応項目アイテム\n少なくともこれはやっておかなければいけないので忘れずに行うこと。",
         completedAt = null,
         createdAt = LocalDateTime.now(),
     )
 
-    WInPTheme {
-        WorkTodoItem(todoItem)
-    }
+    WorkTodoFormColumnItem(todoFormData)
 }
 
 @Preview
 @Composable
 private fun CompletedWorkTodoFormColumnItemPreview() {
-    val todoItem = WorkTodo(
-        workTodoId = 2,
+    val todoFormData = WorkTodoFormData(
+        uuid = UUID.randomUUID(),
+        workTodoId = 1,
         description = "完了済みの対応項目アイテム\n少なくともこれはやっておかなければいけないので忘れずに行うこと。",
         completedAt = LocalDateTime.now(),
         createdAt = LocalDateTime.now(),
     )
 
-    WInPTheme {
-        WorkTodoItem(todoItem)
-    }
+    WorkTodoFormColumnItem(todoFormData)
 }
 
 @Preview(fontScale = 2.0f)
 @Composable
 private fun LargeTextCompletedWorkTodoFormColumnItemPreview() {
-    val todoItem = WorkTodo(
-        workTodoId = 3,
+    val todoFormData = WorkTodoFormData(
+        uuid = UUID.randomUUID(),
+        workTodoId = 1,
         description = "完了済みの対応項目アイテム",
         completedAt = LocalDateTime.now(),
         createdAt = LocalDateTime.now(),
     )
 
-    WInPTheme {
-        WorkTodoItem(todoItem)
-    }
+    WorkTodoFormColumnItem(todoFormData)
 }
 
 @Preview(fontScale = 0.5f)
 @Composable
 private fun SmallTextCompletedWorkTodoFormColumnItemPreview() {
-    val todoItem = WorkTodo(
-        workTodoId = 4,
+    val todoFormData = WorkTodoFormData(
+        uuid = UUID.randomUUID(),
+        workTodoId = 1,
         description = "完了済みの対応項目アイテム",
         completedAt = LocalDateTime.now(),
         createdAt = LocalDateTime.now(),
     )
 
-    WInPTheme {
-        WorkTodoItem(todoItem)
-    }
+    WorkTodoFormColumnItem(todoFormData)
 }

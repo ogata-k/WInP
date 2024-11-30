@@ -1,10 +1,9 @@
-package com.ogata_k.mobile.winp.presentation.widgert.common
+package com.ogata_k.mobile.winp.presentation.widget.common
 
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.ModalBottomSheetDefaults
 import androidx.compose.material3.ModalBottomSheetDefaults.properties
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.contentColorFor

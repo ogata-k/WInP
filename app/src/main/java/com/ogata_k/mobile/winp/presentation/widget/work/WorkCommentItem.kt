@@ -1,4 +1,4 @@
-package com.ogata_k.mobile.winp.presentation.widgert.work
+package com.ogata_k.mobile.winp.presentation.widget.work
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,8 +16,8 @@ import com.ogata_k.mobile.winp.R
 import com.ogata_k.mobile.winp.common.formatter.formatFullDateTimeOrEmpty
 import com.ogata_k.mobile.winp.presentation.model.work.WorkComment
 import com.ogata_k.mobile.winp.presentation.theme.WInPTheme
-import com.ogata_k.mobile.winp.presentation.widgert.common.BodyMediumText
-import com.ogata_k.mobile.winp.presentation.widgert.common.BodySmallText
+import com.ogata_k.mobile.winp.presentation.widget.common.BodyMediumText
+import com.ogata_k.mobile.winp.presentation.widget.common.BodySmallText
 import java.time.LocalDateTime
 
 @Composable
