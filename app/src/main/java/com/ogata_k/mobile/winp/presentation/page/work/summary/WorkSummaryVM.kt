@@ -42,11 +42,12 @@ class WorkSummaryVM @Inject constructor(
                 summaryRangeFrom = fromDateTime,
                 summaryRangeTo = toDateTime,
                 summaryData = WorkSummary.empty(fromDateTime, toDateTime),
-                isUncompletedWorkExpanded = false,
-                isExpiredUncompletedWorkExpanded = false,
-                isCompletedWorkExpanded = false,
-                isExpiredCompletedWorkExpanded = false,
-                isPostedCommentExpanded = false,
+                // 最初は開いた状態で表示させる
+                isUncompletedWorkExpanded = true,
+                isExpiredUncompletedWorkExpanded = true,
+                isCompletedWorkExpanded = true,
+                isExpiredCompletedWorkExpanded = true,
+                isPostedCommentExpanded = true,
             )
         }
     )

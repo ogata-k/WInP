@@ -1,6 +1,8 @@
 package com.ogata_k.mobile.winp.presentation.page.work.summary
 
+import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,9 +12,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.DropdownMenu
@@ -37,8 +43,13 @@ import androidx.navigation.NavController
 import com.ogata_k.mobile.winp.R
 import com.ogata_k.mobile.winp.common.formatter.buildFullDatePatternFormatter
 import com.ogata_k.mobile.winp.presentation.constant.AppIcons
+import com.ogata_k.mobile.winp.presentation.enumerate.ScreenLoadingState
 import com.ogata_k.mobile.winp.presentation.enumerate.SelectRangeDateType
+import com.ogata_k.mobile.winp.presentation.model.work.Work
 import com.ogata_k.mobile.winp.presentation.widgert.common.AppBarBackButton
+import com.ogata_k.mobile.winp.presentation.widgert.common.BodyLargeText
+import com.ogata_k.mobile.winp.presentation.widgert.common.BodyMediumText
+import com.ogata_k.mobile.winp.presentation.widgert.common.BodySmallText
 import com.ogata_k.mobile.winp.presentation.widgert.common.ButtonMediumText
 import com.ogata_k.mobile.winp.presentation.widgert.common.DialogOfRangeDatePicker
 import com.ogata_k.mobile.winp.presentation.widgert.common.LazyColumnScrollBar
@@ -54,7 +65,6 @@ import java.time.LocalDate
 fun WorkSummaryScreen(navController: NavController, viewModel: WorkSummaryVM) {
     val uiState: WorkSummaryUiState by viewModel.uiStateFlow.collectAsState()
     val screenLoadingState = uiState.loadingState
-    val basicScreenState = uiState.basicState
 
     WithScaffoldSmallTopAppBar(
         text = stringResource(id = R.string.title_work_summary),
@@ -69,7 +79,6 @@ fun WorkSummaryScreen(navController: NavController, viewModel: WorkSummaryVM) {
             modifier = modifier,
             topBar = appBar,
         ) { padding ->
-            val summary = uiState.summaryData
             val listState = rememberLazyListState()
 
             Column(modifier = Modifier.padding(padding)) {
@@ -98,33 +107,103 @@ fun WorkSummaryScreen(navController: NavController, viewModel: WorkSummaryVM) {
                 Box {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_large)),
                         contentPadding = PaddingValues(
-                            dimensionResource(R.dimen.padding_none),
-                            dimensionResource(R.dimen.padding_large),
-                            dimensionResource(R.dimen.padding_large),
-                            dimensionResource(R.dimen.padding_large),
+                            bottom = dimensionResource(R.dimen.padding_large),
                         ),
                         state = listState,
                     ) {
-                        // TODO 初期化などの読み込み状態を考慮した表示
+                        when (screenLoadingState) {
+                            // 初期化中はデータフェッチしている時を表すのでローディングの表示
+                            ScreenLoadingState.READY -> {
+                                item {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(
+                                                vertical = dimensionResource(id = R.dimen.padding_medium),
+                                                horizontal = dimensionResource(id = R.dimen.padding_large),
+                                            ),
+                                        horizontalArrangement = Arrangement.Center,
+                                        verticalAlignment = Alignment.CenterVertically,
+                                    ) {
+                                        CircularProgressIndicator()
+                                    }
+                                }
+                            }
 
-                        // TODO これらはExpandして表示とかできるので、VMStateなどでExpand中かどうかのフラグをつかって表示を切り分ける
-                        // TODO stickyHeaderでExpandするかどうかのヘッダーを扱う
-                        item {
-                            // TODO 未完了タスクの一覧
-                        }
-                        item {
-                            // TODO 未完了のうち期限切れのタスクの一覧
-                        }
-                        item {
-                            // TODO 完了タスクの一覧
-                        }
-                        item {
-                            // TODO 完了しているけど期限切れのタスクの一覧
-                        }
-                        item {
-                            // TODO コメントの一覧
+                            ScreenLoadingState.NO_ERROR_INITIALIZED -> {
+                                val summaryData = uiState.summaryData
+
+                                // 未完了タスク一覧
+                                workSummaryExpandableListContent(
+                                    titleResId = R.string.list_of_uncompleted_work,
+                                    keyPrefix = "list_of_uncompleted_work",
+                                    expanded = uiState.isUncompletedWorkExpanded,
+                                    switchExpandState = {
+                                        viewModel.expandUncompletedWorkView(it)
+                                    },
+                                    referenceWorks = summaryData.referenceWorks,
+                                    targetWorkIds = summaryData.uncompletedWorkIds,
+                                )
+
+                                // 期限切れの未完了タスク一覧
+                                workSummaryExpandableListContent(
+                                    titleResId = R.string.list_of_expired_uncompleted_work,
+                                    keyPrefix = "list_of_expired_uncompleted_work",
+                                    expanded = uiState.isExpiredUncompletedWorkExpanded,
+                                    switchExpandState = {
+                                        viewModel.expandExpiredUncompletedWorkView(it)
+                                    },
+                                    referenceWorks = summaryData.referenceWorks,
+                                    targetWorkIds = summaryData.expiredUncompletedWorkIds,
+                                )
+
+                                // 対応済みタスクの一覧
+                                workSummaryExpandableListContent(
+                                    titleResId = R.string.list_of_completed_work,
+                                    keyPrefix = "list_of_completed_work",
+                                    expanded = uiState.isCompletedWorkExpanded,
+                                    switchExpandState = {
+                                        viewModel.expandCompletedWorkView(it)
+                                    },
+                                    referenceWorks = summaryData.referenceWorks,
+                                    targetWorkIds = summaryData.completedWorkIds,
+                                )
+
+                                // 期限切れの対応済みタスクの一覧
+                                workSummaryExpandableListContent(
+                                    titleResId = R.string.list_of_expired_completed_work,
+                                    keyPrefix = "list_of_expired_completed_work",
+                                    expanded = uiState.isExpiredCompletedWorkExpanded,
+                                    switchExpandState = {
+                                        viewModel.expandExpiredCompletedWorkView(it)
+                                    },
+                                    referenceWorks = summaryData.referenceWorks,
+                                    targetWorkIds = summaryData.expiredCompletedWorkIds,
+                                )
+
+                                // TODO コメントの一覧
+                            }
+
+                            ScreenLoadingState.NOT_FOUND_EXCEPTION, ScreenLoadingState.ERROR -> {
+                                item {
+                                    Row(
+                                        modifier = Modifier
+                                            .animateItem()
+                                            .fillMaxWidth()
+                                            .padding(
+                                                vertical = dimensionResource(id = R.dimen.padding_medium),
+                                                horizontal = dimensionResource(id = R.dimen.padding_large),
+                                            )
+                                    ) {
+                                        BodyLargeText(
+                                            stringResource(R.string.failed_fetch_work_summary),
+                                            modifier = Modifier.weight(1f),
+                                            color = MaterialTheme.colorScheme.error,
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
 
@@ -167,7 +246,7 @@ fun WorkSummaryHeader(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Column {
+                Column(modifier = Modifier.weight(1f)) {
                     AnimatedContent(
                         targetState = uiState.rangeDateType.getTypeName(),
                         label = "rangeDateTypeName",
@@ -193,7 +272,7 @@ fun WorkSummaryHeader(
                         )
                     }
                 }
-                Spacer(modifier = Modifier.weight(1f))
+                Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_medium)))
                 Icon(
                     imageVector = AppIcons.selectFromList,
                     contentDescription = stringResource(R.string.select_range_date_type),
@@ -266,6 +345,137 @@ fun WorkSummaryHeader(
                     )
                 }
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+fun LazyListScope.workSummaryExpandableListContent(
+    @StringRes titleResId: Int,
+    keyPrefix: String,
+    expanded: Boolean,
+    switchExpandState: (toExpand: Boolean) -> Unit,
+    referenceWorks: Map<Long, Work>,
+    targetWorkIds: List<Long>,
+) {
+    stickyHeader(
+        key = "%s_header".format(keyPrefix),
+    ) {
+        Surface(
+            modifier = Modifier.clickable { switchExpandState(!expanded) },
+            color = MaterialTheme.colorScheme.tertiaryContainer,
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        vertical = dimensionResource(id = R.dimen.padding_medium),
+                        horizontal = dimensionResource(id = R.dimen.padding_large),
+                    ),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                TitleMediumText(
+                    stringResource(titleResId),
+                    modifier = Modifier.weight(1f),
+                )
+                Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_medium)))
+                Icon(
+                    imageVector = if (expanded) AppIcons.shrinkableHeaderIcon else AppIcons.expandableHeaderIcon,
+                    contentDescription = stringResource(if (expanded) R.string.to_shrink else R.string.to_expand),
+                )
+            }
+        }
+    }
+    item {
+        HorizontalDivider(modifier = Modifier.fillMaxWidth())
+    }
+
+    if (expanded) {
+        if (targetWorkIds.isEmpty()) {
+            item {
+                Row(
+                    modifier = Modifier
+                        .animateItem()
+                        .fillMaxWidth()
+                        .padding(
+                            vertical = dimensionResource(id = R.dimen.padding_medium),
+                            horizontal = dimensionResource(id = R.dimen.padding_large),
+                        )
+                ) {
+                    BodyLargeText(
+                        stringResource(R.string.not_exist_work),
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+            }
+        } else {
+            items(
+                count = targetWorkIds.count(),
+                key = { index ->
+                    "%s_%d".format(keyPrefix, targetWorkIds[index])
+                },
+                itemContent = { index ->
+                    val workId = targetWorkIds[index]
+                    val work = referenceWorks[workId]
+
+                    Surface(
+                        color = MaterialTheme.colorScheme.background,
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .animateItem()
+                                .fillMaxWidth()
+                                .padding(
+                                    vertical = dimensionResource(id = R.dimen.padding_medium),
+                                    horizontal = dimensionResource(id = R.dimen.padding_large),
+                                )
+                        ) {
+                            if (work == null) {
+                                BodyLargeText(
+                                    stringResource(R.string.not_found_work),
+                                    modifier = Modifier.weight(1f),
+                                    color = MaterialTheme.colorScheme.error,
+                                )
+                            } else {
+                                Column(
+                                    modifier = Modifier.weight(1f),
+                                    horizontalAlignment = Alignment.Start,
+                                ) {
+                                    val formattedPeriod =
+                                        work.formatPeriod(
+                                            rangeString = stringResource(id = R.string.period_range),
+                                            noPeriodString = stringResource(id = R.string.no_period),
+                                        )
+                                    BodySmallText(formattedPeriod)
+                                    BodyLargeText(work.title)
+                                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
+                                    val todos = work.todoItems
+                                    val formattedPercent = if (todos.isEmpty()) {
+                                        stringResource(R.string.invalid_passed_percent)
+                                    } else {
+                                        val todosCount = todos.count()
+                                        val completeTodosCount = todos.count { it.isCompleted }
+                                        stringResource(R.string.valid_passed_percent).format((completeTodosCount.toFloat() / todosCount.toFloat()) * 100f)
+                                    }
+                                    BodyMediumText(
+                                        "%s%s%s".format(
+                                            stringResource(R.string.work_todo_passed_rate),
+                                            stringResource(R.string.colon_separator),
+                                            formattedPercent
+                                        ),
+                                        modifier = Modifier.align(Alignment.End),
+                                    )
+                                }
+                            }
+                        }
+                    }
+                },
+            )
+        }
+
+        item {
+            // 展開して表示しているときは終わりがわかるように余白を追加しておく
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_large)))
         }
     }
 }

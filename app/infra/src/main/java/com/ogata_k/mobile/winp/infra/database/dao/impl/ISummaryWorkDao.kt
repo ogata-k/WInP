@@ -33,7 +33,7 @@ class ISummaryWorkDao(private val db: AppDatabase, private val dao: SummaryWorkD
                 uncompletedWorkIds.add(workId)
                 // 期限過ぎでも未完了の場合は別途集計
                 if (workEndedAt != null && workEndedAt < now) {
-                    uncompletedWorkIds.add(workId)
+                    expiredUncompletedWorkIds.add(workId)
                 }
             } else {
                 completedWorkIds.add(workId)

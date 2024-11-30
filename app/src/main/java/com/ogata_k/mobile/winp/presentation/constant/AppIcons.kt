@@ -5,6 +5,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.LibraryBooks
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Close
@@ -36,6 +38,12 @@ class AppIcons {
 
         val moveToIcon: ImageVector
             get() = Icons.Filled.ChevronRight
+
+        val expandableHeaderIcon: ImageVector
+            get() = Icons.Filled.ArrowDropDown
+
+        val shrinkableHeaderIcon: ImageVector
+            get() = Icons.Filled.ArrowDropUp
 
         val confirmIcon: ImageVector
             get() = Icons.Filled.Info
