@@ -416,8 +416,10 @@ private fun <T> LazyListScope.expandableListContent(
                         .animateItem()
                         .fillMaxWidth()
                         .padding(
-                            vertical = dimensionResource(id = R.dimen.padding_medium),
-                            horizontal = dimensionResource(id = R.dimen.padding_large),
+                            start = dimensionResource(id = R.dimen.padding_large),
+                            top = dimensionResource(id = R.dimen.padding_medium),
+                            end = dimensionResource(id = R.dimen.padding_large),
+                            bottom = dimensionResource(id = R.dimen.padding_extra_large),
                         )
                 ) {
                     BodyLargeText(
@@ -439,33 +441,40 @@ private fun <T> LazyListScope.expandableListContent(
                     Surface(
                         color = MaterialTheme.colorScheme.background,
                     ) {
-                        Row(
+                        Column(
                             modifier = Modifier
-                                .animateItem()
                                 .fillMaxWidth()
+                                .animateItem()
                                 .padding(
                                     vertical = dimensionResource(id = R.dimen.padding_medium),
                                     horizontal = dimensionResource(id = R.dimen.padding_large),
-                                )
+                                ),
                         ) {
-                            if (work == null) {
-                                BodyLargeText(
-                                    stringResource(notFoundWorkResId),
-                                    modifier = Modifier.weight(1f),
-                                    color = MaterialTheme.colorScheme.error,
+                            if (index != 0) {
+                                // 区切りをわかるようにしておく
+                                HorizontalDivider(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        // 区切り線の上部の余白の分下に取っておく
+                                        .padding(bottom = dimensionResource(id = R.dimen.padding_medium)),
                                 )
-                            } else {
-                                content(listItem, work)
+                            }
+
+                            Row {
+                                if (work == null) {
+                                    BodyLargeText(
+                                        stringResource(notFoundWorkResId),
+                                        modifier = Modifier.weight(1f),
+                                        color = MaterialTheme.colorScheme.error,
+                                    )
+                                } else {
+                                    content(listItem, work)
+                                }
                             }
                         }
                     }
                 },
             )
-        }
-
-        item {
-            // 展開して表示しているときは終わりがわかるように余白を追加しておく
-            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_large)))
         }
     }
 }
