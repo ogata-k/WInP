@@ -13,6 +13,10 @@ fun buildFullDatePatternFormatter(): DateTimeFormatter {
     return DateTimeFormatter.ofPattern("yyyy/MM/dd")
 }
 
+fun buildFullYearMonthPatternFormatter(): DateTimeFormatter {
+    return DateTimeFormatter.ofPattern("yyyy/MM")
+}
+
 fun buildFullTimePatternFormatter(): DateTimeFormatter {
     return DateTimeFormatter.ofPattern("HH:mm")
 }
@@ -24,7 +28,7 @@ fun formatFullDateTimeOrEmpty(dateTime: LocalDateTime?): String {
     return if (dateTime == null) {
         "----/--/-- --:--"
     } else {
-        DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm").format(dateTime)
+        buildFullDateTimePatternFormatter().format(dateTime)
     }
 }
 
@@ -35,7 +39,18 @@ fun formatFullDateOrEmpty(dateTime: LocalDate?): String {
     return if (dateTime == null) {
         "----/--/--"
     } else {
-        DateTimeFormatter.ofPattern("yyyy/MM/dd").format(dateTime)
+        buildFullDatePatternFormatter().format(dateTime)
+    }
+}
+
+/**
+ * 年月のフォーマットに変換する。nullが値として渡されているならダミーを出力
+ */
+fun formatFullYearMonthOrEmpty(dateTime: LocalDate?): String {
+    return if (dateTime == null) {
+        "----/--"
+    } else {
+        buildFullYearMonthPatternFormatter().format(dateTime)
     }
 }
 
@@ -46,6 +61,6 @@ fun formatFullTimeOrEmpty(dateTime: LocalTime?): String {
     return if (dateTime == null) {
         "--:--"
     } else {
-        DateTimeFormatter.ofPattern("HH:mm").format(dateTime)
+        buildFullTimePatternFormatter().format(dateTime)
     }
 }

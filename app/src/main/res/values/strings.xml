@@ -67,6 +67,8 @@
     <string name="clear_form_value">入力値を削除</string>
     <string name="required">必須</string>
     <string name="optional">任意</string>
+    <string name="no_specified">未指定</string>
+    <string name="specified">指定済み</string>
 
     <!-- フォーム -->
     <string name="work_title">タイトル</string>
