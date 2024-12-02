@@ -10,7 +10,8 @@ enum class EventTarget {
     ERROR,
     WORK,
     WORK_TODO,
-    WORK_COMMENT;
+    WORK_COMMENT,
+    Setting;
 
     @Composable
     fun getName(): String {
@@ -19,6 +20,7 @@ enum class EventTarget {
             WORK -> stringResource(R.string.work)
             WORK_TODO -> stringResource(R.string.work_todo)
             WORK_COMMENT -> stringResource(R.string.work_comment)
+            Setting -> stringResource(R.string.setting)
         }
     }
 }

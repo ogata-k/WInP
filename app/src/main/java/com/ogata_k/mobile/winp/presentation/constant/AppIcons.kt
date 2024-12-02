@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.ui.graphics.vector.ImageVector
 
 class AppIcons {
@@ -68,5 +69,8 @@ class AppIcons {
 
         val selectFromList: ImageVector
             get() = Icons.Filled.FilterList
+
+        val notificationIcon: ImageVector
+            get() = Icons.Filled.Notifications
     }
 }

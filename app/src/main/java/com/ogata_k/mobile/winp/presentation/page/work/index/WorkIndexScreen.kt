@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -40,6 +41,7 @@ import com.ogata_k.mobile.winp.common.constant.AsCreate
 import com.ogata_k.mobile.winp.common.formatter.buildFullDatePatternFormatter
 import com.ogata_k.mobile.winp.presentation.constant.AppIcons
 import com.ogata_k.mobile.winp.presentation.model.work.Work
+import com.ogata_k.mobile.winp.presentation.page.setting.notification.NotificationSettingRouting
 import com.ogata_k.mobile.winp.presentation.page.showSimpleSnackbar
 import com.ogata_k.mobile.winp.presentation.page.work.detail.WorkDetailRouting
 import com.ogata_k.mobile.winp.presentation.page.work.edit.WorkEditRouting
@@ -97,8 +99,30 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
                         viewModel.showMoreAction(false)
                     },
                 )
+
+                HorizontalDivider(modifier = Modifier.fillMaxWidth())
+
+                DropdownMenuItem(
+                    text = {
+                        TitleMediumText(stringResource(R.string.setting_notification))
+                    },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = AppIcons.notificationIcon,
+                            contentDescription = stringResource(
+                                R.string.setting_notification
+                            ),
+                        )
+                    },
+                    onClick = {
+                        // 通知設定画面に遷移
+                        navController.navigate(NotificationSettingRouting().toPath())
+                        // 遷移した先でも表示が少し残ってしまうのですぐ消えるように指定しておく
+                        viewModel.showMoreAction(false)
+                    },
+                )
             }
-        },
+        }
     ) { modifier, appBar ->
         val snackbarHostState = remember { SnackbarHostState() }
 

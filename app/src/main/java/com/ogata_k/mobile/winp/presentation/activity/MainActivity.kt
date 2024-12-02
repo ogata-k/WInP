@@ -19,6 +19,9 @@ import com.ogata_k.mobile.winp.common.constant.AsCreate
 import com.ogata_k.mobile.winp.presentation.event.EventBus
 import com.ogata_k.mobile.winp.presentation.event.toast.ToastEvent
 import com.ogata_k.mobile.winp.presentation.page.composableByRouting
+import com.ogata_k.mobile.winp.presentation.page.setting.notification.NotificationSettingRouting
+import com.ogata_k.mobile.winp.presentation.page.setting.notification.NotificationSettingScreen
+import com.ogata_k.mobile.winp.presentation.page.setting.notification.NotificationSettingVM
 import com.ogata_k.mobile.winp.presentation.page.work.detail.WorkDetailRouting
 import com.ogata_k.mobile.winp.presentation.page.work.detail.WorkDetailScreen
 import com.ogata_k.mobile.winp.presentation.page.work.detail.WorkDetailVM
@@ -53,6 +56,10 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun SetupRouting(navController: NavHostController) {
     NavHost(navController = navController, startDestination = WorkIndexRouting.routingPath) {
+        //
+        // work関連
+        //
+
         // Workのサマリー
         composableByRouting(WorkSummaryRouting) { _ ->
             val vm: WorkSummaryVM = hiltViewModel()
@@ -92,6 +99,19 @@ fun SetupRouting(navController: NavHostController) {
             vm.initializeVM()
 
             WorkEditScreen(navController = navController, viewModel = vm)
+        }
+
+
+        //
+        // 設定関連
+        //
+
+        // 通知設定
+        composableByRouting(NotificationSettingRouting) { _ ->
+            val vm: NotificationSettingVM = hiltViewModel()
+            vm.initializeVM()
+
+            NotificationSettingScreen(navController, vm)
         }
     }
 }
