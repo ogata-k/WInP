@@ -198,13 +198,13 @@ private fun WorkIndexHeader(
     Row(
         modifier = Modifier
             .background(MaterialTheme.colorScheme.background)
+            .clickable { switchShowDatePickerForSearch(true) }
             .fillMaxWidth()
             .padding(dimensionResource(id = R.dimen.padding_medium)),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Row(
             modifier = Modifier
-                .clickable { switchShowDatePickerForSearch(true) }
                 .padding(dimensionResource(id = R.dimen.padding_medium)),
             verticalAlignment = Alignment.CenterVertically,
         ) {
