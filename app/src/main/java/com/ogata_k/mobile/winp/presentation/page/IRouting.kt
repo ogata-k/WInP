@@ -4,6 +4,8 @@ import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
@@ -43,16 +45,16 @@ interface ISetupRouting {
         get() = emptyList()
 
     fun getEnterTransition(): (@JvmSuppressWildcards AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition?)? =
-        null
+        { slideInHorizontally(initialOffsetX = { it }) }
 
     fun getExitTransition(): (@JvmSuppressWildcards AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition?)? =
-        null
+        { ExitTransition.None }
 
     fun getPopEnterTransition(): (@JvmSuppressWildcards AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition?)? =
-        null
+        { EnterTransition.None }
 
     fun getPopExitTransition(): (@JvmSuppressWildcards AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition?)? =
-        null
+        { slideOutHorizontally(targetOffsetX = { it }) }
 }
 
 /**
