@@ -2,12 +2,9 @@ package com.ogata_k.mobile.winp.presentation.page.setting.notification
 
 import androidx.lifecycle.viewModelScope
 import com.ogata_k.mobile.winp.presentation.enumerate.ScreenLoadingState
-import com.ogata_k.mobile.winp.presentation.enumerate.ValidationException
 import com.ogata_k.mobile.winp.presentation.event.EventBus
 import com.ogata_k.mobile.winp.presentation.event.toast.setting.NotFoundSetting
 import com.ogata_k.mobile.winp.presentation.model.common.BasicScreenState
-import com.ogata_k.mobile.winp.presentation.model.setting_form.NotificationSettingFormData
-import com.ogata_k.mobile.winp.presentation.model.setting_form.NotificationSettingFormValidateExceptions
 import com.ogata_k.mobile.winp.presentation.page.AbstractViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +13,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class NotificationSettingVM @Inject constructor() :
+class NotificationSettingVM @Inject constructor(
+    // TODO 取得に必要なユースケース（必要なら二つ）
+    // TODO アラーム設定を更新するユースケース（必要なら二つ）
+) :
     AbstractViewModel<ScreenLoadingState, NotificationSettingVMState, ScreenLoadingState, NotificationSettingUiState>() {
     override val viewModelStateFlow: MutableStateFlow<NotificationSettingVMState> =
         MutableStateFlow(
@@ -24,11 +24,8 @@ class NotificationSettingVM @Inject constructor() :
                 // 初期状態は未初期化状態とする
                 loadingState = ScreenLoadingState.READY,
                 basicState = BasicScreenState.initialState(),
-                formData = NotificationSettingFormData(
-                    todayTime = null,
-                    tomorrowTime = null,
-                ),
-                validateExceptions = NotificationSettingFormValidateExceptions.empty(),
+                todayNotifyTime = null,
+                tomorrowNotifyTime = null,
             )
         )
 
@@ -49,13 +46,17 @@ class NotificationSettingVM @Inject constructor() :
 
         // DBデータでFormの初期化をしたときに初期化を完了とする
         viewModelScope.launch {
-            // TODO 実際の設定値取得処理が失敗した場合にifの中に入るようにする
+            // TODO ここに取得処理
+
+            // TODO　実際の設定値取得処理が失敗した場合にifの中に入るようにする
             if (false) {
                 val loadingState = ScreenLoadingState.NOT_FOUND_EXCEPTION
                 updateVMState(
                     readVMState().copy(
                         loadingState = loadingState,
                         basicState = vmState.basicState.updateInitialize(loadingState),
+                        todayNotifyTime = null,
+                        tomorrowNotifyTime = null,
                     )
                 )
                 EventBus.postToastEvent(NotFoundSetting())
@@ -63,18 +64,14 @@ class NotificationSettingVM @Inject constructor() :
                 return@launch
             }
 
-            // TODO 取得したフォームデータと置き換える
-            val formData = NotificationSettingFormData(
-                todayTime = null,
-                tomorrowTime = null,
-            )
             val loadingState = ScreenLoadingState.NO_ERROR_INITIALIZED
             updateVMState(
                 readVMState().copy(
                     loadingState = loadingState,
                     basicState = vmState.basicState.updateInitialize(loadingState),
-                    formData = formData,
-                    validateExceptions = validateFormData(formData),
+                    // TODO 取得した時刻データと置き換える
+                    todayNotifyTime = null,
+                    tomorrowNotifyTime = null,
                 )
             )
         }
@@ -120,18 +117,5 @@ class NotificationSettingVM @Inject constructor() :
         basicScreenState: BasicScreenState
     ): NotificationSettingVMState {
         return viewModelState.copy(basicState = basicScreenState)
-    }
-
-    /**
-     * 入力内容をバリデーションする
-     */
-    private fun validateFormData(formData: NotificationSettingFormData): NotificationSettingFormValidateExceptions {
-        val todayTimeValidated: ValidationException = ValidationException.empty()
-        val tomorrowTimeValidated: ValidationException = ValidationException.empty()
-
-        return NotificationSettingFormValidateExceptions(
-            todayTime = todayTimeValidated,
-            tomorrowTime = tomorrowTimeValidated,
-        )
     }
 }
