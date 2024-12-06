@@ -24,7 +24,6 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -32,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
@@ -61,7 +61,7 @@ import java.time.LocalDate
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
-    val uiState: WorkIndexUiState by viewModel.uiStateFlow.collectAsState()
+    val uiState: WorkIndexUiState by viewModel.uiStateFlow.collectAsStateWithLifecycle()
 
     // collect fLow and remember state and launch event
     val workPagingItems: LazyPagingItems<Work> = uiState.workPagingData.collectAsLazyPagingItems()

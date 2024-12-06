@@ -32,7 +32,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -44,6 +43,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.ogata_k.mobile.winp.R
 import com.ogata_k.mobile.winp.common.constant.AsCreate
@@ -85,7 +85,7 @@ import com.ogata_k.mobile.winp.presentation.widget.work.WorkTodoItem
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
-    val uiState: WorkDetailUiState by viewModel.uiStateFlow.collectAsState()
+    val uiState: WorkDetailUiState by viewModel.uiStateFlow.collectAsStateWithLifecycle()
     val screenLoadingState = uiState.loadingState
     val basicScreenState = uiState.basicState
 

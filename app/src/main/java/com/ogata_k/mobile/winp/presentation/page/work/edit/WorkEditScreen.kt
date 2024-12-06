@@ -34,7 +34,6 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -45,6 +44,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.ogata_k.mobile.winp.R
 import com.ogata_k.mobile.winp.presentation.constant.AppIcons
@@ -87,7 +87,7 @@ import java.time.LocalTime
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
-    val uiState: WorkEditUiState by viewModel.uiStateFlow.collectAsState()
+    val uiState: WorkEditUiState by viewModel.uiStateFlow.collectAsStateWithLifecycle()
     val screenLoadingState = uiState.loadingState
     val basicScreenState = uiState.basicState
 

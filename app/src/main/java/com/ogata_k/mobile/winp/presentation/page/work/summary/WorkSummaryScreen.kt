@@ -33,7 +33,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,6 +40,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.ogata_k.mobile.winp.R
 import com.ogata_k.mobile.winp.common.formatter.buildFullDatePatternFormatter
@@ -67,7 +67,7 @@ import java.time.LocalDate
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WorkSummaryScreen(navController: NavController, viewModel: WorkSummaryVM) {
-    val uiState: WorkSummaryUiState by viewModel.uiStateFlow.collectAsState()
+    val uiState: WorkSummaryUiState by viewModel.uiStateFlow.collectAsStateWithLifecycle()
     val screenLoadingState = uiState.loadingState
 
     WithScaffoldSmallTopAppBar(
