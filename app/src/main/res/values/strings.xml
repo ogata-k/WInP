@@ -23,7 +23,7 @@
     <string name="input_from_time_input">時間を入力</string>
     <string name="select_date">日にちを入力</string>
     <string name="select_time">時間を入力</string>
-    <string name="ok">OK</string>
+    <string name="decide">確定</string>
     <string name="cancel">キャンセル</string>
     <string name="back">戻る</string>
     <string name="add">追加</string>
@@ -34,6 +34,8 @@
     <string name="dismiss">閉じる</string>
     <string name="to_expand">展開</string>
     <string name="to_shrink">縮小</string>
+    <string name="set_setting">設定</string>
+    <string name="clear_setting">取消し</string>
     <string name="valid_passed_percent">%.1f％</string>
     <string name="invalid_passed_percent">－％</string>
 
@@ -58,10 +60,12 @@
     <string name="title_create_work_comment">コメント作成</string>
     <string name="title_edit_work_comment">コメント編集</string>
     <string name="title_work_summary">サマリー</string>
+    <string name="title_clear_time_setting">時間設定の取消し</string>
 
     <!-- ダイアログコンテンツ -->
     <string name="dialog_content_confirm_delete_work">タスクを削除します。よろしいですか。</string>
     <string name="dialog_content_confirm_update_work_todo_complete_state">選択された対応項目の状態を更新します。よろしいですか。</string>
+    <string name="dialog_content_confirm_clear_time_setting">時間選択を取消します。よろしいですか。</string>
 
     <!-- フォーム共通 -->
     <string name="counter_format">%d／%d</string>
@@ -83,6 +87,8 @@
     <string name="work_began_at">開始日時</string>
     <string name="work_ended_at">終了日時</string>
     <string name="work_comment_title">コメント</string>
+    <string name="today_work_notify_setting_title">当日のタスク</string>
+    <string name="tomorrow_work_notify_setting_title">翌日のタスク</string>
 
     <!-- フォームヘルプ -->
     <string name="form_help_to_add_work_todo_form">タスクで対応状況を管理したい事柄があれば、右上の＋ボタンから追加できます。</string>

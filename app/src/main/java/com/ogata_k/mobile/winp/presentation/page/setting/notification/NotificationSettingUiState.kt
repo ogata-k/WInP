@@ -9,5 +9,9 @@ data class NotificationSettingUiState(
     override val loadingState: ScreenLoadingState,
     override val basicState: BasicScreenState,
     val todayNotifyTime: LocalTime?,
+    val isInShowTodayTimePicker: Boolean,
+    val isInShowClearTodayConfirmDialog: Boolean,
     val tomorrowNotifyTime: LocalTime?,
+    val isInShowTomorrowTimePicker: Boolean,
+    val isInShowClearTomorrowConfirmDialog: Boolean,
 ) : IUiState<ScreenLoadingState>

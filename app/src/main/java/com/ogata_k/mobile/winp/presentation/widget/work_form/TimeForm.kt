@@ -33,6 +33,18 @@ fun TimeFormColumnItem(
     switchShowTimePicker: (toShow: Boolean) -> Unit,
     updateTime: (time: LocalTime?) -> Unit,
     modifier: Modifier = Modifier,
+    deleteButton: @Composable (editing: Boolean) -> Unit = { editing ->
+        IconButton(
+            onClick = { updateTime(null) },
+            enabled = editing,
+        ) {
+            Icon(
+                modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_medium)),
+                imageVector = AppIcons.closeIcon,
+                contentDescription = stringResource(id = R.string.clear_form_value)
+            )
+        }
+    },
     canEdit: Boolean = true,
     canDelete: Boolean = true,
     isError: Boolean = false,
@@ -66,17 +78,8 @@ fun TimeFormColumnItem(
         }
         Spacer(modifier = Modifier.weight(1f))
         if (canDelete) {
-            Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_small)))
-            IconButton(
-                onClick = { updateTime(null) },
-                enabled = canEdit,
-            ) {
-                Icon(
-                    modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_medium)),
-                    imageVector = AppIcons.closeIcon,
-                    contentDescription = stringResource(id = R.string.clear_form_value)
-                )
-            }
+            Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_medium)))
+            deleteButton(canEdit)
         }
     }
     if (isInShowTimePicker) {
@@ -124,7 +127,7 @@ fun TimeFormColumnItem(
                     },
                     enabled = canEdit,
                 ) {
-                    ButtonMediumText(text = stringResource(R.string.ok))
+                    ButtonMediumText(text = stringResource(R.string.decide))
                 }
             },
         )

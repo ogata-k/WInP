@@ -1,10 +1,12 @@
 package com.ogata_k.mobile.winp.presentation.di.infra
 
 import android.content.Context
+import com.ogata_k.mobile.winp.domain.infra.database.dao.LocalNotificationDao
 import com.ogata_k.mobile.winp.domain.infra.database.dao.SummaryWorkDao
 import com.ogata_k.mobile.winp.domain.infra.database.dao.WorkCommentDao
 import com.ogata_k.mobile.winp.domain.infra.database.dao.WorkDao
 import com.ogata_k.mobile.winp.infra.database.AppDatabase
+import com.ogata_k.mobile.winp.infra.database.dao.impl.ILocalNotificationDao
 import com.ogata_k.mobile.winp.infra.database.dao.impl.ISummaryWorkDao
 import com.ogata_k.mobile.winp.infra.database.dao.impl.IWorkCommentDao
 import com.ogata_k.mobile.winp.infra.database.dao.impl.IWorkDao
@@ -41,4 +43,10 @@ object DatabaseModule {
     fun providesWorkCommentDao(
         appDb: AppDatabase,
     ): WorkCommentDao = IWorkCommentDao(appDb, appDb.workCommentDao())
+
+    @Singleton
+    @Provides
+    fun providesLocalNotificationDao(
+        appDb: AppDatabase,
+    ): LocalNotificationDao = ILocalNotificationDao(appDb, appDb.localNotificationDao())
 }

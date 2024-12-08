@@ -73,8 +73,10 @@ fun FormBlock(
     Row(
         modifier = Modifier
             .padding(
-                vertical = dimensionResource(id = R.dimen.padding_medium),
-                horizontal = dimensionResource(id = R.dimen.padding_small),
+                start = dimensionResource(id = R.dimen.padding_small),
+                top = dimensionResource(id = R.dimen.padding_small),
+                end = dimensionResource(id = R.dimen.padding_small),
+                bottom = dimensionResource(id = R.dimen.padding_medium),
             ),
     ) {
         content(errorMessage)

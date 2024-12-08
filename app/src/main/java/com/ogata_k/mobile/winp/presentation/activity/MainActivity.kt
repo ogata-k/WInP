@@ -64,14 +64,19 @@ fun SetupRouting(navController: NavHostController) {
         composableByRouting(WorkSummaryRouting) { _ ->
             val vm: WorkSummaryVM = hiltViewModel()
 
-            vm.initializeVM()
+            LaunchedEffect(Unit) {
+                vm.initializeVM()
+            }
             WorkSummaryScreen(navController = navController, viewModel = vm)
         }
 
         // Workの一覧
         composableByRouting(WorkIndexRouting) { _ ->
             val vm: WorkIndexVM = hiltViewModel()
-            vm.initializeVM()
+
+            LaunchedEffect(Unit) {
+                vm.initializeVM()
+            }
             WorkIndexScreen(navController = navController, viewModel = vm)
         }
 
@@ -79,12 +84,13 @@ fun SetupRouting(navController: NavHostController) {
         composableByRouting(WorkDetailRouting) { entry ->
             val vm: WorkDetailVM = hiltViewModel()
 
-            val workId: Long? = entry.arguments?.getLong(WorkDetailRouting.WORK_ID_KEY)
-            if (workId != null) {
-                vm.setWorkId(workId)
+            LaunchedEffect(Unit) {
+                val workId: Long? = entry.arguments?.getLong(WorkDetailRouting.WORK_ID_KEY)
+                if (workId != null) {
+                    vm.setWorkId(workId)
+                }
+                vm.initializeVM()
             }
-            vm.initializeVM()
-
             WorkDetailScreen(navController = navController, viewModel = vm)
         }
 
@@ -92,12 +98,13 @@ fun SetupRouting(navController: NavHostController) {
         composableByRouting(WorkEditRouting) { entry ->
             val vm: WorkEditVM = hiltViewModel()
 
-            // デフォルトは作成
-            val workId: Long =
-                entry.arguments?.getLong(WorkEditRouting.WORK_ID_KEY) ?: AsCreate.CREATING_ID
-            vm.setWorkId(workId)
-            vm.initializeVM()
-
+            LaunchedEffect(Unit) {
+                // デフォルトは作成
+                val workId: Long =
+                    entry.arguments?.getLong(WorkEditRouting.WORK_ID_KEY) ?: AsCreate.CREATING_ID
+                vm.setWorkId(workId)
+                vm.initializeVM()
+            }
             WorkEditScreen(navController = navController, viewModel = vm)
         }
 

@@ -36,6 +36,18 @@ fun DateFormColumnItem(
     switchShowDatePicker: (toShow: Boolean) -> Unit,
     updateDate: (date: LocalDate?) -> Unit,
     modifier: Modifier = Modifier,
+    deleteButton: @Composable (editing: Boolean) -> Unit = { editing ->
+        IconButton(
+            onClick = { updateDate(null) },
+            enabled = editing,
+        ) {
+            Icon(
+                modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_medium)),
+                imageVector = AppIcons.closeIcon,
+                contentDescription = stringResource(id = R.string.clear_form_value)
+            )
+        }
+    },
     canEdit: Boolean = true,
     canDelete: Boolean = true,
     isError: Boolean = false,
@@ -69,17 +81,8 @@ fun DateFormColumnItem(
         }
         Spacer(modifier = Modifier.weight(1f))
         if (canDelete) {
-            Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_small)))
-            IconButton(
-                onClick = { updateDate(null) },
-                enabled = canEdit,
-            ) {
-                Icon(
-                    modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_medium)),
-                    imageVector = AppIcons.closeIcon,
-                    contentDescription = stringResource(id = R.string.clear_form_value)
-                )
-            }
+            Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_medium)))
+            deleteButton(canEdit)
         }
     }
     if (isInShowDatePicker) {
@@ -112,7 +115,7 @@ fun DateFormColumnItem(
                     },
                     enabled = canEdit,
                 ) {
-                    ButtonMediumText(text = stringResource(R.string.ok))
+                    ButtonMediumText(text = stringResource(R.string.decide))
                 }
             },
         )

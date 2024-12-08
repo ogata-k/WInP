@@ -650,7 +650,21 @@ private fun LabelSmallTextPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun ButtonTextPreview() {
+private fun ButtonLargeTextPreview() {
     ButtonLargeText("本日2024/7/23は晴天なり")
+}
+
+
+@Preview(showBackground = true)
+@Composable
+private fun ButtonMediumTextPreview() {
+    ButtonMediumText("本日2024/7/23は晴天なり")
+}
+
+
+@Preview(showBackground = true)
+@Composable
+private fun ButtonSmallTextPreview() {
+    ButtonSmallText("本日2024/7/23は晴天なり")
 }
 
