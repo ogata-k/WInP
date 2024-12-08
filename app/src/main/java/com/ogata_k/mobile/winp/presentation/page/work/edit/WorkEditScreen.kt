@@ -507,12 +507,16 @@ fun WorkEditScreen(navController: NavController, viewModel: WorkEditVM) {
 
                 // アイテムが見つからず終了
                 ScreenLoadingState.NOT_FOUND_EXCEPTION -> {
-                    navController.popBackStack()
+                    LaunchedEffect(Unit) {
+                        navController.popBackStack()
+                    }
                 }
 
                 // 予期せぬエラーがあった場合
                 ScreenLoadingState.ERROR -> {
-                    navController.popBackStack()
+                    LaunchedEffect(Unit) {
+                        navController.popBackStack()
+                    }
                 }
             }
         }

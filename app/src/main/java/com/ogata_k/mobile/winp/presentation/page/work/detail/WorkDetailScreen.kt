@@ -490,13 +490,17 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                 // アイテムが見つからず終了
                 ScreenLoadingState.NOT_FOUND_EXCEPTION -> {
                     // 続いての処理はできないので前の画面に戻る
-                    navController.popBackStack()
+                    LaunchedEffect(Unit) {
+                        navController.popBackStack()
+                    }
                 }
 
                 // 予期せぬエラーがあった場合
                 ScreenLoadingState.ERROR -> {
                     // 続いての処理はできないので前の画面に戻る
-                    navController.popBackStack()
+                    LaunchedEffect(Unit) {
+                        navController.popBackStack()
+                    }
                 }
             }
         }
