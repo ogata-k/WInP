@@ -262,7 +262,7 @@ private fun WorkIndexHeader(
                             updateAndHideDialogSearchQuery(fromMillsToDate(dateTimestamp))
                         }
                     }) {
-                        ButtonMediumText(text = stringResource(R.string.ok))
+                        ButtonMediumText(text = stringResource(R.string.decide))
                     }
                 },
             )

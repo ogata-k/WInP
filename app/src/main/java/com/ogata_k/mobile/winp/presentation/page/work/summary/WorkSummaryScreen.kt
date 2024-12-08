@@ -353,7 +353,7 @@ private fun SelectableRangeDateHeader(
                                     updateAndHideRangeDatePicker(fromDate, toDate)
                                 }
                             }) {
-                                ButtonMediumText(text = stringResource(R.string.ok))
+                                ButtonMediumText(text = stringResource(R.string.decide))
                             }
                         },
                     )
