@@ -1,16 +1,34 @@
 package com.ogata_k.mobile.winp.presentation.use_case.local_notification
 
+import com.ogata_k.mobile.winp.domain.component.AlarmScheduler
 import com.ogata_k.mobile.winp.domain.infra.database.dao.LocalNotificationDao
 import com.ogata_k.mobile.winp.domain.use_case.local_notification.DeleteLocalNotificationAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.local_notification.DeleteLocalNotificationInput
 import com.ogata_k.mobile.winp.domain.use_case.local_notification.DeleteLocalNotificationOutput
+import com.ogata_k.mobile.winp.presentation.extention.toBroadcastForReminderIntent
 import kotlin.coroutines.cancellation.CancellationException
 
-class IDeleteLocalNotificationAsyncUseCase(private val dao: LocalNotificationDao) :
+class IDeleteLocalNotificationAsyncUseCase(
+    private val alarmScheduler: AlarmScheduler,
+    private val dao: LocalNotificationDao
+) :
     DeleteLocalNotificationAsyncUseCase {
     override suspend fun call(input: DeleteLocalNotificationInput): DeleteLocalNotificationOutput {
         try {
-            dao.deleteLocalNotification(input.notifyDiv)
+            val notifyDiv = input.notifyDiv
+
+            dao.deleteLocalNotification(notifyDiv)
+
+            // アラームはキャンセル
+            alarmScheduler.cancel(
+                requestCode = notifyDiv.value,
+                intentBuilder = { context, requestCode ->
+                    notifyDiv.toBroadcastForReminderIntent(
+                        context,
+                        requestCode
+                    )
+                }
+            )
             return DeleteLocalNotificationOutput.success(Unit)
         } catch (e: CancellationException) {
             // suspendなので中断される可能性を考慮。中断時はキャンセル用のエラーが渡ってくるのでそのまま投げる

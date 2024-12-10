@@ -1,5 +1,6 @@
 package com.ogata_k.mobile.winp.presentation.di.use_case
 
+import com.ogata_k.mobile.winp.domain.component.AlarmScheduler
 import com.ogata_k.mobile.winp.domain.infra.database.dao.LocalNotificationDao
 import com.ogata_k.mobile.winp.domain.use_case.local_notification.DeleteLocalNotificationAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.local_notification.FetchAllLocalNotificationAsyncUseCase
@@ -33,15 +34,17 @@ object LocalNotificationUseCaseModule {
 
     @Provides
     fun provideUpsertLocalNotificationAsyncUseCase(
+        alarmScheduler: AlarmScheduler,
         dao: LocalNotificationDao,
     ): UpsertLocalNotificationAsyncUseCase {
-        return IUpsertLocalNotificationAsyncUseCase(dao)
+        return IUpsertLocalNotificationAsyncUseCase(alarmScheduler, dao)
     }
 
     @Provides
     fun provideDeleteLocalNotificationAsyncUseCase(
+        alarmScheduler: AlarmScheduler,
         dao: LocalNotificationDao,
     ): DeleteLocalNotificationAsyncUseCase {
-        return IDeleteLocalNotificationAsyncUseCase(dao)
+        return IDeleteLocalNotificationAsyncUseCase(alarmScheduler, dao)
     }
 }
