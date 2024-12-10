@@ -1,6 +1,5 @@
 package com.ogata_k.mobile.winp.presentation.page.setting.notification
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -38,6 +37,7 @@ import com.ogata_k.mobile.winp.presentation.enumerate.ScreenLoadingState
 import com.ogata_k.mobile.winp.presentation.event.snackbar.SnackbarEvent
 import com.ogata_k.mobile.winp.presentation.page.showSimpleSnackbar
 import com.ogata_k.mobile.winp.presentation.widget.common.AppBarBackButton
+import com.ogata_k.mobile.winp.presentation.widget.common.BodyMediumText
 import com.ogata_k.mobile.winp.presentation.widget.common.ButtonMediumText
 import com.ogata_k.mobile.winp.presentation.widget.common.ColumnScrollBar
 import com.ogata_k.mobile.winp.presentation.widget.common.ConfirmAlertDialog
@@ -101,8 +101,9 @@ fun NotificationSettingScreen(navController: NavController, viewModel: Notificat
                                 .fillMaxSize()
                                 .padding(dimensionResource(id = R.dimen.padding_large)),
                             horizontalAlignment = Alignment.Start,
-                            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium)),
                         ) {
+                            BodyMediumText(stringResource(R.string.form_help_to_set_notify_time))
+                            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_large)))
                             TimeDisplayAndForm(
                                 title = stringResource(R.string.today_work_notify_setting_title),
                                 time = uiState.todayNotifyTime,
@@ -120,7 +121,7 @@ fun NotificationSettingScreen(navController: NavController, viewModel: Notificat
                                     )
                                 },
                             )
-                            Spacer(Modifier.height(dimensionResource(R.dimen.padding_extra_large)))
+                            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_extra_large)))
                             TimeDisplayAndForm(
                                 title = stringResource(R.string.tomorrow_work_notify_setting_title),
                                 time = uiState.tomorrowNotifyTime,
