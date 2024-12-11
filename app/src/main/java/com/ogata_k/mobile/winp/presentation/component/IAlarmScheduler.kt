@@ -1,23 +1,22 @@
 package com.ogata_k.mobile.winp.presentation.component
 
 import android.app.AlarmManager
-import android.app.PendingIntent
 import android.content.Context
 import com.ogata_k.mobile.winp.common.type_converter.LocalTimeConverter
 import com.ogata_k.mobile.winp.domain.component.AlarmScheduler
+import com.ogata_k.mobile.winp.domain.enumerate.LocalNotifyDiv
+import com.ogata_k.mobile.winp.presentation.constant.WInPRequestCodeCategory
+import com.ogata_k.mobile.winp.presentation.extention.toBroadcastForReminderIntent
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.OffsetDateTime
 
 class IAlarmScheduler(private val context: Context, private val manager: AlarmManager) :
     AlarmScheduler {
-    override fun scheduleInexactRepeating(
-        requestCode: Int,
-        alarmType: Int,
+    override fun scheduleLocalNotifyInexactRepeating(
+        notifyDiv: LocalNotifyDiv,
         notifyTime: LocalTime,
         canSkipPastNotifyTime: Boolean,
-        intervalMills: Long,
-        intentBuilder: (context: Context, requestCode: Int) -> PendingIntent
     ) {
         val nowDateTime: OffsetDateTime = OffsetDateTime.now()
         val targetDateTime: OffsetDateTime = LocalTimeConverter
@@ -32,18 +31,25 @@ class IAlarmScheduler(private val context: Context, private val manager: AlarmMa
                 return@let it
             }
 
+        val requestCode = WInPRequestCodeCategory.toAlarmLocalNotificationRequestCode(notifyDiv)
         manager.setInexactRepeating(
-            requestCode,
+            AlarmManager.RTC_WAKEUP,
             targetDateTime.toZonedDateTime().toInstant().toEpochMilli(),
-            intervalMills,
-            intentBuilder(context, requestCode),
+            AlarmManager.INTERVAL_DAY,
+            notifyDiv.toBroadcastForReminderIntent(
+                context,
+                requestCode
+            ),
         )
     }
 
-    override fun cancel(
-        requestCode: Int,
-        intentBuilder: (context: Context, requestCode: Int) -> PendingIntent
-    ) {
-        manager.cancel(intentBuilder(context, requestCode))
+    override fun cancel(notifyDiv: LocalNotifyDiv) {
+        val requestCode = WInPRequestCodeCategory.toAlarmLocalNotificationRequestCode(notifyDiv)
+        manager.cancel(
+            notifyDiv.toBroadcastForReminderIntent(
+                context,
+                requestCode
+            ),
+        )
     }
 }

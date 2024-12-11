@@ -1,7 +1,6 @@
 package com.ogata_k.mobile.winp.domain.component
 
-import android.app.PendingIntent
-import android.content.Context
+import com.ogata_k.mobile.winp.domain.enumerate.LocalNotifyDiv
 import java.time.LocalTime
 
 interface AlarmScheduler {
@@ -11,20 +10,14 @@ interface AlarmScheduler {
      *
      * [canSkipPastNotifyTime]にtrueを指定すると、時間設定時にその日の時間が過ぎていたらスキップする
      */
-    fun scheduleInexactRepeating(
-        requestCode: Int,
-        alarmType: Int,
+    fun scheduleLocalNotifyInexactRepeating(
+        notifyDiv: LocalNotifyDiv,
         notifyTime: LocalTime,
         canSkipPastNotifyTime: Boolean,
-        intervalMills: Long,
-        intentBuilder: (context: Context, requestCode: Int) -> PendingIntent
     )
 
     /**
      * スケージュールした設定をキャンセルする
      */
-    fun cancel(
-        requestCode: Int,
-        intentBuilder: (context: Context, requestCode: Int) -> PendingIntent
-    )
+    fun cancel(notifyDiv: LocalNotifyDiv)
 }

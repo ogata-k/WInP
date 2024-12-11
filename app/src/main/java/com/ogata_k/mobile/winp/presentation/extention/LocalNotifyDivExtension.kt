@@ -1,6 +1,5 @@
 package com.ogata_k.mobile.winp.presentation.extention
 
-import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -15,22 +14,12 @@ import java.time.LocalTime
 fun LocalNotifyDiv.scheduleReminder(
     alarmScheduler: AlarmScheduler,
     notifyTime: LocalTime,
-    requestCode: Int = this.value,
     canSkipPastNotifyTime: Boolean = true
 ) {
-    val notifyDiv = this
-    alarmScheduler.scheduleInexactRepeating(
-        requestCode = requestCode,
-        alarmType = AlarmManager.RTC_WAKEUP,
+    alarmScheduler.scheduleLocalNotifyInexactRepeating(
+        notifyDiv = this,
         notifyTime = notifyTime,
         canSkipPastNotifyTime = canSkipPastNotifyTime,
-        intervalMills = AlarmManager.INTERVAL_DAY,
-        intentBuilder = { context, code ->
-            notifyDiv.toBroadcastForReminderIntent(
-                context,
-                code
-            )
-        }
     )
 }
 
