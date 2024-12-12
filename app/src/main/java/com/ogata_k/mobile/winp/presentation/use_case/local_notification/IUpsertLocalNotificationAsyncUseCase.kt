@@ -24,7 +24,6 @@ class IUpsertLocalNotificationAsyncUseCase(
             notifyDiv.scheduleReminder(
                 alarmScheduler = alarmScheduler,
                 notifyTime = notifyTime.toLocalTime(),
-                canSkipPastNotifyTime = true,
             )
             return UpsertLocalNotificationOutput.success(Unit)
         } catch (e: CancellationException) {

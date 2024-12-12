@@ -52,7 +52,6 @@ class BootCompletedReceiver : Hilt_BootCompletedReceiver() {
                         setting.localNotifyDiv.scheduleReminder(
                             alarmScheduler = alarmScheduler,
                             notifyTime = setting.notifyTime.toLocalTime(),
-                            canSkipPastNotifyTime = false,
                         )
                     }
                 } catch (e: CancellationException) {

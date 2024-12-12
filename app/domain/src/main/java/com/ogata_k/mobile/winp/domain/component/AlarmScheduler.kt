@@ -13,7 +13,6 @@ interface AlarmScheduler {
     fun scheduleLocalNotifyInexactRepeating(
         notifyDiv: LocalNotifyDiv,
         notifyTime: LocalTime,
-        canSkipPastNotifyTime: Boolean,
     )
 
     /**

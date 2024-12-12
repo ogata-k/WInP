@@ -16,14 +16,13 @@ class IAlarmScheduler(private val context: Context, private val manager: AlarmMa
     override fun scheduleLocalNotifyInexactRepeating(
         notifyDiv: LocalNotifyDiv,
         notifyTime: LocalTime,
-        canSkipPastNotifyTime: Boolean,
     ) {
         val nowDateTime: OffsetDateTime = OffsetDateTime.now()
         val targetDateTime: OffsetDateTime = LocalTimeConverter
             .toOffsetTime(notifyTime)
             .atDate(LocalDate.now())
             .let {
-                if (canSkipPastNotifyTime && nowDateTime >= it) {
+                if (nowDateTime >= it) {
                     // 設定しようとしている日時が過ぎていたので翌日に繰り越し
                     return@let it.plusDays(1)
                 }

@@ -14,12 +14,10 @@ import java.time.LocalTime
 fun LocalNotifyDiv.scheduleReminder(
     alarmScheduler: AlarmScheduler,
     notifyTime: LocalTime,
-    canSkipPastNotifyTime: Boolean = true
 ) {
     alarmScheduler.scheduleLocalNotifyInexactRepeating(
         notifyDiv = this,
         notifyTime = notifyTime,
-        canSkipPastNotifyTime = canSkipPastNotifyTime,
     )
 }
 
