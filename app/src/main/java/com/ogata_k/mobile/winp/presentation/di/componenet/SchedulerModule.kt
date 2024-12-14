@@ -4,9 +4,9 @@ import android.app.AlarmManager
 import android.app.NotificationManager
 import android.content.Context
 import com.ogata_k.mobile.winp.domain.component.AlarmScheduler
-import com.ogata_k.mobile.winp.domain.component.NotificationScheduler
+import com.ogata_k.mobile.winp.domain.component.LocalNotificationScheduler
 import com.ogata_k.mobile.winp.presentation.component.IAlarmScheduler
-import com.ogata_k.mobile.winp.presentation.component.INotificationScheduler
+import com.ogata_k.mobile.winp.presentation.component.ILocalNotificationScheduler
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,9 +28,9 @@ object SchedulerModule {
 
     @Singleton
     @Provides
-    fun providesNotifyScheduler(
+    fun providesLocalNotifyScheduler(
         @ApplicationContext context: Context,
-    ): NotificationScheduler = INotificationScheduler(
+    ): LocalNotificationScheduler = ILocalNotificationScheduler(
         context = context,
         manager = context.getSystemService(NotificationManager::class.java)
     )

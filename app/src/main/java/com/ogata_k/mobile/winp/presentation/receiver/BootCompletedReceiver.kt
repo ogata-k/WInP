@@ -4,11 +4,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.ogata_k.mobile.winp.domain.component.AlarmScheduler
-import com.ogata_k.mobile.winp.domain.model.notification.LocalNotification
-import com.ogata_k.mobile.winp.domain.use_case.local_notification.FetchAllLocalNotificationAsyncUseCase
-import com.ogata_k.mobile.winp.domain.use_case.local_notification.FetchAllLocalNotificationInput
-import com.ogata_k.mobile.winp.presentation.extention.scheduleReminder
+import com.ogata_k.mobile.winp.domain.use_case.local_notification.RescheduleAllScheduledNotificationAsyncUseCase
+import com.ogata_k.mobile.winp.domain.use_case.local_notification.RescheduleAllScheduledNotificationInput
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -25,10 +22,7 @@ class BootCompletedReceiver : Hilt_BootCompletedReceiver() {
     }
 
     @Inject
-    lateinit var alarmScheduler: AlarmScheduler
-
-    @Inject
-    lateinit var fetchAllLocalNotificationUseCase: FetchAllLocalNotificationAsyncUseCase
+    lateinit var rescheduleAllScheduledNotificationUseCase: RescheduleAllScheduledNotificationAsyncUseCase
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
@@ -44,16 +38,9 @@ class BootCompletedReceiver : Hilt_BootCompletedReceiver() {
         coroutineScope.launch {
             try {
                 try {
-                    val allSettings: List<LocalNotification> = fetchAllLocalNotificationUseCase
-                        .call(FetchAllLocalNotificationInput)
-                        .getOrThrow()
-                    allSettings.forEach { setting ->
-                        // アラームの設定
-                        setting.localNotifyDiv.scheduleReminder(
-                            alarmScheduler = alarmScheduler,
-                            notifyTime = setting.notifyTime.toLocalTime(),
-                        )
-                    }
+                    rescheduleAllScheduledNotificationUseCase.call(
+                        RescheduleAllScheduledNotificationInput
+                    ).getOrThrow()
                 } catch (e: CancellationException) {
                     throw e
                 } catch (t: Throwable) {

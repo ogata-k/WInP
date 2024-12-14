@@ -3,12 +3,18 @@ package com.ogata_k.mobile.winp.presentation.page.setting.notification
 import androidx.lifecycle.viewModelScope
 import com.ogata_k.mobile.winp.common.type_converter.LocalTimeConverter
 import com.ogata_k.mobile.winp.domain.enumerate.LocalNotifyDiv
+import com.ogata_k.mobile.winp.domain.use_case.local_notification.CheckHasNotificationPermissionSyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.local_notification.DeleteLocalNotificationAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.local_notification.DeleteLocalNotificationInput
 import com.ogata_k.mobile.winp.domain.use_case.local_notification.GetLocalNotificationAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.local_notification.GetLocalNotificationInput
+import com.ogata_k.mobile.winp.domain.use_case.local_notification.InitializeAllNotificationChannelsInput
+import com.ogata_k.mobile.winp.domain.use_case.local_notification.InitializeAllNotificationChannelsSyncUseCase
+import com.ogata_k.mobile.winp.domain.use_case.local_notification.RequestNotificationPermissionSyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.local_notification.UpsertLocalNotificationAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.local_notification.UpsertLocalNotificationInput
+import com.ogata_k.mobile.winp.domain.use_case.work.NotifyForWorkAsyncUseCase
+import com.ogata_k.mobile.winp.domain.use_case.work.NotifyForWorkInput
 import com.ogata_k.mobile.winp.presentation.enumerate.ScreenLoadingState
 import com.ogata_k.mobile.winp.presentation.event.EventAction
 import com.ogata_k.mobile.winp.presentation.event.EventBus
@@ -34,6 +40,10 @@ class NotificationSettingVM @Inject constructor(
     private val getLocalNotificationUseCase: GetLocalNotificationAsyncUseCase,
     private val deleteLocalNotificationUseCase: DeleteLocalNotificationAsyncUseCase,
     private val upsertLocalNotificationUseCase: UpsertLocalNotificationAsyncUseCase,
+    private val initializeAllNotificationChannelsUseCase: InitializeAllNotificationChannelsSyncUseCase,
+    private val checkHasNotificationPermissionUseCase: CheckHasNotificationPermissionSyncUseCase,
+    private val requestNotificationPermissionUseCase: RequestNotificationPermissionSyncUseCase,
+    private val notifyForWorkUseCase: NotifyForWorkAsyncUseCase,
 ) :
     AbstractViewModel<ScreenLoadingState, NotificationSettingVMState, ScreenLoadingState, NotificationSettingUiState>() {
     override val viewModelStateFlow: MutableStateFlow<NotificationSettingVMState> =
@@ -66,8 +76,10 @@ class NotificationSettingVM @Inject constructor(
         )
         updateVMState(vmState)
 
-        // DBデータでFormの初期化をしたときに初期化を完了とする
         viewModelScope.launch {
+            // 通知するためにはチャネルが作成されないと通知できないのでここで初期化
+            initializeAllNotificationChannelsUseCase.call(InitializeAllNotificationChannelsInput)
+
             val todayLocalNotificationResult =
                 getLocalNotificationUseCase.call(GetLocalNotificationInput(LocalNotifyDiv.TODAY_EVERY_DAY))
             val tomorrowLocalNotificationResult =

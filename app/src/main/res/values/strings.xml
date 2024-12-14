@@ -153,6 +153,13 @@
     <string name="select_range_date_type_PrevYear">昨年</string>
     <string name="select_range_date_type_Custom">カスタム</string>
 
+    <!-- 通知チャンネル -->
+    <string name="work_notification_channel_group_name">タスク</string>
+    <string name="today_work_notification_channel_name">当日のタスク</string>
+    <string name="today_work_notification_channel_description">毎日定刻に行われる当日のタスクについての通知</string>
+    <string name="tomorrow_work_notification_channel_name">翌日のタスク</string>
+    <string name="tomorrow_work_notification_channel_description">毎日定刻に行われる翌日のタスクについての通知</string>
+
     <!-- その他 -->
     <string name="no_period">期限なし</string>
     <string name="not_found_work">タスクが見つかりません</string>

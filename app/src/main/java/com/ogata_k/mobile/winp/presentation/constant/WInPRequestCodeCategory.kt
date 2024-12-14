@@ -8,7 +8,7 @@ import com.ogata_k.mobile.winp.domain.enumerate.LocalNotifyDiv
 class WInPRequestCodeCategory {
     companion object {
         /**
-         * LocalNotifyDivをアラームに登録するときに利用する値
+         * [LocalNotifyDiv]をもとに通知をたたくためのアラームを登録するときに利用する値
          */
         private const val ALARM_LOCAL_NOTIFY: Int = 100
 
@@ -17,5 +17,27 @@ class WInPRequestCodeCategory {
          */
         fun toAlarmLocalNotificationRequestCode(notifyDiv: LocalNotifyDiv): Int =
             ALARM_LOCAL_NOTIFY + notifyDiv.value
+
+        /**
+         * [LocalNotifyDiv]の通知処理を行う時のPendingIntent用のリクエストコード
+         */
+        private const val LOCAL_NOTIFY_REQUEST_CODE: Int = 200
+
+        /**
+         * 通知するときのPendingIntent用のリクエストコードに変換
+         */
+        fun toNotifyRequestCode(notifyDiv: LocalNotifyDiv): Int =
+            LOCAL_NOTIFY_REQUEST_CODE + notifyDiv.value
+
+        /**
+         * [LocalNotifyDiv]の通知処理を行う時の通知ID
+         */
+        private const val LOCAL_NOTIFY_NOTIFICATION_ID: Int = 300
+
+        /**
+         * 通知するときの値に変換
+         */
+        fun toNotifyNotificationId(notifyDiv: LocalNotifyDiv): Int =
+            LOCAL_NOTIFY_NOTIFICATION_ID + notifyDiv.value
     }
 }

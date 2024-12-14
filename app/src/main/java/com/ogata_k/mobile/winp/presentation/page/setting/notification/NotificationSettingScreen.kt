@@ -19,6 +19,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
@@ -33,6 +34,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.ogata_k.mobile.winp.R
 import com.ogata_k.mobile.winp.common.formatter.formatFullTimeOrEmpty
+import com.ogata_k.mobile.winp.domain.enumerate.LocalNotifyDiv
 import com.ogata_k.mobile.winp.presentation.enumerate.ScreenLoadingState
 import com.ogata_k.mobile.winp.presentation.event.snackbar.SnackbarEvent
 import com.ogata_k.mobile.winp.presentation.page.showSimpleSnackbar

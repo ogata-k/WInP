@@ -20,16 +20,24 @@ import com.ogata_k.mobile.winp.presentation.model.common.BasicScreenState
 import com.ogata_k.mobile.winp.presentation.model.work.Work
 import com.ogata_k.mobile.winp.presentation.page.AbstractViewModel
 import com.ogata_k.mobile.winp.presentation.paging_source.WorkPagingSource
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.time.LocalDate
-import javax.inject.Inject
 
-@HiltViewModel
-class WorkIndexVM @Inject constructor(
-    private val fetchPageWorksUseCase: FetchPageWorksAsyncUseCase
+@HiltViewModel(assistedFactory = WorkIndexVM.WorkIndexVMFactory::class)
+class WorkIndexVM @AssistedInject constructor(
+    @Assisted private val initialSearchDate: LocalDate,
+    private val fetchPageWorksUseCase: FetchPageWorksAsyncUseCase,
 ) : AbstractViewModel<ScreenLoadingState, WorkIndexVMState, ScreenLoadingState, WorkIndexUiState>() {
+    @AssistedFactory
+    interface WorkIndexVMFactory {
+        fun create(initialSearchDate: LocalDate): WorkIndexVM
+    }
+
     companion object {
         // 初回ページサイズ
         const val INITIAL_PAGE_SIZE: Int = 50
@@ -49,7 +57,7 @@ class WorkIndexVM @Inject constructor(
                 .updateInitialize(ScreenLoadingState.NO_ERROR_INITIALIZED),
             inShowMoreAction = false,
             isInSearchDate = false,
-            searchDate = LocalDate.now(),
+            searchDate = initialSearchDate,
             isInRefreshing = false,
             workPagingData = Pager(
                 config = PagingConfig(
@@ -71,6 +79,7 @@ class WorkIndexVM @Inject constructor(
                 .cachedIn(scope = viewModelScope)
         )
         )
+
     override val uiStateFlow: StateFlow<WorkIndexUiState> =
         asUIStateFlow(viewModelScope, viewModelStateFlow)
 
@@ -89,7 +98,7 @@ class WorkIndexVM @Inject constructor(
 
     override fun replaceVMBasicScreenState(
         viewModelState: WorkIndexVMState,
-        basicScreenState: BasicScreenState
+        basicScreenState: BasicScreenState,
     ): WorkIndexVMState {
         return viewModelState.copy(basicState = basicScreenState)
     }
@@ -166,12 +175,19 @@ class WorkIndexVM @Inject constructor(
         val vmState = readVMState()
         if (vmState.searchDate == date) {
             // 検索条件が変化していないのでリフレッシュはせずに終了
-            val newVmState = vmState.copy(isInSearchDate = false)
+            val newVmState = vmState.copy(
+                isInSearchDate = false,
+                basicState = vmState.basicState.copy(needForceUpdate = false),
+            )
             updateVMState(newVmState)
             return
         }
 
-        val newVmState = vmState.copy(searchDate = date, isInSearchDate = false)
+        val newVmState = vmState.copy(
+            searchDate = date,
+            isInSearchDate = false,
+            basicState = vmState.basicState.copy(needForceUpdate = false),
+        )
         updateVMState(newVmState)
 
         workPagingItems.refresh()

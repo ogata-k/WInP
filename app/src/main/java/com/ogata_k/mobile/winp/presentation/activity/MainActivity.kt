@@ -1,6 +1,8 @@
 package com.ogata_k.mobile.winp.presentation.activity
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import android.widget.Toast.LENGTH_LONG
 import androidx.activity.ComponentActivity
@@ -36,6 +38,8 @@ import com.ogata_k.mobile.winp.presentation.page.work.summary.WorkSummaryScreen
 import com.ogata_k.mobile.winp.presentation.page.work.summary.WorkSummaryVM
 import com.ogata_k.mobile.winp.presentation.theme.WInPTheme
 import dagger.hilt.android.AndroidEntryPoint
+import java.time.LocalDate
+import java.time.format.DateTimeParseException
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -46,7 +50,7 @@ class MainActivity : ComponentActivity() {
             WInPTheme {
                 val navController = rememberNavController()
 
-                SetupRouting(navController = navController)
+                SetupRouting(navController = navController, intent = intent)
                 SetupToastNotifier()
             }
         }
@@ -54,7 +58,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun SetupRouting(navController: NavHostController) {
+fun SetupRouting(navController: NavHostController, intent: Intent) {
     NavHost(navController = navController, startDestination = WorkIndexRouting.routingPath) {
         //
         // work関連
@@ -72,7 +76,20 @@ fun SetupRouting(navController: NavHostController) {
 
         // Workの一覧
         composableByRouting(WorkIndexRouting) { _ ->
-            val vm: WorkIndexVM = hiltViewModel()
+            val vm: WorkIndexVM = hiltViewModel { factory: WorkIndexVM.WorkIndexVMFactory ->
+                val initialSearchDate =
+                    intent.getStringExtra(WorkIndexRouting.SEARCH_DATE_INTENT_EXTRA_KEY)?.let {
+                        try {
+                            return@let LocalDate.parse(it)
+                        } catch (e: DateTimeParseException) {
+                            Log.e(WorkIndexRouting.toString(), e.toString())
+                        }
+
+                        return@let null
+                    } ?: LocalDate.now()
+
+                factory.create(initialSearchDate)
+            }
 
             LaunchedEffect(Unit) {
                 vm.initializeVM()
