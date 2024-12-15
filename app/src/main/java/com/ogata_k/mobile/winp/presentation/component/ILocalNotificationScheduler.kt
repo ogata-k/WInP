@@ -11,6 +11,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.provider.Settings
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.ogata_k.mobile.winp.R
@@ -155,6 +156,14 @@ class ILocalNotificationScheduler(
         shrankBody: String,
         expandedBody: String?,
     ) {
+        if (!checkHasNotificationPermission(notifyDiv)) {
+            Log.e(
+                "LocalNotificationScheduler",
+                "FAIL LOCAL PUSH BECAUSE NO PERMISSION FOR notify_div %s".format(notifyDiv.toString())
+            )
+            return
+        }
+
         val activityIntent = Intent(context, MainActivity::class.java).apply {
             // 開こうとしているActivityと同じActivityのインスタンスが存在する場合、そのActivityとその上のActivityをクリアして新しいActivityで起動する
             flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -205,9 +214,7 @@ class ILocalNotificationScheduler(
                 .setContentIntent(activityActionPendingIntent)
                 .build()
 
-        if (checkHasNotificationPermission(notifyDiv)) {
             val notificationId = WInPRequestCodeCategory.toNotifyNotificationId(notifyDiv)
             manager.notify(notificationId, notification)
-        }
     }
 }
