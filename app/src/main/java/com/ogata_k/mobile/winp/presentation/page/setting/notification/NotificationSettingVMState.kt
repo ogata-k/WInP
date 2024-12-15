@@ -9,9 +9,11 @@ data class NotificationSettingVMState(
     override val loadingState: ScreenLoadingState,
     override val basicState: BasicScreenState,
     val todayNotifyTime: LocalTime?,
+    val needRequestTodayNotifyPermission: Boolean,
     val isInShowTodayTimePicker: Boolean,
     val isInShowClearTodayConfirmDialog: Boolean,
     val tomorrowNotifyTime: LocalTime?,
+    val needRequestTomorrowNotifyPermission: Boolean,
     val isInShowTomorrowTimePicker: Boolean,
     val isInShowClearTomorrowConfirmDialog: Boolean,
 ) : IVMState<ScreenLoadingState, ScreenLoadingState, NotificationSettingUiState> {
@@ -20,9 +22,11 @@ data class NotificationSettingVMState(
             loadingState = loadingState,
             basicState = basicState,
             todayNotifyTime = todayNotifyTime,
+            needRequestTodayNotifyPermission = needRequestTodayNotifyPermission,
             isInShowTodayTimePicker = isInShowTodayTimePicker,
             isInShowClearTodayConfirmDialog = isInShowClearTodayConfirmDialog,
             tomorrowNotifyTime = tomorrowNotifyTime,
+            needRequestTomorrowNotifyPermission = needRequestTomorrowNotifyPermission,
             isInShowTomorrowTimePicker = isInShowTomorrowTimePicker,
             isInShowClearTomorrowConfirmDialog = isInShowClearTomorrowConfirmDialog,
         )

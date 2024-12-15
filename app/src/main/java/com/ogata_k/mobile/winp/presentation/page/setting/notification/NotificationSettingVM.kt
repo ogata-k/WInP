@@ -3,6 +3,7 @@ package com.ogata_k.mobile.winp.presentation.page.setting.notification
 import androidx.lifecycle.viewModelScope
 import com.ogata_k.mobile.winp.common.type_converter.LocalTimeConverter
 import com.ogata_k.mobile.winp.domain.enumerate.LocalNotifyDiv
+import com.ogata_k.mobile.winp.domain.use_case.local_notification.CheckHasNotificationPermissionInput
 import com.ogata_k.mobile.winp.domain.use_case.local_notification.CheckHasNotificationPermissionSyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.local_notification.DeleteLocalNotificationAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.local_notification.DeleteLocalNotificationInput
@@ -10,6 +11,7 @@ import com.ogata_k.mobile.winp.domain.use_case.local_notification.GetLocalNotifi
 import com.ogata_k.mobile.winp.domain.use_case.local_notification.GetLocalNotificationInput
 import com.ogata_k.mobile.winp.domain.use_case.local_notification.InitializeAllNotificationChannelsInput
 import com.ogata_k.mobile.winp.domain.use_case.local_notification.InitializeAllNotificationChannelsSyncUseCase
+import com.ogata_k.mobile.winp.domain.use_case.local_notification.RequestNotificationPermissionInput
 import com.ogata_k.mobile.winp.domain.use_case.local_notification.RequestNotificationPermissionSyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.local_notification.UpsertLocalNotificationAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.local_notification.UpsertLocalNotificationInput
@@ -53,9 +55,11 @@ class NotificationSettingVM @Inject constructor(
                 loadingState = ScreenLoadingState.READY,
                 basicState = BasicScreenState.initialState(),
                 todayNotifyTime = null,
+                needRequestTodayNotifyPermission = false,
                 isInShowTodayTimePicker = false,
                 isInShowClearTodayConfirmDialog = false,
                 tomorrowNotifyTime = null,
+                needRequestTomorrowNotifyPermission = false,
                 isInShowTomorrowTimePicker = false,
                 isInShowClearTomorrowConfirmDialog = false,
             )
@@ -131,7 +135,7 @@ class NotificationSettingVM @Inject constructor(
      */
     private fun reloadVMWithOptional(
         vmState: NotificationSettingVMState,
-        optionalUpdater: (basicState: BasicScreenState) -> BasicScreenState = { it }
+        optionalUpdater: (basicState: BasicScreenState) -> BasicScreenState = { it },
     ) {
         if (readVMState().loadingState == ScreenLoadingState.READY) {
             // 初期化中相当の時は無視する
@@ -152,9 +156,79 @@ class NotificationSettingVM @Inject constructor(
 
     override fun replaceVMBasicScreenState(
         viewModelState: NotificationSettingVMState,
-        basicScreenState: BasicScreenState
+        basicScreenState: BasicScreenState,
     ): NotificationSettingVMState {
         return viewModelState.copy(basicState = basicScreenState)
+    }
+
+    /**
+     * 本日の通知に関して通知権限リクエスト確認画面を閉じる
+     */
+    fun dismissTodayNotifyPermissionConfirmDialog() {
+        val vmState = readVMState()
+        if (!vmState.loadingState.isNoErrorInitialized()) {
+            // 正常に初期化ができていないなら処理の必要はない
+            return
+        }
+
+        updateVMState(
+            vmState.copy(
+                needRequestTodayNotifyPermission = false,
+            )
+        )
+    }
+
+    /**
+     * 明日の通知に関して通知権限リクエスト確認画面を閉じる
+     */
+    fun dismissTomorrowNotifyPermissionConfirmDialog() {
+        val vmState = readVMState()
+        if (!vmState.loadingState.isNoErrorInitialized()) {
+            // 正常に初期化ができていないなら処理の必要はない
+            return
+        }
+
+        updateVMState(
+            vmState.copy(
+                needRequestTomorrowNotifyPermission = false,
+            )
+        )
+    }
+
+    /**
+     * 本日の通知に関して通知権限をリクエストしてからリクエスト確認画面を閉じる
+     */
+    fun requestTodayNotifyPermissionAndDismissConfirmDialog() {
+        val vmState = readVMState()
+        if (!vmState.loadingState.isNoErrorInitialized()) {
+            // 正常に初期化ができていないなら処理の必要はない
+            return
+        }
+
+        requestNotificationPermissionUseCase.call(RequestNotificationPermissionInput(LocalNotifyDiv.TODAY_EVERY_DAY))
+        updateVMState(
+            vmState.copy(
+                needRequestTodayNotifyPermission = false,
+            )
+        )
+    }
+
+    /**
+     * 明日の通知に関して通知権限をリクエストしてからリクエスト確認画面を閉じる
+     */
+    fun requestTomorrowNotifyPermissionAndDismissConfirmDialog() {
+        val vmState = readVMState()
+        if (!vmState.loadingState.isNoErrorInitialized()) {
+            // 正常に初期化ができていないなら処理の必要はない
+            return
+        }
+
+        requestNotificationPermissionUseCase.call(RequestNotificationPermissionInput(LocalNotifyDiv.TOMORROW_EVERY_DAY))
+        updateVMState(
+            vmState.copy(
+                needRequestTomorrowNotifyPermission = false,
+            )
+        )
     }
 
     /**
@@ -163,8 +237,25 @@ class NotificationSettingVM @Inject constructor(
     fun showTodayTimePicker(show: Boolean = true) {
         val vmState = readVMState()
         if (!vmState.loadingState.isNoErrorInitialized()) {
-            // 正常に初期化ができていないなら削除はできない
+            // 正常に初期化ができていないなら処理の必要はない
             return
+        }
+
+        if (show) {
+            // 時間選択ダイアログを使って設定する前に通知権限がなければ通知できないので通知権限がなければリクエストさせる
+            if (!checkHasNotificationPermissionUseCase.call(
+                    CheckHasNotificationPermissionInput(
+                        LocalNotifyDiv.TODAY_EVERY_DAY
+                    )
+                )
+            ) {
+                updateVMState(
+                    vmState.copy(
+                        needRequestTodayNotifyPermission = true,
+                    )
+                )
+                return
+            }
         }
 
         updateVMState(
@@ -180,8 +271,25 @@ class NotificationSettingVM @Inject constructor(
     fun showTomorrowTimePicker(show: Boolean = true) {
         val vmState = readVMState()
         if (!vmState.loadingState.isNoErrorInitialized()) {
-            // 正常に初期化ができていないなら削除はできない
+            // 正常に初期化ができていないなら処理の必要はない
             return
+        }
+
+        if (show) {
+            // 時間選択ダイアログを使って設定する前に通知権限がなければ通知できないので通知権限がなければリクエストさせる
+            if (!checkHasNotificationPermissionUseCase.call(
+                    CheckHasNotificationPermissionInput(
+                        LocalNotifyDiv.TOMORROW_EVERY_DAY
+                    )
+                )
+            ) {
+                updateVMState(
+                    vmState.copy(
+                        needRequestTomorrowNotifyPermission = true,
+                    )
+                )
+                return
+            }
         }
 
         updateVMState(

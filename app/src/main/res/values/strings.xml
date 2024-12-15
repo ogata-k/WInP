@@ -36,6 +36,7 @@
     <string name="to_shrink">縮小</string>
     <string name="set_setting">設定</string>
     <string name="clear_setting">取消し</string>
+    <string name="open_setting_app">表示</string>
     <string name="valid_passed_percent">%.1f％</string>
     <string name="invalid_passed_percent">－％</string>
 
@@ -61,11 +62,13 @@
     <string name="title_edit_work_comment">コメント編集</string>
     <string name="title_work_summary">サマリー</string>
     <string name="title_clear_time_setting">時間設定の取消し</string>
+    <string name="title_request_open_notify_permission_setting">通知権限設定画面表示確認</string>
 
     <!-- ダイアログコンテンツ -->
     <string name="dialog_content_confirm_delete_work">タスクを削除します。よろしいですか。</string>
     <string name="dialog_content_confirm_update_work_todo_complete_state">選択された対応項目の状態を更新します。よろしいですか。</string>
     <string name="dialog_content_confirm_clear_time_setting">時間選択を取消します。よろしいですか。</string>
+    <string name="dialog_content_confirm_request_open_notify_permission_setting">通知設定を行うには通知の権限を許可してあげる必要があります。表示される設定画面で通知を許可してください。</string>
 
     <!-- フォーム共通 -->
     <string name="counter_format">%d／%d</string>

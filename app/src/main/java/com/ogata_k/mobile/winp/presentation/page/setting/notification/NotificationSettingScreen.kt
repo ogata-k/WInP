@@ -109,9 +109,20 @@ fun NotificationSettingScreen(navController: NavController, viewModel: Notificat
                             TimeDisplayAndForm(
                                 title = stringResource(R.string.today_work_notify_setting_title),
                                 time = uiState.todayNotifyTime,
+                                needRequestNotifyPermission = uiState.needRequestTodayNotifyPermission,
+                                dismissNotifyPermissionConfirmDialog = {
+                                    viewModel.dismissTodayNotifyPermissionConfirmDialog()
+                                },
+                                requestNotifyPermissionAndDismissConfirmDialog = {
+                                    viewModel.requestTodayNotifyPermissionAndDismissConfirmDialog()
+                                },
                                 isInShowTimePicker = uiState.isInShowTodayTimePicker,
                                 isInClearConfirmDialog = uiState.isInShowClearTodayConfirmDialog,
-                                switchShowTimePicker = { viewModel.showTodayTimePicker(it) },
+                                switchShowTimePickerOrCheckNotifyPermission = {
+                                    viewModel.showTodayTimePicker(
+                                        it
+                                    )
+                                },
                                 switchShowClearConfirmDialog = {
                                     viewModel.showClearTodayConfirmDialog(
                                         it
@@ -127,9 +138,20 @@ fun NotificationSettingScreen(navController: NavController, viewModel: Notificat
                             TimeDisplayAndForm(
                                 title = stringResource(R.string.tomorrow_work_notify_setting_title),
                                 time = uiState.tomorrowNotifyTime,
+                                needRequestNotifyPermission = uiState.needRequestTomorrowNotifyPermission,
+                                dismissNotifyPermissionConfirmDialog = {
+                                    viewModel.dismissTomorrowNotifyPermissionConfirmDialog()
+                                },
+                                requestNotifyPermissionAndDismissConfirmDialog = {
+                                    viewModel.requestTomorrowNotifyPermissionAndDismissConfirmDialog()
+                                },
                                 isInShowTimePicker = uiState.isInShowTomorrowTimePicker,
                                 isInClearConfirmDialog = uiState.isInShowClearTomorrowConfirmDialog,
-                                switchShowTimePicker = { viewModel.showTomorrowTimePicker(it) },
+                                switchShowTimePickerOrCheckNotifyPermission = {
+                                    viewModel.showTomorrowTimePicker(
+                                        it
+                                    )
+                                },
                                 switchShowClearConfirmDialog = {
                                     viewModel.showClearTomorrowConfirmDialog(
                                         it
@@ -172,7 +194,7 @@ fun NotificationSettingScreen(navController: NavController, viewModel: Notificat
                     // 続いての処理はできないので前の画面に戻る
                     // エラーの通知はトーストで行うので問題なし
                     LaunchedEffect(Unit) {
-                    navController.popBackStack()
+                        navController.popBackStack()
                     }
                 }
 
@@ -194,9 +216,12 @@ fun NotificationSettingScreen(navController: NavController, viewModel: Notificat
 private fun TimeDisplayAndForm(
     title: String,
     time: LocalTime?,
+    needRequestNotifyPermission: Boolean,
+    dismissNotifyPermissionConfirmDialog: () -> Unit,
+    requestNotifyPermissionAndDismissConfirmDialog: () -> Unit,
     isInShowTimePicker: Boolean,
     isInClearConfirmDialog: Boolean,
-    switchShowTimePicker: (toShow: Boolean) -> Unit,
+    switchShowTimePickerOrCheckNotifyPermission: (toShow: Boolean) -> Unit,
     switchShowClearConfirmDialog: (toShow: Boolean) -> Unit,
     updateTimeAndDismiss: (time: LocalTime?) -> Unit,
     modifier: Modifier = Modifier,
@@ -216,7 +241,7 @@ private fun TimeDisplayAndForm(
             Spacer(modifier = Modifier.weight(1f))
             // 設定ボタン
             Button(
-                onClick = { switchShowTimePicker(true) },
+                onClick = { switchShowTimePickerOrCheckNotifyPermission(true) },
                 colors = ButtonDefaults.buttonColors()
             ) { ButtonMediumText(text = stringResource(R.string.set_setting)) }
             Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_medium)))
@@ -227,6 +252,24 @@ private fun TimeDisplayAndForm(
                 enabled = time != null
             ) { ButtonMediumText(text = stringResource(R.string.clear_setting)) }
         }
+    }
+    if (needRequestNotifyPermission) {
+        ConfirmAlertDialog(
+            dialogTitle = stringResource(R.string.title_request_open_notify_permission_setting),
+            dialogText = stringResource(R.string.dialog_content_confirm_request_open_notify_permission_setting),
+            onDismissRequest = {
+                dismissNotifyPermissionConfirmDialog()
+            },
+            confirmButtonAction = Pair(
+                stringResource(R.string.open_setting_app)
+            ) {
+                requestNotifyPermissionAndDismissConfirmDialog()
+            },
+            dismissOnBackPress = true,
+            dismissOnClickOutside = false,
+            confirmActionIsDanger = false,
+            enabledButtons = true,
+        )
     }
     if (isInShowTimePicker) {
         val (baseTimeHour, baseTimeMinute) = if (time == null) {
@@ -258,7 +301,7 @@ private fun TimeDisplayAndForm(
             dismissButton = {
                 TextButton(
                     onClick = {
-                        switchShowTimePicker(false)
+                        switchShowTimePickerOrCheckNotifyPermission(false)
                     },
                     enabled = true,
                 ) {

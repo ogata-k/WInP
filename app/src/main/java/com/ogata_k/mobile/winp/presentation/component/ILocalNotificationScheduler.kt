@@ -114,13 +114,21 @@ class ILocalNotificationScheduler(
         }
 
         // OREO以降なら個別にチェックできるのでチェックする
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel =
                 manager.getNotificationChannel(getNotificationChannelId(context, notifyDiv))
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                val notificationChannelGroup = manager.getNotificationChannelGroup(channel.group)
+                if (notificationChannelGroup.isBlocked) {
+                    return false
+                }
+            }
+
             return channel?.importance != NotificationManager.IMPORTANCE_NONE
         } else {
             // OREOより前なら通知は全体で一つなので、アプリに関して許可を出している現時点では許可されているものとみなす
-            true
+            return true
         }
     }
 
@@ -131,6 +139,9 @@ class ILocalNotificationScheduler(
         val intent = Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS).apply {
             putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
             putExtra(Settings.EXTRA_CHANNEL_ID, notificationChannel.id)
+
+            // Activity以外からActivityを呼び出すためのフラグを設定
+            setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         context.startActivity(intent)
     }
