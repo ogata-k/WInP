@@ -13,6 +13,8 @@ import com.ogata_k.mobile.winp.domain.use_case.local_notification.InitializeAllN
 import com.ogata_k.mobile.winp.domain.use_case.local_notification.InitializeAllNotificationChannelsSyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.local_notification.RequestNotificationPermissionInput
 import com.ogata_k.mobile.winp.domain.use_case.local_notification.RequestNotificationPermissionSyncUseCase
+import com.ogata_k.mobile.winp.domain.use_case.local_notification.RescheduleAllScheduledNotificationAsyncUseCase
+import com.ogata_k.mobile.winp.domain.use_case.local_notification.RescheduleAllScheduledNotificationInput
 import com.ogata_k.mobile.winp.domain.use_case.local_notification.UpsertLocalNotificationAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.local_notification.UpsertLocalNotificationInput
 import com.ogata_k.mobile.winp.domain.use_case.work.NotifyForWorkAsyncUseCase
@@ -42,6 +44,7 @@ class NotificationSettingVM @Inject constructor(
     private val getLocalNotificationUseCase: GetLocalNotificationAsyncUseCase,
     private val deleteLocalNotificationUseCase: DeleteLocalNotificationAsyncUseCase,
     private val upsertLocalNotificationUseCase: UpsertLocalNotificationAsyncUseCase,
+    private val rescheduleAllScheduledNotificationUseCase: RescheduleAllScheduledNotificationAsyncUseCase,
     private val initializeAllNotificationChannelsUseCase: InitializeAllNotificationChannelsSyncUseCase,
     private val checkHasNotificationPermissionUseCase: CheckHasNotificationPermissionSyncUseCase,
     private val requestNotificationPermissionUseCase: RequestNotificationPermissionSyncUseCase,
@@ -81,6 +84,9 @@ class NotificationSettingVM @Inject constructor(
         updateVMState(vmState)
 
         viewModelScope.launch {
+            // 既存のスケジュールされたものを再度スケジュールする。ないとは思うが揮発してしまっている可能性があるため。
+            rescheduleAllScheduledNotificationUseCase.call(RescheduleAllScheduledNotificationInput)
+
             // 通知するためにはチャネルが作成されないと通知できないのでここで初期化
             initializeAllNotificationChannelsUseCase.call(InitializeAllNotificationChannelsInput)
 
