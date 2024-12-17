@@ -27,7 +27,7 @@ class BootCompletedReceiver : Hilt_BootCompletedReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
 
-        if (intent.action != Intent.ACTION_BOOT_COMPLETED) {
+        if (intent.action != Intent.ACTION_BOOT_COMPLETED && intent.action != Intent.ACTION_MY_PACKAGE_REPLACED) {
             // 想定していない呼び出し
             return
         }
