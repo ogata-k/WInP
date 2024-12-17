@@ -17,8 +17,6 @@ import com.ogata_k.mobile.winp.domain.use_case.local_notification.RescheduleAllS
 import com.ogata_k.mobile.winp.domain.use_case.local_notification.RescheduleAllScheduledNotificationInput
 import com.ogata_k.mobile.winp.domain.use_case.local_notification.UpsertLocalNotificationAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.local_notification.UpsertLocalNotificationInput
-import com.ogata_k.mobile.winp.domain.use_case.work.NotifyForWorkAsyncUseCase
-import com.ogata_k.mobile.winp.domain.use_case.work.NotifyForWorkInput
 import com.ogata_k.mobile.winp.presentation.enumerate.ScreenLoadingState
 import com.ogata_k.mobile.winp.presentation.event.EventAction
 import com.ogata_k.mobile.winp.presentation.event.EventBus
@@ -48,7 +46,6 @@ class NotificationSettingVM @Inject constructor(
     private val initializeAllNotificationChannelsUseCase: InitializeAllNotificationChannelsSyncUseCase,
     private val checkHasNotificationPermissionUseCase: CheckHasNotificationPermissionSyncUseCase,
     private val requestNotificationPermissionUseCase: RequestNotificationPermissionSyncUseCase,
-    private val notifyForWorkUseCase: NotifyForWorkAsyncUseCase,
 ) :
     AbstractViewModel<ScreenLoadingState, NotificationSettingVMState, ScreenLoadingState, NotificationSettingUiState>() {
     override val viewModelStateFlow: MutableStateFlow<NotificationSettingVMState> =
