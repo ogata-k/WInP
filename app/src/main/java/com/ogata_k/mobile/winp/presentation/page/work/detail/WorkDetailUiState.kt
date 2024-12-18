@@ -12,6 +12,10 @@ import java.util.Optional
 data class WorkDetailUiState(
     override val loadingState: ScreenLoadingState,
     override val basicState: BasicScreenState,
+    /**
+     * 現在の画面を強制的に閉じてほしいときに指定する。あまり使われない想定。
+     */
+    val needForcePopThisScreen: Boolean,
     val workId: Long,
     val work: Optional<Work>,
     // 作成日時が直近->昔となるように並べられている
@@ -22,6 +26,7 @@ data class WorkDetailUiState(
     val inShowMoreAction: Boolean,
     val inShowMoreCommentAction: Boolean,
     val inConfirmDelete: Boolean,
+    val inConfirmCopy: Boolean,
     // Not nullで表示中
     val inConfirmWorkTodoState: Long?,
 ) : IUiState<ScreenLoadingState>

@@ -131,6 +131,23 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                             viewModel.showDeleteConfirmDialog(true)
                         },
                     )
+                    HorizontalDivider(modifier = Modifier.fillMaxWidth())
+                    DropdownMenuItem(
+                        text = {
+                            TitleMediumText(stringResource(R.string.copy_work))
+                        },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = AppIcons.copyIcon,
+                                contentDescription = stringResource(
+                                    R.string.copy_work
+                                ),
+                            )
+                        },
+                        onClick = {
+                            viewModel.showCopyConfirmDialog(true)
+                        },
+                    )
                 }
 
                 if (uiState.inConfirmDelete) {
@@ -152,6 +169,33 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                         enabledButtons = basicScreenState.actionState.canLaunch(),
                     )
                 }
+
+                if (uiState.inConfirmCopy) {
+                    ConfirmAlertDialog(
+                        dialogTitle = stringResource(R.string.title_copy_work),
+                        dialogText = stringResource(R.string.dialog_content_confirm_copy_work),
+                        onDismissRequest = {
+                            viewModel.showCopyConfirmDialog(false)
+                        },
+                        confirmButtonAction = Pair(
+                            stringResource(R.string.show_form)
+                        ) {
+                            // 複製してフォームを開いてもらうために自身のworkIdを指定する
+                            navController.navigate(
+                                WorkEditRouting(
+                                    AsCreate.CREATING_ID,
+                                    uiState.workId
+                                ).toPath()
+                            )
+                            // 削除はこの画面に戻ってくることがなかったがコピーの場合は戻ってくるので、ダイアログは閉じておく
+                            viewModel.showCopyConfirmDialog(false)
+                        },
+                        dismissOnBackPress = false,
+                        dismissOnClickOutside = false,
+                        confirmActionIsDanger = false,
+                        enabledButtons = basicScreenState.actionState.canLaunch(),
+                    )
+                }
             }
         },
     ) { modifier, appBar ->
@@ -169,6 +213,13 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
             val eventLifecycle = LocalLifecycleOwner.current
             LaunchedEffect(Unit) {
                 viewModel.listenEvent(eventLifecycle)
+            }
+
+            // 閉じるべきというフラグが立っているなら閉じる
+            if (uiState.needForcePopThisScreen) {
+                LaunchedEffect(Unit) {
+                    navController.popBackStack()
+                }
             }
 
             when (screenLoadingState) {

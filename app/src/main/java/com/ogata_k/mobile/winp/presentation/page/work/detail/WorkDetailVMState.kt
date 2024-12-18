@@ -12,6 +12,10 @@ import java.util.Optional
 data class WorkDetailVMState(
     override val loadingState: ScreenLoadingState,
     override val basicState: BasicScreenState,
+    /**
+     * 現在の画面を強制的に閉じてほしいときに指定する。ほかのフラグとの競合に注意。
+     */
+    val needForcePopThisScreen: Boolean,
     val workId: Long,
     val work: Optional<Work>,
     // 作成日時が直近->昔となるように並べられている
@@ -22,6 +26,7 @@ data class WorkDetailVMState(
     val inShowMoreAction: Boolean,
     val inShowMoreCommentAction: Boolean,
     val inConfirmDelete: Boolean,
+    val inConfirmCopy: Boolean,
     // Not nullで表示中
     val inConfirmWorkTodoState: Long?,
 ) : IVMState<ScreenLoadingState, ScreenLoadingState, WorkDetailUiState> {
@@ -29,6 +34,7 @@ data class WorkDetailVMState(
         return WorkDetailUiState(
             loadingState = loadingState,
             basicState = basicState,
+            needForcePopThisScreen = needForcePopThisScreen,
             workId = workId,
             work = work,
             workComments = workComments,
@@ -38,6 +44,7 @@ data class WorkDetailVMState(
             inShowMoreAction = inShowMoreAction,
             inShowMoreCommentAction = inShowMoreCommentAction,
             inConfirmDelete = inConfirmDelete,
+            inConfirmCopy = inConfirmCopy,
             inConfirmWorkTodoState = inConfirmWorkTodoState,
         )
     }

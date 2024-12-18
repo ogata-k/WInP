@@ -72,6 +72,39 @@ data class WorkFormData(
                 todoItems = todoFormItems.toList(),
             )
         }
+
+        /**
+         * タスク作成用に複製元のタスクをもとにフォームデータを作成する。
+         */
+        fun fromDomainModelFromCopyWork(domain: DomainWork): WorkFormData {
+            val todoFormItems: MutableList<WorkTodoFormData> = mutableListOf()
+            val initialUuid = UUID.randomUUID()
+            val usingUuid: MutableList<UUID> = mutableListOf(initialUuid)
+            domain.workTodos.forEach {
+                var uuid = UUID.randomUUID()
+                while (usingUuid.contains(uuid)) {
+                    uuid = UUID.randomUUID()
+                }
+                usingUuid.add(uuid)
+                todoFormItems.add(WorkTodoFormData.fromDomainModelFromCopyWork(it, uuid))
+            }
+
+            return WorkFormData(
+                // あくまでも作成用
+                workId = AsCreate.CREATING_ID,
+                title = domain.title,
+                description = domain.description,
+                beganDate = domain.beganAt?.toLocalDate(),
+                beganTime = domain.beganAt?.toLocalTime(),
+                endedDate = domain.endedAt?.toLocalDate(),
+                endedTime = domain.endedAt?.toLocalTime(),
+                // 作成するタスクは完了していることはあまりないので、未完了のタスクとして作成
+                completedAt = null,
+                editingTodoItem = WorkTodoFormData.empty(initialUuid),
+                createdAt = LocalDateTime.now(),
+                todoItems = todoFormItems.toList(),
+            )
+        }
     }
 
     val isCompleted: Boolean = completedAt != null

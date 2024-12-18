@@ -18,6 +18,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.ogata_k.mobile.winp.common.constant.AsCreate
+import com.ogata_k.mobile.winp.presentation.constant.DummyID
 import com.ogata_k.mobile.winp.presentation.event.EventBus
 import com.ogata_k.mobile.winp.presentation.event.toast.ToastEvent
 import com.ogata_k.mobile.winp.presentation.page.composableByRouting
@@ -119,7 +120,19 @@ fun SetupRouting(navController: NavHostController, intent: Intent) {
                 // デフォルトは作成
                 val workId: Long =
                     entry.arguments?.getLong(WorkEditRouting.WORK_ID_KEY) ?: AsCreate.CREATING_ID
+                val copyFromWorkId: Long? =
+                    entry.arguments?.getLong(WorkEditRouting.COPY_FROM_WORK_ID_KEY)?.let {
+                        if (it == DummyID.INVALID_ID) {
+                            // 不正な入力の場合なのでnullに変換しておく
+                            null
+                        } else {
+                            it
+                        }
+                    }
                 vm.setWorkId(workId)
+                if (copyFromWorkId != null) {
+                    vm.setCopyFromWorkId(copyFromWorkId)
+                }
                 vm.initializeVM()
             }
             WorkEditScreen(navController = navController, viewModel = vm)

@@ -59,6 +59,7 @@ class WorkEditVM @Inject constructor(
             basicState = BasicScreenState.initialState(),
             isInCreating = true,
             workId = AsCreate.CREATING_ID,
+            copyFromWorkId = null,
             formData = WorkFormData.empty(),
             validateExceptions = WorkFormValidateExceptions.empty(),
             isInShowEditingTodoForm = false,
@@ -80,6 +81,14 @@ class WorkEditVM @Inject constructor(
         updateVMState(vmState.copy(workId = workId))
     }
 
+    /**
+     * 複製元のworkIdを初期化
+     */
+    fun setCopyFromWorkId(copyFromWorkId: Long) {
+        val vmState = readVMState()
+        updateVMState(vmState.copy(copyFromWorkId = copyFromWorkId))
+    }
+
     override fun initializeVM() {
         var vmState = readVMState()
         if (vmState.loadingState.isInitialized()) {
@@ -94,32 +103,76 @@ class WorkEditVM @Inject constructor(
             vmState = vmState.copy(basicState = vmState.basicState.toDoingAction())
             updateVMState(vmState)
 
-            // 作成用のフォームデータ
-            val formData = WorkFormData(
-                workId = workId,
-                title = "",
-                description = "",
-                beganDate = null,
-                beganTime = null,
-                endedDate = null,
-                endedTime = null,
-                completedAt = null,
-                editingTodoItem = WorkTodoFormData.empty(UUID.randomUUID()),
-                createdAt = LocalDateTime.now(),
-                todoItems = emptyList(),
-            )
-            val loadingState = ScreenLoadingState.NO_ERROR_INITIALIZED
-            val newVmState = vmState.copy(
-                loadingState = loadingState,
-                basicState = vmState.basicState.updateInitialize(loadingState),
-                isInCreating = true,
-                workId = workId,
-                formData = formData,
-                validateExceptions = validateFormData(formData, vmState.isInShowEditingTodoForm),
-            )
+            val copyFromWorkId = vmState.copyFromWorkId
 
-            updateVMState(newVmState)
-            // 作成中なのでDBなど見に行く必要はなし
+            if (copyFromWorkId == null) {
+                // 作成用のフォームデータ
+                val formData = WorkFormData(
+                    workId = workId,
+                    title = "",
+                    description = "",
+                    beganDate = null,
+                    beganTime = null,
+                    endedDate = null,
+                    endedTime = null,
+                    completedAt = null,
+                    editingTodoItem = WorkTodoFormData.empty(UUID.randomUUID()),
+                    createdAt = LocalDateTime.now(),
+                    todoItems = emptyList(),
+                )
+
+                val loadingState = ScreenLoadingState.NO_ERROR_INITIALIZED
+                val newVmState = vmState.copy(
+                    loadingState = loadingState,
+                    basicState = vmState.basicState.updateInitialize(loadingState),
+                    isInCreating = true,
+                    workId = workId,
+                    formData = formData,
+                    validateExceptions = validateFormData(
+                        formData,
+                        vmState.isInShowEditingTodoForm
+                    ),
+                )
+
+                updateVMState(newVmState)
+                // 作成中なのでDBなど見に行く必要はなし
+            } else {
+                viewModelScope.launch {
+                    val workResult = getWorkUseCase.call(GetWorkInput(copyFromWorkId))
+                    if (workResult.isFailure || !workResult.getOrThrow().isPresent) {
+                        val loadingState = ScreenLoadingState.NOT_FOUND_EXCEPTION
+                        updateVMState(
+                            readVMState().copy(
+                                loadingState = loadingState,
+                                basicState = vmState.basicState.updateInitialize(loadingState),
+                            )
+                        )
+                        EventBus.postToastEvent(NotFoundWork(vmState.workId))
+
+                        return@launch
+                    }
+
+                    val formData =
+                        WorkFormData.fromDomainModelFromCopyWork(workResult.getOrThrow().get())
+
+                    val loadingState = ScreenLoadingState.NO_ERROR_INITIALIZED
+                    val newVmState = vmState.copy(
+                        loadingState = loadingState,
+                        basicState = vmState.basicState.updateInitialize(loadingState),
+                        isInCreating = true,
+                        workId = workId,
+                        formData = formData,
+                        validateExceptions = validateFormData(
+                            formData,
+                            vmState.isInShowEditingTodoForm
+                        ),
+                    )
+
+                    updateVMState(newVmState)
+                }
+            }
+
+            // フォーム作成は以上で終了
             return
         }
 
@@ -179,7 +232,7 @@ class WorkEditVM @Inject constructor(
      */
     private fun reloadVMWithOptional(
         vmState: WorkEditVMState,
-        optionalUpdater: (basicState: BasicScreenState) -> BasicScreenState = { it }
+        optionalUpdater: (basicState: BasicScreenState) -> BasicScreenState = { it },
     ) {
         if (readVMState().loadingState == ScreenLoadingState.READY) {
             // 初期化中相当の時は無視する
@@ -200,7 +253,7 @@ class WorkEditVM @Inject constructor(
 
     override fun replaceVMBasicScreenState(
         viewModelState: WorkEditVMState,
-        basicScreenState: BasicScreenState
+        basicScreenState: BasicScreenState,
     ): WorkEditVMState {
         return viewModelState.copy(basicState = basicScreenState)
     }
@@ -527,7 +580,7 @@ class WorkEditVM @Inject constructor(
      * 入力内容をバリデーションする
      */
     private fun validateFormData(
-        formData: WorkFormData, isInShowEditingTodoForm: Boolean
+        formData: WorkFormData, isInShowEditingTodoForm: Boolean,
     ): WorkFormValidateExceptions {
         val titleValidated = if (formData.title.isEmpty()) ValidationException.of(
             ValidationExceptionType.EmptyValue(false)
@@ -675,7 +728,8 @@ class WorkEditVM @Inject constructor(
             if (result.isSuccess) {
                 val toastEvent =
                     if (oldVmState.isInCreating) SucceededCreateWork(
-                        oldVmState.workId
+                        oldVmState.workId,
+                        oldVmState.copyFromWorkId,
                     ) else SucceededUpdateWork(
                         oldVmState.workId
                     )

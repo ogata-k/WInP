@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.CopyAll
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
@@ -30,6 +31,9 @@ class AppIcons {
 
         val deleteIcon: ImageVector
             get() = Icons.Filled.Delete
+
+        val copyIcon: ImageVector
+            get() = Icons.Filled.CopyAll
 
         val closeIcon: ImageVector
             get() = Icons.Filled.Close

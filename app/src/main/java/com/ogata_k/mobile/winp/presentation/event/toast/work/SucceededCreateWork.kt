@@ -9,7 +9,8 @@ import java.time.LocalDateTime
 
 data class SucceededCreateWork(
     val workId: Long,
-    private val timestamp: LocalDateTime = LocalDateTime.now()
+    val fromCopyWorkId: Long?,
+    private val timestamp: LocalDateTime = LocalDateTime.now(),
 ) : ToastEvent {
     override fun getTarget(): EventTarget {
         return EventTarget.WORK

@@ -33,6 +33,7 @@ import com.ogata_k.mobile.winp.presentation.event.snackbar.work_todo.FailedUpdat
 import com.ogata_k.mobile.winp.presentation.event.snackbar.work_todo.SucceededUpdateWorkTodo
 import com.ogata_k.mobile.winp.presentation.event.toast.common.ErrorOccurred
 import com.ogata_k.mobile.winp.presentation.event.toast.work.NotFoundWork
+import com.ogata_k.mobile.winp.presentation.event.toast.work.SucceededCreateWork
 import com.ogata_k.mobile.winp.presentation.event.toast.work.SucceededDeleteWork
 import com.ogata_k.mobile.winp.presentation.event.toast.work.SucceededUpdateWork
 import com.ogata_k.mobile.winp.presentation.model.common.BasicScreenState
@@ -74,6 +75,7 @@ class WorkDetailVM @Inject constructor(
             // 初期状態は未初期化状態とする
             loadingState = ScreenLoadingState.READY,
             basicState = BasicScreenState.initialState(),
+            needForcePopThisScreen = false,
             workId = DummyID.INVALID_ID,
             work = Optional.empty(),
             isInShowCommentForm = false,
@@ -83,6 +85,7 @@ class WorkDetailVM @Inject constructor(
             inShowMoreAction = false,
             inShowMoreCommentAction = false,
             inConfirmDelete = false,
+            inConfirmCopy = false,
             inConfirmWorkTodoState = null,
         )
     )
@@ -211,13 +214,38 @@ class WorkDetailVM @Inject constructor(
     }
 
     /**
+     * 強制的に画面を取り除くようにフラグを立てる
+     */
+    private fun toNeedPopThisScreenState() {
+        val vmState = readVMState()
+        // 初期化に成功していれば通常に閉じることができるので問題ないかをチェック。そうでない場合、画面上でうまくハンドリングするのでここでは対応しない
+        if (!vmState.loadingState.isNoErrorInitialized()) {
+            return
+        }
+
+        updateVMState(
+            vmState.copy(
+                needForcePopThisScreen = true,
+            )
+        )
+    }
+
+    /**
      * Eventの監視
      * LaunchedEffect内で呼び出さないと何度も同じOwnerで監視してしまうので注意
      */
     fun listenEvent(
         screenLifecycle: LifecycleOwner,
     ) {
-        // 詳細で表示しているWorkはすでに作成済みなので作成イベントの監視は不要
+        // 詳細で表示しているWorkはすでに作成済みなので作成イベントの監視は不要だが、この画面から作成している可能性があるので監視する
+        EventBus.onEvent<SucceededCreateWork>(screenLifecycle) {
+            val vmState = readVMState()
+            if (it.fromCopyWorkId != vmState.workId) {
+                return@onEvent
+            }
+
+            toNeedPopThisScreenState()
+        }
 
         EventBus.onEvent<SucceededUpdateWork>(screenLifecycle) {
             val vmState = readVMState()
@@ -275,6 +303,23 @@ class WorkDetailVM @Inject constructor(
         updateVMState(
             vmState.copy(
                 inConfirmDelete = show,
+            )
+        )
+    }
+
+    /**
+     * コピーをするかどうかの確認ダイアログを表示する
+     */
+    fun showCopyConfirmDialog(show: Boolean = true) {
+        val vmState = readVMState()
+        if (!vmState.loadingState.isNoErrorInitialized()) {
+            // 正常に初期化ができていないなら削除はできない
+            return
+        }
+
+        updateVMState(
+            vmState.copy(
+                inConfirmCopy = show,
             )
         )
     }

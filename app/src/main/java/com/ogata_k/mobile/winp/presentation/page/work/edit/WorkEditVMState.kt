@@ -10,6 +10,7 @@ data class WorkEditVMState(
     override val loadingState: ScreenLoadingState,
     override val basicState: BasicScreenState,
     val workId: Long,
+    val copyFromWorkId: Long?,
     val isInCreating: Boolean,
     val formData: WorkFormData,
     val validateExceptions: WorkFormValidateExceptions,

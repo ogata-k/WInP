@@ -43,6 +43,21 @@ data class WorkTodoFormData(
                 createdAt = LocalDateTimeConverter.fromOffsetDateTime(domain.createdAt),
             )
         }
+
+        /**
+         * タスク作成用に複製元の対応項目をもとにフォームデータを作成する。
+         */
+        fun fromDomainModelFromCopyWork(domain: DomainWorkTodo, uuid: UUID): WorkTodoFormData {
+            return WorkTodoFormData(
+                uuid = uuid,
+                // あくまでも作成用
+                workTodoId = AsCreate.CREATING_ID,
+                description = domain.description,
+                // 作成する対応項目は完了していることはあまりないので、未完了の対応項目として作成
+                completedAt = null,
+                createdAt = LocalDateTime.now(),
+            )
+        }
     }
 
     val isCompleted: Boolean = completedAt != null
