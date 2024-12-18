@@ -51,4 +51,32 @@ data class WorkSummary(
             )
         }
     }
+
+    /**
+     * 未完了タスクの個数
+     */
+    fun countUncompletedWork(): Int {
+        return uncompletedWorkIds.count()
+    }
+
+    /**
+     * 期限切れ未完了タスクの個数
+     */
+    fun countExpiredUncompletedWork(): Int {
+        return expiredUncompletedWorkIds.count()
+    }
+
+    /**
+     * 完了したタスクの個数
+     */
+    fun countCompletedWork(): Int {
+        return completedWorkIds.count()
+    }
+
+    /**
+     * 期限切れの完了したタスクの個数
+     */
+    fun countExpiredCompletedWork(): Int {
+        return expiredCompletedWorkIds.count()
+    }
 }

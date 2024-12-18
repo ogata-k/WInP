@@ -1,5 +1,6 @@
 package com.ogata_k.mobile.winp.presentation.di.use_case
 
+import android.content.Context
 import com.ogata_k.mobile.winp.domain.component.LocalNotificationScheduler
 import com.ogata_k.mobile.winp.domain.infra.database.dao.SummaryWorkDao
 import com.ogata_k.mobile.winp.domain.use_case.work.NotifyForWorkAsyncUseCase
@@ -8,6 +9,7 @@ import com.ogata_k.mobile.winp.presentation.use_case.work.INotifyForWorkAsyncUse
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -17,11 +19,13 @@ object WorkUseCaseSingletonModule {
     @Provides
     @Singleton
     fun provideNotifyWorkAsyncUseCase(
+        @ApplicationContext context: Context,
         localNotificationScheduler: LocalNotificationScheduler,
         summaryWorkDao: SummaryWorkDao,
     ): NotifyForWorkAsyncUseCase {
         // GetSummaryWorkAsyncUseCaseがSingletonModule以外で提供されているのでこの中で構築する
         return INotifyForWorkAsyncUseCase(
+            context,
             localNotificationScheduler,
             IGetSummaryWorkAsyncUseCase(summaryWorkDao)
         )

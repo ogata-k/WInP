@@ -156,12 +156,22 @@
     <string name="select_range_date_type_PrevYear">昨年</string>
     <string name="select_range_date_type_Custom">カスタム</string>
 
-    <!-- 通知チャンネル -->
+    <!-- 通知 -->
     <string name="work_notification_channel_group_name">タスク</string>
     <string name="today_work_notification_channel_name">当日のタスク</string>
     <string name="today_work_notification_channel_description">毎日定刻に行われる当日のタスクについての通知</string>
     <string name="tomorrow_work_notification_channel_name">翌日のタスク</string>
     <string name="tomorrow_work_notification_channel_description">毎日定刻に行われる翌日のタスクについての通知</string>
+    <string name="today_work_notification_title">当日のタスク</string>
+    <string name="tomorrow_work_notification_title">翌日のタスク</string>
+    <string name="notification_failed_fetch_summary">データの取得に失敗しました。</string>
+    <string name="notification_not_exist_uncompleted_task">未完了のタスクがありません。</string>
+    <string name="notification_exist_uncompleted_task">未完了のタスクが%d件あります。</string>
+    <string name="notification_fetched_date">集計日：%s</string>
+    <string name="notification_count_uncompleted">・未完了タスク：%d件</string>
+    <string name="notification_count_expired_uncompleted">・未完了タスクのうち期限切れ：%d件</string>
+    <string name="notification_count_completed">・完了済みタスク：%d件</string>
+    <string name="notification_count_expired_completed">・完了済みタスクのうち期限切れ：%d件</string>
 
     <!-- その他 -->
     <string name="no_period">期限なし</string>
