@@ -46,6 +46,7 @@
     <string name="edit_work">タスクを編集</string>
     <string name="delete_work">タスクを削除</string>
     <string name="copy_work">タスクをコピー</string>
+    <string name="update_work_complete_state">タスクの状態を更新</string>
     <string name="create_work_todo">対応項目を作成</string>
     <string name="delete_work_todo">対応項目を削除</string>
     <string name="update_work_todo_complete_state">対応項目の状態を更新</string>
@@ -58,6 +59,7 @@
     <string name="title_edit_work">タスク編集</string>
     <string name="title_delete_work">タスク削除</string>
     <string name="title_copy_work">タスクコピー</string>
+    <string name="title_update_work_complete_state">タスクの状態を更新</string>
     <string name="title_create_work_todo">対応項目作成</string>
     <string name="title_edit_work_todo">対応項目編集</string>
     <string name="title_update_work_todo_complete_state">対応項目の状態を更新</string>
@@ -70,6 +72,7 @@
     <!-- ダイアログコンテンツ -->
     <string name="dialog_content_confirm_delete_work">タスクを削除します。よろしいですか。</string>
     <string name="dialog_content_confirm_copy_work">このタスクと同じ内容があらかじめ入力されたタスク作成画面を開きます。\nなお、タスクと対応項目それぞれの状態は未完了に置き換えられます。コメントは引き継がれません。</string>
+    <string name="dialog_content_confirm_update_work_complete_state">選択されたタスクの状態を更新します。よろしいですか。</string>
     <string name="dialog_content_confirm_update_work_todo_complete_state">選択された対応項目の状態を更新します。よろしいですか。</string>
     <string name="dialog_content_confirm_clear_time_setting">時間選択を取消します。よろしいですか。</string>
     <string name="dialog_content_confirm_request_open_notify_permission_setting">通知設定を行うには通知の権限を許可してあげる必要があります。表示される設定画面で通知を許可してください。</string>

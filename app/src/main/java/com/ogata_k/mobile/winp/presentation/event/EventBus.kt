@@ -2,6 +2,7 @@ package com.ogata_k.mobile.winp.presentation.event
 
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import com.ogata_k.mobile.winp.presentation.event.snackbar.SnackbarEvent
 import com.ogata_k.mobile.winp.presentation.event.toast.ToastEvent
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -22,6 +23,12 @@ object EventBus {
     }
 
     suspend fun postToastEvent(event: ToastEvent) {
+        postEvent(event)
+    }
+
+    // @todo SnackbarEventはあまり外に出したくない。今回は全体に影響を及ぼしたいので仕方なく使っている。
+    //       Actionをしてもらうための専用のイベントを作ってそれを流す方式にしたほうがいいかもしれない。
+    suspend fun postSnackbarEvent(event: SnackbarEvent) {
         postEvent(event)
     }
 

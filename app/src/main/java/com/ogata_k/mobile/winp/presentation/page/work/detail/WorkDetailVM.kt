@@ -16,6 +16,8 @@ import com.ogata_k.mobile.winp.domain.use_case.work.GetWorkAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.GetWorkInput
 import com.ogata_k.mobile.winp.domain.use_case.work.UpdateWorkCommentAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.UpdateWorkCommentInput
+import com.ogata_k.mobile.winp.domain.use_case.work.UpdateWorkStateAsyncUseCase
+import com.ogata_k.mobile.winp.domain.use_case.work.UpdateWorkStateInput
 import com.ogata_k.mobile.winp.domain.use_case.work.UpdateWorkTodoStateAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.UpdateWorkTodoStateInput
 import com.ogata_k.mobile.winp.presentation.constant.DummyID
@@ -24,8 +26,10 @@ import com.ogata_k.mobile.winp.presentation.enumerate.ValidationException
 import com.ogata_k.mobile.winp.presentation.enumerate.ValidationExceptionType
 import com.ogata_k.mobile.winp.presentation.event.EventAction
 import com.ogata_k.mobile.winp.presentation.event.EventBus
+import com.ogata_k.mobile.winp.presentation.event.snackbar.SnackbarEvent
 import com.ogata_k.mobile.winp.presentation.event.snackbar.work.DoneWork
 import com.ogata_k.mobile.winp.presentation.event.snackbar.work.FailedDeleteWork
+import com.ogata_k.mobile.winp.presentation.event.snackbar.work.FailedUpdateWork
 import com.ogata_k.mobile.winp.presentation.event.snackbar.work_comment.DoneWorkComment
 import com.ogata_k.mobile.winp.presentation.event.snackbar.work_comment.FailedCreateWorkComment
 import com.ogata_k.mobile.winp.presentation.event.snackbar.work_comment.FailedUpdateWorkComment
@@ -54,11 +58,13 @@ import java.time.LocalDateTime
 import java.util.Optional
 import javax.inject.Inject
 import kotlin.jvm.optionals.getOrNull
+import com.ogata_k.mobile.winp.presentation.event.snackbar.work.SucceededUpdateWork as SnackbarSucceededUpdateWork
 
 @HiltViewModel
 class WorkDetailVM @Inject constructor(
     private val getWorkUseCase: GetWorkAsyncUseCase,
     private val deleteWorkUseCase: DeleteWorkAsyncUseCase,
+    private val updateWorkStateUseCase: UpdateWorkStateAsyncUseCase,
     private val updateWorkTodoStateUseCase: UpdateWorkTodoStateAsyncUseCase,
     private val fetchAllWorkCommentsUseCase: FetchAllWorkCommentsAsyncUseCase,
     private val createWorkCommentUseCase: CreateWorkCommentAsyncUseCase,
@@ -86,6 +92,7 @@ class WorkDetailVM @Inject constructor(
             inShowMoreCommentAction = false,
             inConfirmDelete = false,
             inConfirmCopy = false,
+            inConfirmWorkState = false,
             inConfirmWorkTodoState = null,
         )
     )
@@ -187,7 +194,7 @@ class WorkDetailVM @Inject constructor(
      */
     private fun reloadVMWithOptional(
         vmState: WorkDetailVMState,
-        optionalUpdater: (basicState: BasicScreenState) -> BasicScreenState = { it }
+        optionalUpdater: (basicState: BasicScreenState) -> BasicScreenState = { it },
     ) {
         if (readVMState().loadingState == ScreenLoadingState.READY) {
             // 初期化中相当の時は無視する
@@ -208,7 +215,7 @@ class WorkDetailVM @Inject constructor(
 
     override fun replaceVMBasicScreenState(
         viewModelState: WorkDetailVMState,
-        basicScreenState: BasicScreenState
+        basicScreenState: BasicScreenState,
     ): WorkDetailVMState {
         return viewModelState.copy(basicState = basicScreenState)
     }
@@ -248,13 +255,6 @@ class WorkDetailVM @Inject constructor(
         }
 
         EventBus.onEvent<SucceededUpdateWork>(screenLifecycle) {
-            val vmState = readVMState()
-            if (it.workId != vmState.workId) {
-                return@onEvent
-            }
-            reloadVM()
-        }
-        EventBus.onEvent<SucceededUpdateWorkTodo>(screenLifecycle) {
             val vmState = readVMState()
             if (it.workId != vmState.workId) {
                 return@onEvent
@@ -325,6 +325,23 @@ class WorkDetailVM @Inject constructor(
     }
 
     /**
+     * タスクの状態を更新するかどうかの確認ダイアログを表示する
+     */
+    fun showWorkStateConfirmDialog(show: Boolean = true) {
+        val vmState = readVMState()
+        if (!vmState.loadingState.isNoErrorInitialized()) {
+            // 正常に初期化ができていないなら更新はできない
+            return
+        }
+
+        updateVMState(
+            vmState.copy(
+                inConfirmWorkState = show,
+            )
+        )
+    }
+
+    /**
      * 表示しているタスクを削除
      */
     fun deleteWork() {
@@ -386,6 +403,74 @@ class WorkDetailVM @Inject constructor(
                 // 削除に成功したときは詳細画面をPOPするので、トーストで通知
                 val toastEvent = SucceededDeleteWork(workId = oldVmState.workId)
                 EventBus.postToastEvent(toastEvent)
+            }
+        }
+    }
+
+    /**
+     * 表示しているタスクの状態を更新（完了しているなら完了していない状態にし、完了していないなら完了している状態にする）
+     */
+    fun updateWorkState() {
+        val vmState = readVMState()
+        val work: Work? = vmState.work.getOrNull()
+        // 初期化が完了していなかったり取得に失敗していたらそれで終了
+        if (!vmState.loadingState.isNoErrorInitialized() || work == null) {
+            val snackbarEvent = FailedUpdateWork(vmState.workId)
+
+            // 正常に初期化ができていなかったり対象が見つからないのはフローとしておかしいのでエラーとして通知
+            updateVMState(
+                vmState.copy(
+                    basicState = vmState.basicState
+                        .toDoneAction()
+                        .toAcceptSnackbarEvent(snackbarEvent),
+                    inConfirmWorkState = false,
+                )
+            )
+            return
+        }
+
+        val newVmState = vmState.copy(basicState = vmState.basicState.toDoingAction())
+        updateVMState(newVmState)
+
+        viewModelScope.launch {
+            // アプリを強制停止する場合を除いて、実行中に画面をpopしたりしたときなどに最後まで実行されないのは困る
+            val result: Result<Work> =
+                async(Dispatchers.IO + SupervisorJob()) {
+                    return@async updateWorkStateUseCase.call(
+                        UpdateWorkStateInput(
+                            vmState.workId,
+                            if (work.completedAt == null) LocalDateTimeConverter.toOffsetDateTime(
+                                LocalDateTime.now()
+                            ) else null
+                        )
+                    ).map { Work.fromDomainModel(it) }
+                }.await()
+
+            val oldVmState = readVMState()
+            val snackbarEvent: SnackbarEvent =
+                if (result.isSuccess) SnackbarSucceededUpdateWork(
+                    vmState.workId,
+                ) else FailedUpdateWork(
+                    vmState.workId,
+                )
+            val newBasicState = oldVmState.basicState
+                .toDoneAction()
+                .toAcceptSnackbarEvent(snackbarEvent)
+            // 実行結果を通知
+            updateVMState(
+                oldVmState.copy(
+                    // 強制アップデートは要求しない
+                    basicState = newBasicState,
+                    // ダイアログを非表示にする
+                    inConfirmWorkState = false,
+                    work = if (result.isSuccess) Optional.of(result.getOrThrow()) else oldVmState.work,
+                )
+            )
+
+            // 詳細画面上での出来事を想定しているので通知はスナックバーだけで充分
+            // しかし、一覧画面を更新してほしいのでEventBusで通知する
+            if (result.isSuccess) {
+                EventBus.postSnackbarEvent(snackbarEvent)
             }
         }
     }

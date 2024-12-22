@@ -9,9 +9,6 @@ import androidx.paging.compose.LazyPagingItems
 import com.ogata_k.mobile.winp.domain.use_case.work.FetchPageWorksAsyncUseCase
 import com.ogata_k.mobile.winp.presentation.enumerate.ScreenLoadingState
 import com.ogata_k.mobile.winp.presentation.event.EventBus
-import com.ogata_k.mobile.winp.presentation.event.snackbar.work.FailedCreateWork
-import com.ogata_k.mobile.winp.presentation.event.snackbar.work.FailedDeleteWork
-import com.ogata_k.mobile.winp.presentation.event.snackbar.work.FailedUpdateWork
 import com.ogata_k.mobile.winp.presentation.event.toast.work.NotFoundWork
 import com.ogata_k.mobile.winp.presentation.event.toast.work.SucceededCreateWork
 import com.ogata_k.mobile.winp.presentation.event.toast.work.SucceededDeleteWork
@@ -27,6 +24,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.time.LocalDate
+import com.ogata_k.mobile.winp.presentation.event.snackbar.work.SucceededUpdateWork as SnackbarSucceededUpdateWork
 
 @HiltViewModel(assistedFactory = WorkIndexVM.WorkIndexVMFactory::class)
 class WorkIndexVM @AssistedInject constructor(
@@ -111,27 +109,20 @@ class WorkIndexVM @AssistedInject constructor(
         screenLifecycle: LifecycleOwner,
         refreshListRequest: () -> Unit,
     ) {
+        // @todo workのリストを更新するためのイベントを専用に作ったほうが使いやすそうなので、専用イベントで更新リクエストを行うように変更する。
+
         EventBus.onEvent<SucceededCreateWork>(screenLifecycle) {
             refreshListRequest()
         }
-        EventBus.onEvent<FailedCreateWork>(screenLifecycle) {
-            refreshListRequest()
-        }
-
         EventBus.onEvent<SucceededUpdateWork>(screenLifecycle) {
             refreshListRequest()
         }
-        EventBus.onEvent<FailedUpdateWork>(screenLifecycle) {
+        EventBus.onEvent<SnackbarSucceededUpdateWork>(screenLifecycle) {
             refreshListRequest()
         }
-
         EventBus.onEvent<SucceededDeleteWork>(screenLifecycle) {
             refreshListRequest()
         }
-        EventBus.onEvent<FailedDeleteWork>(screenLifecycle) {
-            refreshListRequest()
-        }
-
         EventBus.onEvent<NotFoundWork>(screenLifecycle) {
             refreshListRequest()
         }

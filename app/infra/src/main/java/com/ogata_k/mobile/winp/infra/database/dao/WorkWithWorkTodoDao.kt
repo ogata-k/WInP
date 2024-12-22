@@ -111,6 +111,12 @@ interface WorkWithWorkTodoDao {
     suspend fun updateWork(work: Work)
 
     /**
+     * タスクのIDを指定して更新
+     */
+    @Query("UPDATE works SET completed_at = :completedAt WHERE work_id = :workId")
+    suspend fun updateWorkState(workId: Long, completedAt: OffsetDateTime?)
+
+    /**
      * タスクの対応項目を更新する
      */
     @Update(onConflict = OnConflictStrategy.REPLACE)
@@ -120,7 +126,7 @@ interface WorkWithWorkTodoDao {
      * 対応項目のIDを指定して更新
      */
     @Query("UPDATE work_todos SET completed_at = :completedAt WHERE work_todo_id = :workTodoId")
-    suspend fun updateTaskState(workTodoId: Long, completedAt: OffsetDateTime?)
+    suspend fun updateWorkTodoState(workTodoId: Long, completedAt: OffsetDateTime?)
 
     /**
      * タスクを削除する

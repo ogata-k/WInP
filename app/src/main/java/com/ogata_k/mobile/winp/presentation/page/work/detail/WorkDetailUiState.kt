@@ -27,6 +27,7 @@ data class WorkDetailUiState(
     val inShowMoreCommentAction: Boolean,
     val inConfirmDelete: Boolean,
     val inConfirmCopy: Boolean,
+    val inConfirmWorkState: Boolean,
     // Not nullで表示中
     val inConfirmWorkTodoState: Long?,
 ) : IUiState<ScreenLoadingState>

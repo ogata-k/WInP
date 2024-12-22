@@ -57,9 +57,15 @@ class IWorkDao(private val db: AppDatabase, private val dao: WorkWithWorkTodoDao
         }
     }
 
-    override suspend fun updateTaskState(workTodoId: Long, completedAt: OffsetDateTime?) {
+    override suspend fun updateWorkState(workId: Long, completedAt: OffsetDateTime?) {
         db.withTransaction {
-            dao.updateTaskState(workTodoId, completedAt)
+            dao.updateWorkState(workId, completedAt)
+        }
+    }
+
+    override suspend fun updateWorkTodoState(workTodoId: Long, completedAt: OffsetDateTime?) {
+        db.withTransaction {
+            dao.updateWorkTodoState(workTodoId, completedAt)
         }
     }
 

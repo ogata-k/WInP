@@ -55,6 +55,7 @@ import com.ogata_k.mobile.winp.presentation.enumerate.toErrorMessage
 import com.ogata_k.mobile.winp.presentation.event.EventAction
 import com.ogata_k.mobile.winp.presentation.event.snackbar.SnackbarEvent
 import com.ogata_k.mobile.winp.presentation.event.snackbar.work.DoneWork
+import com.ogata_k.mobile.winp.presentation.event.snackbar.work.SucceededUpdateWork
 import com.ogata_k.mobile.winp.presentation.event.snackbar.work_todo.SucceededUpdateWorkTodo
 import com.ogata_k.mobile.winp.presentation.model.work.Work
 import com.ogata_k.mobile.winp.presentation.model.work.WorkComment
@@ -148,6 +149,23 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                             viewModel.showCopyConfirmDialog(true)
                         },
                     )
+                    HorizontalDivider(modifier = Modifier.fillMaxWidth())
+                    DropdownMenuItem(
+                        text = {
+                            TitleMediumText(stringResource(R.string.update_work_complete_state))
+                        },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = AppIcons.copyIcon,
+                                contentDescription = stringResource(
+                                    R.string.update_work_complete_state
+                                ),
+                            )
+                        },
+                        onClick = {
+                            viewModel.showWorkStateConfirmDialog(true)
+                        },
+                    )
                 }
 
                 if (uiState.inConfirmDelete) {
@@ -190,6 +208,26 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                             // 削除はこの画面に戻ってくることがなかったがコピーの場合は戻ってくるので、ダイアログは閉じておく
                             viewModel.showCopyConfirmDialog(false)
                         },
+                        dismissOnBackPress = false,
+                        dismissOnClickOutside = false,
+                        confirmActionIsDanger = false,
+                        enabledButtons = basicScreenState.actionState.canLaunch(),
+                    )
+                }
+
+                if (uiState.inConfirmWorkState) {
+                    ConfirmAlertDialog(
+                        dialogTitle = stringResource(R.string.title_update_work_complete_state),
+                        dialogText = stringResource(R.string.dialog_content_confirm_update_work_complete_state),
+                        onDismissRequest = {
+                            viewModel.showWorkStateConfirmDialog(false)
+                        },
+                        confirmButtonAction = Pair(
+                            stringResource(R.string.update)
+                        ) {
+                            viewModel.updateWorkState()
+                        },
+                        // ほかのドロップダウンメニューで表示しているダイアログと同様に閉じられなくする
                         dismissOnBackPress = false,
                         dismissOnClickOutside = false,
                         confirmActionIsDanger = false,
@@ -512,12 +550,18 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                     val event: SnackbarEvent? = uiState.peekSnackbarEvent()
                     if (event != null) {
                         val text = event.toMessage()
+                        // @todo もう少し指定を簡単にしたい
                         LaunchedEffect(event) {
                             if (event.getKind().isSucceeded()) {
                                 if (event is DoneWork && event.workId == uiState.workId && event.getAction() == EventAction.DELETE) {
                                     // タスク削除
                                     navController.popBackStack()
                                 } else if (event is SucceededUpdateWorkTodo && event.workId == uiState.workId) {
+                                    // 対応項目更新
+                                    showSimpleSnackbar(snackbarHostState, text)
+
+                                    viewModel.consumeEvent()
+                                } else if (event is SucceededUpdateWork && event.workId == uiState.workId) {
                                     // 対応項目更新
                                     showSimpleSnackbar(snackbarHostState, text)
 

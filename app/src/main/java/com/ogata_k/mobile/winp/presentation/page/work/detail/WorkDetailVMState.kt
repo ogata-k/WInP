@@ -27,6 +27,7 @@ data class WorkDetailVMState(
     val inShowMoreCommentAction: Boolean,
     val inConfirmDelete: Boolean,
     val inConfirmCopy: Boolean,
+    val inConfirmWorkState: Boolean,
     // Not nullで表示中
     val inConfirmWorkTodoState: Long?,
 ) : IVMState<ScreenLoadingState, ScreenLoadingState, WorkDetailUiState> {
@@ -45,6 +46,7 @@ data class WorkDetailVMState(
             inShowMoreCommentAction = inShowMoreCommentAction,
             inConfirmDelete = inConfirmDelete,
             inConfirmCopy = inConfirmCopy,
+            inConfirmWorkState = inConfirmWorkState,
             inConfirmWorkTodoState = inConfirmWorkTodoState,
         )
     }

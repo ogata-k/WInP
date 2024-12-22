@@ -12,6 +12,7 @@ import com.ogata_k.mobile.winp.domain.use_case.work.GetSummaryAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.GetWorkAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.UpdateWorkAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.UpdateWorkCommentAsyncUseCase
+import com.ogata_k.mobile.winp.domain.use_case.work.UpdateWorkStateAsyncUseCase
 import com.ogata_k.mobile.winp.domain.use_case.work.UpdateWorkTodoStateAsyncUseCase
 import com.ogata_k.mobile.winp.presentation.use_case.work.ICreateWorkAsyncUseCase
 import com.ogata_k.mobile.winp.presentation.use_case.work.ICreateWorkCommentAsyncUseCase
@@ -22,6 +23,7 @@ import com.ogata_k.mobile.winp.presentation.use_case.work.IGetSummaryWorkAsyncUs
 import com.ogata_k.mobile.winp.presentation.use_case.work.IGetWorkAsyncUseCase
 import com.ogata_k.mobile.winp.presentation.use_case.work.IUpdateWorkAsyncUseCase
 import com.ogata_k.mobile.winp.presentation.use_case.work.IUpdateWorkCommentAsyncUseCase
+import com.ogata_k.mobile.winp.presentation.use_case.work.IUpdateWorkStateAsyncUseCase
 import com.ogata_k.mobile.winp.presentation.use_case.work.IUpdateWorkTodoStateAsyncUseCase
 import dagger.Module
 import dagger.Provides
@@ -64,6 +66,13 @@ object WorkUseCaseModule {
         workDao: WorkDao,
     ): UpdateWorkAsyncUseCase {
         return IUpdateWorkAsyncUseCase(workDao)
+    }
+
+    @Provides
+    fun provideUpdateWorkStateAsyncUseCase(
+        workDao: WorkDao,
+    ): UpdateWorkStateAsyncUseCase {
+        return IUpdateWorkStateAsyncUseCase(workDao)
     }
 
     @Provides
