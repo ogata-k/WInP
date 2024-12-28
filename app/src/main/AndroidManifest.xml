@@ -25,6 +25,14 @@
             </intent-filter>
         </activity>
 
+        <!-- ライセンスページはActionBarの指定が必要なので上書きしておく -->
+        <activity
+            android:name="com.google.android.gms.oss.licenses.OssLicensesActivity"
+            android:theme="@style/Theme.License" />
+        <activity
+            android:name="com.google.android.gms.oss.licenses.OssLicensesMenuActivity"
+            android:theme="@style/Theme.License" />
+
         <receiver
             android:name=".presentation.receiver.BootCompletedReceiver"
             android:exported="false">

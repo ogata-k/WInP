@@ -7,4 +7,5 @@ plugins {
     alias(libs.plugins.google.dagger.hilt.android) apply false
     alias(libs.plugins.androidx.room) apply false
     alias(libs.plugins.android.library) apply false
+    alias(libs.plugins.gms.oss.license.plugin) apply false
 }

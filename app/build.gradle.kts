@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.compose)
     alias(libs.plugins.google.ksp)
     alias(libs.plugins.google.dagger.hilt.android)
+    alias(libs.plugins.gms.oss.license.plugin)
 }
 
 android {
@@ -69,6 +70,8 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
+    // for google play service
+    implementation(libs.gms.play.services.oss.licenses)
 
     // For Local tests
     testImplementation(libs.junit)

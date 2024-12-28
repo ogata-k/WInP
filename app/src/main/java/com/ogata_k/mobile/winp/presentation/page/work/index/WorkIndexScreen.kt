@@ -1,5 +1,6 @@
 package com.ogata_k.mobile.winp.presentation.page.work.index
 
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -28,6 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -36,6 +38,7 @@ import androidx.navigation.NavController
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import com.ogata_k.mobile.winp.R
 import com.ogata_k.mobile.winp.common.constant.AsCreate
 import com.ogata_k.mobile.winp.common.formatter.buildFullDatePatternFormatter
@@ -58,6 +61,7 @@ import com.ogata_k.mobile.winp.presentation.widget.common.fromMillsToDate
 import com.ogata_k.mobile.winp.presentation.widget.work.WorkItem
 import java.time.LocalDate
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
@@ -69,6 +73,8 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
     WithScaffoldSmallTopAppBar(
         text = stringResource(id = R.string.app_name),
         actions = {
+            val mContext = LocalContext.current
+
             IconButton(onClick = { navController.navigate(WorkEditRouting(AsCreate.CREATING_ID).toPath()) }) {
                 Icon(
                     imageVector = AppIcons.addIcon,
@@ -117,6 +123,35 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
                     onClick = {
                         // 通知設定画面に遷移
                         navController.navigate(NotificationSettingRouting().toPath())
+                        // 遷移した先でも表示が少し残ってしまうのですぐ消えるように指定しておく
+                        viewModel.showMoreAction(false)
+                    },
+                )
+
+                HorizontalDivider(modifier = Modifier.fillMaxWidth())
+
+                val licensePageTitle: String = stringResource(R.string.list_of_license)
+                DropdownMenuItem(
+                    text = {
+                        TitleMediumText(stringResource(R.string.list_of_license))
+                    },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = AppIcons.licenseIcon,
+                            contentDescription = stringResource(
+                                R.string.list_of_license
+                            ),
+                        )
+                    },
+                    onClick = {
+                        // ライセンス画面に遷移
+                        val intent = Intent(
+                            mContext,
+                            OssLicensesMenuActivity::class.java
+                        )
+                        intent.putExtra("title", licensePageTitle)
+                        mContext.startActivity(intent)
+
                         // 遷移した先でも表示が少し残ってしまうのですぐ消えるように指定しておく
                         viewModel.showMoreAction(false)
                     },
@@ -217,7 +252,7 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
 private fun WorkIndexHeader(
     uiState: WorkIndexUiState,
     switchShowDatePickerForSearch: (toShow: Boolean) -> Unit,
-    updateAndHideDialogSearchQuery: (date: LocalDate) -> Unit
+    updateAndHideDialogSearchQuery: (date: LocalDate) -> Unit,
 ) {
     Row(
         modifier = Modifier
