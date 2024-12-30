@@ -209,7 +209,7 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
                         pagingItems = workPagingItems,
                         emptyBuilder = {
                             TitleMediumText(
-                                text = stringResource(R.string.no_exist_data),
+                                text = stringResource(R.string.not_exist_work),
                                 modifier = Modifier.padding(
                                     vertical = dimensionResource(id = R.dimen.padding_medium),
                                     horizontal = dimensionResource(id = R.dimen.padding_medium_large),
