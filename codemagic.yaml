@@ -1,0 +1,69 @@
+workflows:
+  staging-workflow:
+    name: Build Staging WInP App
+    max_build_duration: 120
+    instance_type: windows_x2
+    environment:
+      android_signing:
+        - keystore_reference
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: staging
+          include: true
+          source: true
+    scripts:
+      - name: Set Android SDK location
+        script: |
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/local.properties"
+      - name: Build Android App
+        script: |
+          ./gradlew bundleRelease assembleStagingRelease
+    artifacts:
+      - app/build/outputs/**/*.aab
+    publishing:
+      email:
+        recipients:
+          - ogtkzk712@gmail.com
+        notify:
+          success: true
+          failure: true
+  production-workflow:
+    name: Build Production WInP App
+    max_build_duration: 120
+    instance_type: windows_x2
+    environment:
+      android_signing:
+        - keystore_reference
+      groups:
+        - google_play
+      vars:
+        PACKAGE_NAME: "com.ogata_k.mobile.winp"
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: master
+          include: true
+          source: true
+    scripts:
+      - name: Set Android SDK location
+        script: |
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/local.properties"
+      - name: Build Android App
+        script: |
+          ./gradlew bundleRelease assembleProductRelease
+    artifacts:
+      - app/build/outputs/**/*.aab
+    publishing:
+      email:
+        recipients:
+          - ogtkzk712@gmail.com
+        notify:
+          success: true
+          failure: true
+      google_play:
+        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
+        track: internal
+        submit_as_draft: true
