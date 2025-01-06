@@ -1,3 +1,9 @@
+definitions:
+  scripts:
+    - &set_android_sdk_location
+      name: Set Android SDK location
+      script: |
+        echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/local.properties"
 workflows:
   development-workflow:
     name: Build Development WInP App
@@ -6,9 +12,7 @@ workflows:
     environment:
       java: 17
     scripts:
-      - name: Set Android SDK location
-        script: |
-          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/local.properties"
+      - *set_android_sdk_location
       - name: Build Android App
         script: |
           ./gradlew bundleRelease assembleDevelopDebug
@@ -37,9 +41,7 @@ workflows:
           include: true
           source: true
     scripts:
-      - name: Set Android SDK location
-        script: |
-          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/local.properties"
+      - *set_android_sdk_location
       - name: Build Android App
         script: |
           ./gradlew bundleRelease assembleStagingRelease
@@ -72,9 +74,7 @@ workflows:
           include: true
           source: true
     scripts:
-      - name: Set Android SDK location
-        script: |
-          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/local.properties"
+      - *set_android_sdk_location
       - name: Build Android App
         script: |
           ./gradlew bundleRelease assembleProductRelease
