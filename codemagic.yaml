@@ -83,7 +83,8 @@ workflows:
         notify:
           success: true
           failure: true
-      google_play:
-        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
-        track: internal
-        submit_as_draft: true
+      # TODO Google Playの設定を対応した後にコメントアウトを解除する
+      #google_play:
+      #  credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
+      #  track: internal
+      #  submit_as_draft: true
