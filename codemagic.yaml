@@ -40,6 +40,7 @@ workflows:
         - pattern: staging
           include: true
           source: true
+      cancel_previous_builds: true
     scripts:
       - *set_android_sdk_location
       - name: Build Android App
@@ -73,6 +74,7 @@ workflows:
         - pattern: master
           include: true
           source: true
+      cancel_previous_builds: true
     scripts:
       - *set_android_sdk_location
       - name: Build Android App
