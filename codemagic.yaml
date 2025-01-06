@@ -8,7 +8,7 @@ workflows:
   development-workflow:
     name: Build Development WInP App
     max_build_duration: 120
-    instance_type: windows_x2
+    instance_type: mac_mini_m2
     environment:
       java: 17
     scripts:
@@ -29,7 +29,7 @@ workflows:
   staging-workflow:
     name: Build Staging WInP App
     max_build_duration: 120
-    instance_type: windows_x2
+    instance_type: mac_mini_m2
     environment:
       java: 17
       android_signing:
@@ -60,7 +60,7 @@ workflows:
   production-workflow:
     name: Build Production WInP App
     max_build_duration: 120
-    instance_type: windows_x2
+    instance_type: mac_mini_m2
     environment:
       java: 17
       android_signing:
