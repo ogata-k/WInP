@@ -31,10 +31,13 @@ android {
     signingConfigs {
         create("release") {
             if (System.getenv("CI") == "true") { // CI=true is exported by Codemagic
-                storeFile = file(System.getenv("CM_KEYSTORE_PATH"))
-                storePassword = System.getenv("CM_KEYSTORE_PASSWORD")
-                keyAlias = System.getenv("CM_KEY_ALIAS")
-                keyPassword = System.getenv("CM_KEY_PASSWORD")
+                val storeFilePath = System.getenv("CM_KEYSTORE_PATH")
+                if (storeFilePath != null && storeFilePath != "") {
+                    storeFile = file(storeFilePath)
+                    storePassword = System.getenv("CM_KEYSTORE_PASSWORD")
+                    keyAlias = System.getenv("CM_KEY_ALIAS")
+                    keyPassword = System.getenv("CM_KEY_PASSWORD")
+                }
             } else {
                 val keystoreProperties = Properties()
                 val keystorePropertiesFile = rootProject.file("keystore.properties")
