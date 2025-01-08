@@ -4,6 +4,9 @@ definitions:
       name: Set Android SDK location
       script: |
         echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/local.properties"
+    - &chmod_gradlew
+      name: Make gradlew executable
+      run: chmod +x ./gradlew
 workflows:
   development-workflow:
     name: Build Development WInP App
@@ -13,6 +16,7 @@ workflows:
       java: 17
     scripts:
       - *set_android_sdk_location
+      - *chmod_gradlew
       - name: Build Android App
         script: |
           ./gradlew bundleRelease assembleDevelopDebug
@@ -43,6 +47,7 @@ workflows:
           source: true
       cancel_previous_builds: true
     scripts:
+      - *chmod_gradlew
       - *set_android_sdk_location
       - name: Build Android App
         script: |
@@ -78,6 +83,7 @@ workflows:
           source: true
       cancel_previous_builds: true
     scripts:
+      - *chmod_gradlew
       - *set_android_sdk_location
       - name: Build Android App
         script: |
