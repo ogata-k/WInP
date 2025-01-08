@@ -54,8 +54,8 @@ private fun BackHandlerSetter(enabled: Boolean = true, callback: () -> Unit) {
 @Composable
 fun WithLoading(
     button: @Composable (modifier: Modifier) -> Unit,
-    isLoading: Boolean = false,
     modifier: Modifier = Modifier,
+    isLoading: Boolean = false,
 ) {
     if (isLoading) {
         CircularProgressIndicator(modifier = modifier)

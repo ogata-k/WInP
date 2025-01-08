@@ -24,6 +24,10 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    lint {
+        baseline = file("lint-baseline.xml")
+    }
+
     signingConfigs {
         create("release") {
             if (System.getenv("CI") == "true") { // CI=true is exported by Codemagic
