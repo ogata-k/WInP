@@ -50,6 +50,9 @@ workflows:
     scripts:
       - *chmod_gradlew
       - *set_android_sdk_location
+      - name: Lint App
+        script: |
+          ./gradlew lintStagingRelease
       - name: Build Android App
         script: |
           ./gradlew bundleRelease assembleStagingRelease
@@ -86,6 +89,9 @@ workflows:
     scripts:
       - *chmod_gradlew
       - *set_android_sdk_location
+      - name: Lint App
+        script: |
+          ./gradlew lintProductRelease
       - name: Build Android App
         script: |
           ./gradlew bundleRelease assembleProductRelease
