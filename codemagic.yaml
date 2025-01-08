@@ -20,7 +20,7 @@ workflows:
       - *chmod_gradlew
       - name: Build Android App
         script: |
-          ./gradlew assembleDevelopDebug
+          ./gradlew app:assembleDevelopDebug
     artifacts:
       - app/build/outputs/**/*.aab
       - app/build/outputs/**/mapping.txt
@@ -52,10 +52,10 @@ workflows:
       - *set_android_sdk_location
       - name: Lint App
         script: |
-          ./gradlew lintStagingRelease
+          ./gradlew app:lintStagingRelease
       - name: Build Android App
         script: |
-          ./gradlew assembleStagingRelease
+          ./gradlew app:assembleStagingRelease
     artifacts:
       - app/build/outputs/**/*.aab
       - app/build/outputs/**/mapping.txt
@@ -91,10 +91,10 @@ workflows:
       - *set_android_sdk_location
       - name: Lint App
         script: |
-          ./gradlew lintProductRelease
+          ./gradlew app:lintProductRelease
       - name: Build Android App
         script: |
-          ./gradlew assembleProductRelease
+          ./gradlew app:assembleProductRelease
     artifacts:
       - app/build/outputs/**/*.aab
       - app/build/outputs/**/mapping.txt
