@@ -22,7 +22,7 @@ workflows:
         script: |
           ./gradlew app:assembleDevelopDebug
     artifacts:
-      - app/build/outputs/bundle/developDebug/*.aab
+      - app/build/outputs/bundle/developDebug/*
       - app/build/outputs/apk/develop/debug/*
     publishing:
       email:
@@ -57,8 +57,7 @@ workflows:
         script: |
           ./gradlew app:assembleStagingRelease
     artifacts:
-      - app/build/outputs/bundle/stagingRelease/*.aab
-      - app/build/outputs/bundle/stagingRelease/mapping.txt
+      - app/build/outputs/bundle/stagingRelease/*
       - app/build/outputs/apk/staging/release/*
     publishing:
       email:
@@ -97,8 +96,7 @@ workflows:
         script: |
           ./gradlew app:assembleProductRelease
     artifacts:
-      - app/build/outputs/bundle/productRelease/*.aab
-      - app/build/outputs/bundle/productRelease/mapping.txt
+      - app/build/outputs/bundle/productRelease/*
       - app/build/outputs/apk/product/release/*
     publishing:
       email:
