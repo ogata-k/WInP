@@ -24,7 +24,7 @@ workflows:
     artifacts:
       - app/build/outputs/bundle/developDebug/*
       - app/build/outputs/apk/develop/debug/*
-      - app/*
+      - app/build/*
     publishing:
       email:
         recipients:
