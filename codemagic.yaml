@@ -20,9 +20,9 @@ workflows:
       - *chmod_gradlew
       - name: Build Android App
         script: |
-          ./gradlew app:bundleDevelopDebug
+          ./gradlew app:assembleDevelopDebug
     artifacts:
-      - app/build/outputs/bundle/developDebug/*
+      - app/build/outputs/apk/develop/debug/*
     publishing:
       email:
         recipients:
