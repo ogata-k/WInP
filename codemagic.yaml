@@ -42,7 +42,8 @@ workflows:
       events:
         - push
       branch_patterns:
-        - pattern: staging*
+        - pattern: *
+        - pattern: staging
       cancel_previous_builds: true
     scripts:
       - *chmod_gradlew
@@ -78,7 +79,8 @@ workflows:
       events:
         - push
       branch_patterns:
-        - pattern: master*
+        - pattern: *
+        - pattern: master
       cancel_previous_builds: true
     scripts:
       - *chmod_gradlew
