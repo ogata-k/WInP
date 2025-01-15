@@ -37,7 +37,7 @@ workflows:
     environment:
       java: 17
       android_signing:
-        - keystore_reference
+        - winp_keystore
     triggering:
       events:
         - push
@@ -71,7 +71,7 @@ workflows:
     environment:
       java: 17
       android_signing:
-        - keystore_reference
+        - winp_keystore
       groups:
         - google_play
       vars:
