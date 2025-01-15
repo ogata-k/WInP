@@ -11,3 +11,6 @@
 local.properties
 codemagic.keystore
 keystore.properties
+gradle/wrapper
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
