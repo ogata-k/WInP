@@ -59,6 +59,7 @@ workflows:
     artifacts:
       - app/build/outputs/bundle/stagingRelease/*
       - app/build/outputs/mapping/stagingRelease/*
+      - app/build/intermediates/stripped_native_libs/stagingRelease/stripStagingReleaseDebugSymbols/out/lib
       - app/build/outputs/apk/staging/release/*
     publishing:
       email:
@@ -100,6 +101,7 @@ workflows:
     artifacts:
       - app/build/outputs/bundle/productRelease/*
       - app/build/outputs/mapping/productRelease/*
+      - app/build/intermediates/stripped_native_libs/productRelease/stripProductReleaseDebugSymbols/out/lib
       - app/build/outputs/apk/product/release/*
     publishing:
       email:
