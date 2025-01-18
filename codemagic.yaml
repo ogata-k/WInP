@@ -58,6 +58,7 @@ workflows:
           ./gradlew app:assembleStagingRelease
     artifacts:
       - app/build/outputs/bundle/stagingRelease/*
+      - app/build/outputs/mapping/stagingRelease/*
       - app/build/outputs/apk/staging/release/*
     publishing:
       email:
@@ -98,6 +99,7 @@ workflows:
           ./gradlew app:assembleProductRelease
     artifacts:
       - app/build/outputs/bundle/productRelease/*
+      - app/build/outputs/mapping/productRelease/*
       - app/build/outputs/apk/product/release/*
     publishing:
       email:
