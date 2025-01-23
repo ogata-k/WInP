@@ -94,11 +94,19 @@ workflows:
           ./gradlew app:lintProductRelease
       - name: Build Android App For aab
         script: |
-          ./gradlew bundleProductRelease
+          ./gradlew app:bundleProductRelease
+      - name: Zip Debug Symbols
+        script: |
+          zip debug-symbols.zip app/build/intermediates/stripped_native_libs/productRelease/stripProductReleaseDebugSymbols/out/lib/
+          echo Please upload debug-symbols.zip to uploaded app's native_debug_symbols.zip in play store
+      - name: Build Android App For apk
+        script: |
+          ./gradlew app:assembleProductRelease
     artifacts:
       - app/build/outputs/bundle/productRelease/*
       - app/build/outputs/mapping/productRelease/*
-      - app/build/intermediates/stripped_native_libs/productRelease/stripProductReleaseDebugSymbols/out/lib
+      - debug-symbols.zip
+      - app/build/outputs/apk/staging/release/*
     publishing:
       email:
         recipients:
