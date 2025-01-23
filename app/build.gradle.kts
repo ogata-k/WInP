@@ -10,6 +10,11 @@ plugins {
     alias(libs.plugins.gms.oss.license.plugin)
 }
 
+// get version code from the specified property argument `-PversionCode` during the build call
+fun getCDVersionCode(): Int {
+    return project.properties.getOrDefault("versionCode", "-1").toString().toInt()
+}
+
 android {
     namespace = "com.ogata_k.mobile.winp"
     compileSdk = 34
@@ -18,7 +23,7 @@ android {
         applicationId = "com.ogata_k.mobile.winp"
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
+        versionCode = getCDVersionCode()
         versionName = "0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
