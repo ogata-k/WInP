@@ -1,7 +1,7 @@
 package com.ogata_k.mobile.winp.presentation.page.work.detail
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -360,15 +360,12 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                                         modifier = Modifier
                                             // @todo 余白の取り方の問題でチケット状に成形した形に選択状態が反映されない。ほかの画面との兼ね合いもあるのでとりあえずこのままにしておく。
                                             .padding(dimensionResource(id = R.dimen.padding_medium))
-                                            .combinedClickable(
-                                                onLongClickLabel = stringResource(id = R.string.update_work_todo_complete_state),
-                                                onLongClick = {
-                                                    viewModel.showWorkTodoStateConfirmDialog(
-                                                        todoItem.workTodoId
-                                                    )
-                                                }
+                                            .clickable(
+                                                onClickLabel = stringResource(id = R.string.update_work_todo_complete_state),
                                             ) {
-                                                // none onClick action
+                                                viewModel.showWorkTodoStateConfirmDialog(
+                                                    todoItem.workTodoId
+                                                )
                                             },
                                     )
                                 }
