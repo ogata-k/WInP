@@ -15,7 +15,6 @@ workflows:
     instance_type: mac_mini_m2
     environment:
       java: 17
-      ndk: r27c
     scripts:
       - *set_android_sdk_location
       - *chmod_gradlew
@@ -37,7 +36,6 @@ workflows:
     instance_type: mac_mini_m2
     environment:
       java: 17
-      ndk: r27c
       android_signing:
         - winp_keystore
     triggering:
@@ -75,7 +73,6 @@ workflows:
     instance_type: mac_mini_m2
     environment:
       java: 17
-      ndk: r27c
       android_signing:
         - winp_keystore
       groups:
