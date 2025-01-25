@@ -1,12 +1,5 @@
 definitions:
   scripts:
-    - &pre_build_script
-      name: Pre-Build Script
-      script: |
-        echo "Installing NDK"
-        curl -o $FCI_BUILD_DIR/ndk.zip https://dl.google.com/android/repository/android-ndk-r27-darwin-x86_64.zip\?hl\=ja
-        unzip -o $FCI_BUILD_DIR/ndk.zip -d $FCI_BUILD_DIR
-        echo "ndk.dir=$FCI_BUILD_DIR/android-ndk-r21e" > "$FCI_BUILD_DIR/android/local.properties"
     - &set_android_sdk_location
       name: Set Android SDK location
       script: |
@@ -22,9 +15,8 @@ workflows:
     instance_type: mac_mini_m2
     environment:
       java: 17
-      # ndk: r27
+      ndk: r27c
     scripts:
-      - *pre_build_script
       - *set_android_sdk_location
       - *chmod_gradlew
       - name: Build Android App For apk
@@ -45,7 +37,7 @@ workflows:
     instance_type: mac_mini_m2
     environment:
       java: 17
-      # ndk: r27
+      ndk: r27c
       android_signing:
         - winp_keystore
     triggering:
@@ -55,7 +47,6 @@ workflows:
         - pattern: 'staging'
       cancel_previous_builds: true
     scripts:
-      - *pre_build_script
       - *chmod_gradlew
       - *set_android_sdk_location
       - name: Lint App
@@ -84,7 +75,7 @@ workflows:
     instance_type: mac_mini_m2
     environment:
       java: 17
-      # ndk: r27
+      ndk: r27c
       android_signing:
         - winp_keystore
       groups:
@@ -98,7 +89,6 @@ workflows:
         - pattern: 'master'
       cancel_previous_builds: true
     scripts:
-      - *pre_build_script
       - *chmod_gradlew
       - *set_android_sdk_location
       - name: Lint App
