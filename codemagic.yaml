@@ -95,10 +95,6 @@ workflows:
       - name: Build Android App For aab
         script: |
           ./gradlew app:bundleProductRelease
-      - name: Zip Debug Symbols
-        script: |
-          zip native_debug_symbols app/build/intermediates/merged_native_libs/productRelease/mergeProductReleaseNativeLibs/out/lib/*
-          echo Please upload native_debug_symbols.zip to uploaded app's native_debug_symbols.zip in play store
       - name: Build Android App For apk
         script: |
           ./gradlew app:assembleProductRelease
