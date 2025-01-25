@@ -28,6 +28,10 @@ android {
         baseline = file("lint-baseline.xml")
     }
 
+    packaging {
+        jniLibs.excludes.add("lib/armeabi/**")
+    }
+
     signingConfigs {
         create("release") {
             if (System.getenv("CI") == "true") { // CI=true is exported by Codemagic
