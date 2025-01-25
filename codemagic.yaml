@@ -20,7 +20,7 @@ workflows:
       - *chmod_gradlew
       - name: Build Android App For apk
         script: |
-          ./gradlew app:assembleDevelopDebug
+          ./gradlew app:assembleDevelopDebug --info
     artifacts:
       - app/build/outputs/apk/develop/debug/*
     publishing:
@@ -49,13 +49,13 @@ workflows:
       - *set_android_sdk_location
       - name: Lint App
         script: |
-          ./gradlew app:lintStagingRelease
+          ./gradlew app:lintStagingRelease --info
       - name: Build Android App For aab
         script: |
-          ./gradlew app:bundleStagingRelease
+          ./gradlew app:bundleStagingRelease --info
       - name: Build Android App For apk
         script: |
-          ./gradlew app:assembleStagingRelease
+          ./gradlew app:assembleStagingRelease --info
     artifacts:
       - app/build/outputs/bundle/stagingRelease/*
       - app/build/outputs/mapping/stagingRelease/*
@@ -90,13 +90,13 @@ workflows:
       - *set_android_sdk_location
       - name: Lint App
         script: |
-          ./gradlew app:lintProductRelease
+          ./gradlew app:lintProductRelease --info
       - name: Build Android App For aab
         script: |
-          ./gradlew app:bundleProductRelease
+          ./gradlew app:bundleProductRelease --info
       - name: Build Android App For apk
         script: |
-          ./gradlew app:assembleProductRelease
+          ./gradlew app:assembleProductRelease --info
     artifacts:
       - app/build/outputs/bundle/productRelease/*
       - app/build/outputs/mapping/productRelease/*
