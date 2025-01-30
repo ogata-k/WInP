@@ -8,6 +8,7 @@
     <!-- 一般共通のエラー -->
     <string name="error">&lt;予期せぬエラー&gt;</string>
     <string name="fail_fetch_error">取得に失敗しました</string>
+    <string name="fail_open_page">表示できませんでした</string>
 
     <!-- 一般共通 -->
     <string name="work">タスク</string>
@@ -194,5 +195,6 @@
     <string name="list_of_expired_completed_work">期限切れ対応済みタスク　一覧</string>
     <string name="list_of_posted_work_comment">コメント　一覧</string>
     <string name="setting_notification">通知設定</string>
+    <string name="list_of_privacy_policy">プライバシー ポリシー</string>
     <string name="list_of_license">ライセンス</string>
 </resources>

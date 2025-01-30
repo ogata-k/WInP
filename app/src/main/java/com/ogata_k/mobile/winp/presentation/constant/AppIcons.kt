@@ -4,6 +4,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.LibraryBooks
 import androidx.compose.material.icons.automirrored.filled.ListAlt
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -77,6 +78,9 @@ class AppIcons {
 
         val notificationIcon: ImageVector
             get() = Icons.Filled.Notifications
+
+        val privacyPolicyIcon: ImageVector
+            get() = Icons.AutoMirrored.Filled.OpenInNew
 
         val licenseIcon: ImageVector
             get() = Icons.AutoMirrored.Filled.ListAlt

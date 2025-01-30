@@ -1,6 +1,8 @@
 package com.ogata_k.mobile.winp.presentation.page.work.index
 
+import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -27,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -59,12 +62,16 @@ import com.ogata_k.mobile.winp.presentation.widget.common.WithScaffoldSmallTopAp
 import com.ogata_k.mobile.winp.presentation.widget.common.fromDateToMills
 import com.ogata_k.mobile.winp.presentation.widget.common.fromMillsToDate
 import com.ogata_k.mobile.winp.presentation.widget.work.WorkItem
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+
     val uiState: WorkIndexUiState by viewModel.uiStateFlow.collectAsStateWithLifecycle()
 
     // collect fLow and remember state and launch event
@@ -130,6 +137,40 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
 
                 HorizontalDivider(modifier = Modifier.fillMaxWidth())
 
+                val privacyPolicyErrorMessage: String = stringResource(R.string.fail_open_page)
+                DropdownMenuItem(
+                    text = {
+                        TitleMediumText(stringResource(R.string.list_of_privacy_policy))
+                    },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = AppIcons.privacyPolicyIcon,
+                            contentDescription = stringResource(
+                                R.string.list_of_privacy_policy
+                            ),
+                        )
+                    },
+                    onClick = {
+                        try {
+                            // プライバシーポリシーを外部ブラウザで表示
+                            val privacyPolicyUrl =
+                                "https://doc-hosting.flycricket.io/winp-privacy-policy/0742c828-021f-4fdf-a406-8b2d37823ade/privacy"
+                            val intent = Intent(Intent.ACTION_VIEW)
+                            intent.setData(Uri.parse(privacyPolicyUrl))
+                            mContext.startActivity(intent)
+                        } catch (e: ActivityNotFoundException) {
+                            scope.launch {
+                                showSimpleSnackbar(snackbarHostState, privacyPolicyErrorMessage)
+                            }
+                        }
+
+                        // 遷移した先でも表示が少し残ってしまうのですぐ消えるように指定しておく
+                        viewModel.showMoreAction(false)
+                    },
+                )
+
+                HorizontalDivider(modifier = Modifier.fillMaxWidth())
+
                 val licensePageTitle: String = stringResource(R.string.list_of_license)
                 DropdownMenuItem(
                     text = {
@@ -159,8 +200,6 @@ fun WorkIndexScreen(navController: NavController, viewModel: WorkIndexVM) {
             }
         }
     ) { modifier, appBar ->
-        val snackbarHostState = remember { SnackbarHostState() }
-
         val pullToRefreshState = rememberPullToRefreshState()
 
         // Eventを監視
