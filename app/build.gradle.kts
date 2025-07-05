@@ -12,12 +12,12 @@ plugins {
 
 android {
     namespace = "com.ogata_k.mobile.winp"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.ogata_k.mobile.winp"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 4
         versionName = "1.0"
 
