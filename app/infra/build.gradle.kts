@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.ogata_k.mobile.winp.infra"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 26
