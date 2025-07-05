@@ -156,7 +156,7 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                         },
                         leadingIcon = {
                             Icon(
-                                imageVector = AppIcons.copyIcon,
+                                imageVector = AppIcons.editIcon,
                                 contentDescription = stringResource(
                                     R.string.update_work_complete_state
                                 ),
@@ -426,7 +426,7 @@ fun WorkDetailScreen(navController: NavController, viewModel: WorkDetailVM) {
                                                     },
                                                     leadingIcon = {
                                                         Icon(
-                                                            imageVector = AppIcons.editIcon,
+                                                            imageVector = AppIcons.editNoteIcon,
                                                             contentDescription = stringResource(
                                                                 R.string.modify_latest_work_comment
                                                             ),
