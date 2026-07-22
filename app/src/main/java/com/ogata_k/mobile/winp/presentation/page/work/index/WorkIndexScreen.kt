@@ -41,7 +41,7 @@ import androidx.navigation.NavController
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
+import com.google.android.gms.oss.licenses.v2.OssLicensesMenuActivity
 import com.ogata_k.mobile.winp.R
 import com.ogata_k.mobile.winp.common.constant.AsCreate
 import com.ogata_k.mobile.winp.common.formatter.buildFullDatePatternFormatter
@@ -64,7 +64,6 @@ import com.ogata_k.mobile.winp.presentation.widget.common.fromMillsToDate
 import com.ogata_k.mobile.winp.presentation.widget.work.WorkItem
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
