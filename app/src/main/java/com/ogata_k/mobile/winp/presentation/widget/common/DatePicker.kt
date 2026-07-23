@@ -15,6 +15,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
@@ -90,7 +91,7 @@ fun DialogOfRangeDatePicker(
                 val selectedStartDateMillis = state.selectedStartDateMillis
                 val selectedEndDateMillis = state.selectedEndDateMillis
 
-                val defaultLocale = CalendarLocale.getDefault()
+                val defaultLocale = LocalLocale.current.platformLocale
                 val formatterStartDate =
                     rangeDatePickerFormatter.formatDate(
                         dateMillis = selectedStartDateMillis,
